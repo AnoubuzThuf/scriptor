@@ -37,7 +37,7 @@ class Spell(val subject: Subject, vararg val spells: PartialSpell) {
     for (spell in spells) {
       var caster = originalCaster
       var targets = originalTargets
-      var deduplicatedDescriptors = spell.deduplicatedDescriptors()
+      val deduplicatedDescriptors = spell.deduplicatedDescriptors()
       for (descriptor in deduplicatedDescriptors) {
         if (descriptor is TargetDescriptor) targets = descriptor.modifyTargets(targets, caster)
         if (descriptor is MultiTargetFocusDescriptor) targets = descriptor.modifyTargetsFocus(targets, caster)

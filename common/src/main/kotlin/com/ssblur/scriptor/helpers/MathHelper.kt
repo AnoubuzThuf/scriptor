@@ -5,7 +5,6 @@ import net.minecraft.core.Direction
 import net.minecraft.world.phys.Vec2
 import net.minecraft.world.phys.Vec3
 import kotlin.math.PI
-import kotlin.math.abs
 import kotlin.math.sin
 import kotlin.math.cos
 import kotlin.math.ceil
