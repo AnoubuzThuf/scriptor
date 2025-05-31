@@ -19,7 +19,7 @@ object Actions {
   val INFLAME = register("inflame", InflameAction())
   val LIGHT = register("light", LightAction())
   val FREEZE = register("freeze", FreezeAction())
-  val ARCANE_BURN = register("arcane_burn", ArcaneBurnAction())
+  val ARCANE_POISON = register("arcane_poison", ArcanePoisonAction())
   val HEAL = register("heal", HealAction())
   val SMITE = register("smite", SmiteAction())
   val EXPLOSION = register("explosion", ExplosionAction())

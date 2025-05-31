@@ -1,0 +1,26 @@
+{
+  "name": "tome.scriptor.arcane_poison",
+  "author": "AnoubuzThuf",
+  "tier": 4,
+  "item": "scriptor:spellbook_purple",
+  "spell": {
+    "subject": "projectile",
+    "spells": [
+      {
+        "action": "poison",
+        "descriptors": []
+      },
+      {
+        "action": "slow",
+        "descriptors": []
+      },
+      {
+        "action": "arcane_poison",
+        "descriptors": [
+          "strong",
+          "long"
+        ]
+      }
+    ]
+  }
+}

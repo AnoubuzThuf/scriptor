@@ -4,7 +4,7 @@ import net.minecraft.world.effect.MobEffect
 import net.minecraft.world.effect.MobEffectCategory
 import net.minecraft.world.entity.LivingEntity
 
-open class ArcaneBurnStatusEffect: MobEffect {
+open class ArcanePoisonStatusEffect: MobEffect {
     constructor(): super(MobEffectCategory.HARMFUL, 8954814)
 
     constructor(mobEffectCategory: MobEffectCategory, i: Int): super(mobEffectCategory, i)

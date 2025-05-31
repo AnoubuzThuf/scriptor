@@ -3,7 +3,7 @@ package com.ssblur.scriptor.word.action
 import com.ssblur.scriptor.api.word.Action
 import com.ssblur.scriptor.api.word.Descriptor
 import com.ssblur.scriptor.api.word.Word
-import com.ssblur.scriptor.effect.ScriptorEffects.ARCANE_BURN
+import com.ssblur.scriptor.effect.ScriptorEffects.ARCANE_POISON
 import com.ssblur.scriptor.effect.ScriptorEffects.FREEZE
 import com.ssblur.scriptor.helpers.targetable.EntityTargetable
 import com.ssblur.scriptor.helpers.targetable.Targetable
@@ -27,7 +27,7 @@ import kotlin.math.min
  * Each status effect can only contribute once, with diminishing returns. Scales better with more, weaker effects than
  * using a single strong effect.
  */
-class ArcaneBurnAction: Action() {
+class ArcanePoisonAction: Action() {
     override fun apply(caster: Targetable, targetable: Targetable, descriptors: Array<Descriptor>, words: Array<Word?>) {
         // Damage/10 ticks = strength * 0.5
         var strength: Double = 1.0
@@ -91,7 +91,7 @@ class ArcaneBurnAction: Action() {
 
         if (targetable is EntityTargetable && targetable.targetEntity is LivingEntity) (targetable.targetEntity as LivingEntity).addEffect(
             MobEffectInstance(
-                ARCANE_BURN, Math.round(duration).toInt(), floor(strength).toInt()
+                ARCANE_POISON, Math.round(duration).toInt(), floor(strength).toInt()
             )
         )
     }

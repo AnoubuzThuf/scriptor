@@ -1,0 +1,15 @@
+{
+  "name": "tome.scriptor.cool_off",
+  "author": "AnoubuzThuf",
+  "tier": 1,
+  "item": "scriptor:spellbook_white",
+  "spell": {
+    "subject": "self",
+    "spells": [
+      {
+        "action": "freeze",
+        "descriptors": []
+      }
+    ]
+  }
+}
