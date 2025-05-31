@@ -19,11 +19,13 @@ class FreezeAction: PotionAction(FREEZE.ref(), 30.0, 1.0 / 3.0, Cost(4.0, COSTTY
   ) {
 
     val level = targetable!!.level
-    val pos = targetable.offsetBlockPos
+//    Prioritise freezing liquids
+    val pos = targetable.targetBlockPos
 
     val state = targetable.level.getBlockState(pos)
-
     val block = state.block
+    if (block.defaultDestroyTime() < 0) return
+
     if(block is LiquidBlock) {
       when (state.fluidState.getType()) {
         Fluids.WATER -> level.setBlockAndUpdate(pos, Blocks.ICE.defaultBlockState())
@@ -31,11 +33,22 @@ class FreezeAction: PotionAction(FREEZE.ref(), 30.0, 1.0 / 3.0, Cost(4.0, COSTTY
         Fluids.LAVA -> level.setBlockAndUpdate(pos, Blocks.OBSIDIAN.defaultBlockState())
         Fluids.FLOWING_LAVA -> level.setBlockAndUpdate(pos, Blocks.COBBLESTONE.defaultBlockState())
       }
+      return
     }
 
     if (!level.getBlockState(pos).canBeReplaced()) return
 
-    level.setBlock(pos, Blocks.POWDER_SNOW.defaultBlockState(), 11)
+    val blockEntity = level.getBlockEntity(pos)
+    level.setBlock(
+      pos,
+      Blocks.POWDER_SNOW.defaultBlockState(),
+      2
+    )
+    if (blockEntity != null) {
+      level.removeBlockEntity(pos)
+      level.setBlockEntity(blockEntity)
+    }
+
     level.playSound(
       null,
       pos,
