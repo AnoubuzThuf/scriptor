@@ -40,7 +40,7 @@ class Spell(val subject: Subject, vararg val spells: PartialSpell) {
         if (descriptor is FocusDescriptor) caster = descriptor.modifyFocus(caster)
       }
       for (target in targets)
-        spell.action.apply(caster, target, spell.deduplicatedDescriptors())
+        spell.action.apply(caster, target, spell.deduplicatedDescriptors(), words())
     }
   }
 

@@ -1,6 +1,7 @@
 package com.ssblur.scriptor.word.action
 
 import com.ssblur.scriptor.api.word.Action
+import com.ssblur.scriptor.api.word.Word
 import com.ssblur.scriptor.api.word.Descriptor
 import com.ssblur.scriptor.helpers.ItemTargetableHelper
 import com.ssblur.scriptor.helpers.targetable.EntityTargetable
@@ -17,7 +18,7 @@ import net.minecraft.world.item.crafting.SingleRecipeInput
 import net.minecraft.world.level.block.BaseFireBlock
 
 class InflameAction: Action() {
-  override fun apply(caster: Targetable, targetable: Targetable, descriptors: Array<Descriptor>) {
+  override fun apply(caster: Targetable, targetable: Targetable, descriptors: Array<Descriptor>, words: Array<Word?>) {
     var seconds = 2.0
     for (d in descriptors) {
       if (d is DurationDescriptor) seconds += d.durationModifier()

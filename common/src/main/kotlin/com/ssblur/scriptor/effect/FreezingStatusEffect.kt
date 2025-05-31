@@ -4,7 +4,7 @@ import net.minecraft.world.effect.MobEffect
 import net.minecraft.world.effect.MobEffectCategory
 import net.minecraft.world.entity.LivingEntity
 
-open class FreezingEffect: MobEffect {
+open class FreezingStatusEffect: MobEffect {
     constructor(): super(MobEffectCategory.HARMFUL, 8954814)
 
     constructor(mobEffectCategory: MobEffectCategory, i: Int): super(mobEffectCategory, i)
@@ -15,7 +15,7 @@ open class FreezingEffect: MobEffect {
     }
 
     override fun shouldApplyEffectTickThisTick(i: Int, j: Int): Boolean {
-        val k = 40 shr j
+        val k = 80 shr j
         return if (k > 0) (i % k == 0) else true
     }
 }

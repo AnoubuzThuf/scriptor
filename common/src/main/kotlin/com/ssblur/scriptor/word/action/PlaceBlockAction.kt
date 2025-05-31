@@ -1,6 +1,7 @@
 package com.ssblur.scriptor.word.action
 
 import com.ssblur.scriptor.api.word.Action
+import com.ssblur.scriptor.api.word.Word
 import com.ssblur.scriptor.api.word.Descriptor
 import com.ssblur.scriptor.color.CustomColors.getColor
 import com.ssblur.scriptor.helpers.ItemTargetableHelper
@@ -16,7 +17,7 @@ import net.minecraft.world.phys.BlockHitResult
 class PlaceBlockAction: Action() {
   override fun cost() = Cost(1.5, COSTTYPE.ADDITIVE)
 
-  override fun apply(caster: Targetable, targetable: Targetable, descriptors: Array<Descriptor>) {
+  override fun apply(caster: Targetable, targetable: Targetable, descriptors: Array<Descriptor>, words: Array<Word?>) {
     val color = getColor(descriptors)
     val pos = targetable.targetBlockPos
     val level = targetable.level

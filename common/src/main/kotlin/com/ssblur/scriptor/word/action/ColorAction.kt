@@ -1,6 +1,7 @@
 package com.ssblur.scriptor.word.action
 
 import com.ssblur.scriptor.api.word.Action
+import com.ssblur.scriptor.api.word.Word
 import com.ssblur.scriptor.api.word.Descriptor
 import com.ssblur.scriptor.color.CustomColors.getColor
 import com.ssblur.scriptor.color.interfaces.Colorable
@@ -14,7 +15,7 @@ import com.ssblur.scriptor.registry.colorable.ColorableBlockRegistry.has
 import net.minecraft.world.item.ItemStack
 
 class ColorAction: Action() {
-  override fun apply(caster: Targetable, targetable: Targetable, descriptors: Array<Descriptor>) {
+  override fun apply(caster: Targetable, targetable: Targetable, descriptors: Array<Descriptor>, words: Array<Word?>) {
     val color = getColor(descriptors)
     if (targetable is EntityTargetable) {
       if (targetable.targetEntity is Colorable) {

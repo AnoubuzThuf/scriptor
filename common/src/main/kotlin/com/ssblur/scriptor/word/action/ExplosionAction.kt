@@ -1,6 +1,7 @@
 package com.ssblur.scriptor.word.action
 
 import com.ssblur.scriptor.api.word.Action
+import com.ssblur.scriptor.api.word.Word
 import com.ssblur.scriptor.api.word.Descriptor
 import com.ssblur.scriptor.helpers.targetable.EntityTargetable
 import com.ssblur.scriptor.helpers.targetable.Targetable
@@ -22,7 +23,7 @@ class ExplosionAction: Action() {
     }
   }
 
-  override fun apply(caster: Targetable, targetable: Targetable, descriptors: Array<Descriptor>) {
+  override fun apply(caster: Targetable, targetable: Targetable, descriptors: Array<Descriptor>, words: Array<Word?>) {
     if (targetable.level.isClientSide) return
     var strength = 2.0
     for (d in descriptors) {

@@ -1,6 +1,7 @@
 package com.ssblur.scriptor.word.action.potions
 
 import com.ssblur.scriptor.api.word.Action
+import com.ssblur.scriptor.api.word.Word
 import com.ssblur.scriptor.api.word.Descriptor
 import com.ssblur.scriptor.helpers.targetable.EntityTargetable
 import com.ssblur.scriptor.helpers.targetable.Targetable
@@ -19,7 +20,7 @@ open class PotionAction(
   var strengthScale: Double,
   var cost: Cost
 ): Action() {
-  override fun apply(caster: Targetable, targetable: Targetable, descriptors: Array<Descriptor>) {
+  override fun apply(caster: Targetable, targetable: Targetable, descriptors: Array<Descriptor>, words: Array<Word?>) {
     var strength = 0.0
     var duration = 2.0
     for (d in descriptors) {

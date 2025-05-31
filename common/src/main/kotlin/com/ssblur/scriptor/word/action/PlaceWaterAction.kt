@@ -1,6 +1,7 @@
 package com.ssblur.scriptor.word.action
 
 import com.ssblur.scriptor.api.word.Action
+import com.ssblur.scriptor.api.word.Word
 import com.ssblur.scriptor.api.word.Descriptor
 import com.ssblur.scriptor.helpers.targetable.Targetable
 import net.minecraft.world.level.block.Blocks
@@ -8,7 +9,7 @@ import net.minecraft.world.level.block.Blocks
 class PlaceWaterAction: Action() {
   override fun cost() = Cost(1.5, COSTTYPE.ADDITIVE)
 
-  override fun apply(caster: Targetable, targetable: Targetable, descriptors: Array<Descriptor>) {
+  override fun apply(caster: Targetable, targetable: Targetable, descriptors: Array<Descriptor>, words: Array<Word?>) {
     val pos = targetable.targetBlockPos
     val level = targetable.level
 

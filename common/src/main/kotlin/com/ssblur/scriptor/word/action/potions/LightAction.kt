@@ -1,6 +1,7 @@
 package com.ssblur.scriptor.word.action.potions
 
 import com.ssblur.scriptor.api.word.Action
+import com.ssblur.scriptor.api.word.Word
 import com.ssblur.scriptor.api.word.Descriptor
 import com.ssblur.scriptor.block.ScriptorBlocks
 import com.ssblur.scriptor.blockentity.LightBlockEntity
@@ -15,7 +16,7 @@ import net.minecraft.world.effect.MobEffects
 import net.minecraft.world.entity.LivingEntity
 
 class LightAction: Action() {
-  override fun apply(caster: Targetable, targetable: Targetable, descriptors: Array<Descriptor>) {
+  override fun apply(caster: Targetable, targetable: Targetable, descriptors: Array<Descriptor>, words: Array<Word?>) {
     var seconds = 6
     for (d in descriptors) {
       if (d is DurationDescriptor) seconds = (seconds + 3 * d.durationModifier()).toInt()

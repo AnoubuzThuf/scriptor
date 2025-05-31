@@ -5,6 +5,7 @@ import com.ssblur.scriptor.registry.words.WordRegistry.register
 import com.ssblur.scriptor.word.action.*
 import com.ssblur.scriptor.word.action.bound.BoundSwordAction
 import com.ssblur.scriptor.word.action.bound.BoundToolAction
+import com.ssblur.scriptor.word.action.potions.FreezeAction
 import com.ssblur.scriptor.word.action.potions.LightAction
 import com.ssblur.scriptor.word.action.teleport.BringAction
 import com.ssblur.scriptor.word.action.teleport.GotoAction
@@ -17,6 +18,8 @@ import net.minecraft.tags.TagKey
 object Actions {
   val INFLAME = register("inflame", InflameAction())
   val LIGHT = register("light", LightAction())
+  val FREEZE = register("freeze", FreezeAction())
+  val ARCANE_BURN = register("arcane_burn", ArcaneBurnAction())
   val HEAL = register("heal", HealAction())
   val SMITE = register("smite", SmiteAction())
   val EXPLOSION = register("explosion", ExplosionAction())

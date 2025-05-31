@@ -1,6 +1,7 @@
 package com.ssblur.scriptor.word.action.bound
 
 import com.ssblur.scriptor.api.word.Action
+import com.ssblur.scriptor.api.word.Word
 import com.ssblur.scriptor.api.word.Descriptor
 import com.ssblur.scriptor.color.CustomColors.getColor
 import com.ssblur.scriptor.data.components.ScriptorDataComponents
@@ -21,7 +22,7 @@ import java.util.function.Supplier
 import kotlin.math.floor
 
 class BoundToolAction(var item: Supplier<Item>, var tags: List<TagKey<Block>>): Action() {
-  override fun apply(caster: Targetable, targetable: Targetable, descriptors: Array<Descriptor>) {
+  override fun apply(caster: Targetable, targetable: Targetable, descriptors: Array<Descriptor>, words: Array<Word?>) {
     var strength = 6f
     var duration = 4.0
     for (d in descriptors) {

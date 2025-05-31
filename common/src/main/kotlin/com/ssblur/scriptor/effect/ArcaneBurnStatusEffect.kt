@@ -4,13 +4,13 @@ import net.minecraft.world.effect.MobEffect
 import net.minecraft.world.effect.MobEffectCategory
 import net.minecraft.world.entity.LivingEntity
 
-open class ArcaneFlameStatusEffect: MobEffect {
+open class ArcaneBurnStatusEffect: MobEffect {
     constructor(): super(MobEffectCategory.HARMFUL, 8954814)
 
     constructor(mobEffectCategory: MobEffectCategory, i: Int): super(mobEffectCategory, i)
 
     override fun applyEffectTick(entity: LivingEntity, amplifier: Int): Boolean {
-        entity.hurt(entity.damageSources().magic(), 0.1F * amplifier);
+        entity.hurt(entity.damageSources().magic(), 0.5F * amplifier);
         return true
     }
 

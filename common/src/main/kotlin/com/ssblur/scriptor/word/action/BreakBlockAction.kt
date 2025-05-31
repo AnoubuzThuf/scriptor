@@ -1,6 +1,7 @@
 package com.ssblur.scriptor.word.action
 
 import com.ssblur.scriptor.api.word.Action
+import com.ssblur.scriptor.api.word.Word
 import com.ssblur.scriptor.api.word.Descriptor
 import com.ssblur.scriptor.helpers.ItemTargetableHelper
 import com.ssblur.scriptor.helpers.targetable.EntityTargetable
@@ -12,7 +13,7 @@ import net.minecraft.world.item.Items
 import java.util.stream.Collectors
 
 class BreakBlockAction: Action() {
-  override fun apply(caster: Targetable, targetable: Targetable, descriptors: Array<Descriptor>) {
+  override fun apply(caster: Targetable, targetable: Targetable, descriptors: Array<Descriptor>, words: Array<Word?>) {
     if (targetable.level.isClientSide) return
     var strength = 1.0
     for (d in descriptors) {

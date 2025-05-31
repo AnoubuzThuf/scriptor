@@ -14,6 +14,7 @@ object ScriptorEffects {
   val PHASING: RegistrySupplier<MobEffect> = registerEffect("phasing") { PhasingStatusEffect() }
   val WILD_PHASING: RegistrySupplier<MobEffect> = registerEffect("wild_phasing") { WildPhasingStatusEffect() }
   val SILVER_TONGUE: RegistrySupplier<MobEffect> = registerEffect("silver_tongue") { EmpoweredStatusEffect(0.8f) }
-
+  val FREEZE: RegistrySupplier<MobEffect> = registerEffect("freeze") { FreezingStatusEffect() }
+  val ARCANE_BURN: RegistrySupplier<MobEffect> = registerEffect("arcane_burn") { ArcaneBurnStatusEffect() }
   fun register() {}
 }

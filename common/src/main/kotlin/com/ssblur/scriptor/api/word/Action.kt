@@ -10,5 +10,5 @@ abstract class Action: Word() {
    * @param targetable A Targetable which describes the target of this spell (position, entity, item, etc.)
    * @param descriptors A list of all Descriptors which this spell contains
    */
-  abstract fun apply(caster: Targetable, targetable: Targetable, descriptors: Array<Descriptor>)
+  abstract fun apply(caster: Targetable, targetable: Targetable, descriptors: Array<Descriptor>, words: Array<Word?>)
 }

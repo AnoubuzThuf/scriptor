@@ -2,6 +2,7 @@ package com.ssblur.scriptor.word.action.bound
 
 import com.ssblur.scriptor.ScriptorMod
 import com.ssblur.scriptor.api.word.Action
+import com.ssblur.scriptor.api.word.Word
 import com.ssblur.scriptor.api.word.Descriptor
 import com.ssblur.scriptor.color.CustomColors.getColor
 import com.ssblur.scriptor.data.components.ScriptorDataComponents
@@ -20,7 +21,7 @@ import net.minecraft.world.item.component.ItemAttributeModifiers
 import kotlin.math.floor
 
 class BoundSwordAction: Action() {
-  override fun apply(caster: Targetable, targetable: Targetable, descriptors: Array<Descriptor>) {
+  override fun apply(caster: Targetable, targetable: Targetable, descriptors: Array<Descriptor>, words: Array<Word?>) {
     var strength = 5.0
     var duration = 4.0
     for (d in descriptors) {

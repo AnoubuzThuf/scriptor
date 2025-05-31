@@ -1,10 +1,11 @@
 package com.ssblur.scriptor.word.action.teleport
 
 import com.ssblur.scriptor.api.word.Descriptor
+import com.ssblur.scriptor.api.word.Word
 import com.ssblur.scriptor.helpers.targetable.Targetable
 
 class BringAction: SwapAction() {
-  override fun apply(caster: Targetable, targetable: Targetable, descriptors: Array<Descriptor>) {
+  override fun apply(caster: Targetable, targetable: Targetable, descriptors: Array<Descriptor>, words: Array<Word?>) {
     if (targetable.level.isClientSide) return
 
     teleport(targetable, caster)

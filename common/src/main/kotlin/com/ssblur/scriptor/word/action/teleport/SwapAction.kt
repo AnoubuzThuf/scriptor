@@ -2,6 +2,7 @@ package com.ssblur.scriptor.word.action.teleport
 
 import com.ssblur.scriptor.api.word.Action
 import com.ssblur.scriptor.api.word.Descriptor
+import com.ssblur.scriptor.api.word.Word
 import com.ssblur.scriptor.helpers.targetable.EntityTargetable
 import com.ssblur.scriptor.helpers.targetable.InventoryTargetable
 import com.ssblur.scriptor.helpers.targetable.ItemTargetable
@@ -18,7 +19,7 @@ import net.minecraft.world.level.ChunkPos
 import net.minecraft.world.level.Level
 
 open class SwapAction: Action() {
-  override fun apply(caster: Targetable, targetable: Targetable, descriptors: Array<Descriptor>) {
+  override fun apply(caster: Targetable, targetable: Targetable, descriptors: Array<Descriptor>, words: Array<Word?>) {
     if (targetable.level.isClientSide) return
 
     teleport(caster, targetable)
