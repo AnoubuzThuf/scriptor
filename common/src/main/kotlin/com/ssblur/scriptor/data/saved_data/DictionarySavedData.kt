@@ -182,6 +182,11 @@ class DictionarySavedData: SavedData {
       LOGGER.warn("No text provided to parser!")
       return null
     }
+    //  This fixes an issue with word ordering where a Descriptor immediately follows And - the position isn't incremented
+    // so another And is expected. Permitting the Descriptor in the And-check section avoids this bug, but allows
+    // the word ordering to be broken. e.g. Action Subject And Descriptor Action Descriptor
+    var expectingAnd: Boolean = false
+
     var position = 0
     var tokenPosition = 0
     try {
@@ -192,26 +197,35 @@ class DictionarySavedData: SavedData {
 
       var action: Action? = null
       val descriptors: MutableList<Descriptor> = ArrayList()
-
       var parsed: String?
       while (tokenPosition < tokens.size) {
-        if (position % spellStructure.size == 0 && position > 0) {
+        if (expectingAnd) {
+          expectingAnd = false
           parsed = parseWord(tokens[tokenPosition])
           if (parsed != null && parsed == "other:and") {
             tokenPosition++
             spells.add(PartialSpell(action!!, *descriptors.toTypedArray()))
+//            Reset action to ensure this sentence is invalid (otherwise action is repeated)
+//            descriptor action subject and descriptor
+            action = null
 //          Reset descriptors list to allow precise control over which descriptors affect which action
             descriptors.clear()
           } else {
+            LOGGER.debug("Failed to process spell with text: \"$text\"")
+            LOGGER.debug("Null word error")
             return null
           }
         }
-        if (position >= spellStructure.size && spellStructure[position % spellStructure.size] == WORD.SUBJECT) position++
+        if (position >= spellStructure.size && spellStructure[position % spellStructure.size] == WORD.SUBJECT) {
+          position++
+          expectingAnd = (position % spellStructure.size == 0)
+          continue
+        }
         val word = spellStructure[position % spellStructure.size]
         val wordData = parseWord(tokens[tokenPosition])
         when (word) {
           WORD.ACTION -> {
-            if (wordData == null) {
+            if (wordData == null || (actionRegistry[wordData.substring(7)] == null)) {
               LOGGER.debug("Failed to process spell with text: \"$text\"")
               LOGGER.debug("No word found for \"" + tokens[tokenPosition] + "\", action expected")
               return null
@@ -223,21 +237,22 @@ class DictionarySavedData: SavedData {
             // Descriptors aren't required. If there are none, roll forward as necessary and continue.
             if (wordData == null || wordData.length < 12) {
               position++
+              expectingAnd = (position % spellStructure.size == 0)
               continue
             }
             val descriptor = descriptorRegistry[wordData.substring(11)]
             if (descriptor == null) {
               position++
+              expectingAnd = (position % spellStructure.size == 0)
               continue
             }
             descriptors.add(descriptor)
-
             tokenPosition++
             continue
           }
 
           WORD.SUBJECT -> {
-            if (wordData == null) {
+            if (wordData == null || (subjectRegistry[wordData.substring(8)] == null)) {
               LOGGER.debug("Failed to process spell with text: \"$text\"")
               LOGGER.debug("Subject " + tokens[tokenPosition] + " not found")
               return null
@@ -249,6 +264,7 @@ class DictionarySavedData: SavedData {
         }
         position++
         tokenPosition++
+        expectingAnd = (position % spellStructure.size == 0)
       }
 
       if (action != null && subject != null) {
