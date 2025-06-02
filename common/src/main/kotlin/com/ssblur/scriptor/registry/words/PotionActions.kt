@@ -143,4 +143,58 @@ object PotionActions {
     "arcane_poison",
     ArcanePoisonAction()
   )
+  val LEVITATION_POTION = register(
+    "levitate",
+    PotionAction(
+      MobEffects.LEVITATION,
+      15.0,
+      1.0,
+      Word.Cost(15.0, Word.COSTTYPE.ADDITIVE)
+    )
+  )
+  val BLINDNESS_POTION = register(
+    "blind",
+    PotionAction(
+      MobEffects.BLINDNESS,
+      30.0,
+      1.0 / 3.0,
+      Word.Cost(6.0, Word.COSTTYPE.ADDITIVE)
+    )
+  )
+  val ABSORPTION_POTION = register(
+    "absorption",
+    PotionAction(
+      MobEffects.ABSORPTION,
+      30.0,
+      1.0 / 3.0,
+      Word.Cost(8.0, Word.COSTTYPE.ADDITIVE)
+    )
+  )
+  val DOLPHINS_GRACE_POTION = register(
+    "dolphins_grace",
+    PotionAction(
+      MobEffects.DOLPHINS_GRACE,
+      80.0,
+      1.0 / 2.0,
+      Word.Cost(6.0, Word.COSTTYPE.ADDITIVE)
+    )
+  )
+  val SLOW_FALLING_POTION = register(
+    "slow_falling",
+    PotionAction(
+      MobEffects.SLOW_FALLING,
+      80.0,
+      1.0 / 2.0,
+      Word.Cost(6.0, Word.COSTTYPE.ADDITIVE)
+    )
+  )
+  val INVISIBILITY_POTION = register(
+    "invisible",
+    PotionAction(
+      MobEffects.INVISIBILITY,
+      15.0,
+      1.0 / 3.0,
+      Word.Cost(8.0, Word.COSTTYPE.ADDITIVE)
+    )
+  )
 }

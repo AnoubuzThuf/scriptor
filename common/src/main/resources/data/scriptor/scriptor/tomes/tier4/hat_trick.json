@@ -1,0 +1,21 @@
+{
+  "name": "tome.scriptor.hat_trick",
+  "author": "AnoubuzThuf",
+  "tier": 4,
+  "item": "scriptor:spellbook_black",
+  "spell": {
+    "subject": "projectile",
+    "spells": [
+      {
+        "action": "invisible",
+        "descriptors": [
+          "black"
+        ]
+      },
+      {
+        "action": "swap",
+        "descriptors": []
+      }
+    ]
+  }
+}

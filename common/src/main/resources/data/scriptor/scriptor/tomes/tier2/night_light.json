@@ -1,0 +1,17 @@
+{
+  "name": "tome.scriptor.blind",
+  "author": "AnoubuzThuf",
+  "item": "scriptor:spellbook_yellow",
+  "tier": 2,
+  "spell": {
+    "subject": "self",
+    "spells": [
+      {
+        "action": "blind",
+        "descriptors": [
+          "longer"
+        ]
+      }
+    ]
+  }
+}

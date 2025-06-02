@@ -1,0 +1,23 @@
+{
+  "name": "tome.scriptor.blessing_of_hermes",
+  "author": "AnoubuzThuf",
+  "tier": 3,
+  "item": "scriptor:spellbook_light_blue",
+  "spell": {
+    "subject": "self",
+    "spells": [
+      {
+        "action": "speed",
+        "descriptors": [
+          "long"
+        ]
+      },
+      {
+        "action": "dolphins_grace",
+        "descriptors": [
+          "long"
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "name": "tome.scriptor.happy_thoughts",
+  "author": "AnoubuzThuf",
+  "tier": 4,
+  "item": "scriptor:spellbook_yellow",
+  "spell": {
+    "subject": "self",
+    "spells": [
+      {
+        "action": "levitate",
+        "descriptors": []
+      }
+    ]
+  }
+}

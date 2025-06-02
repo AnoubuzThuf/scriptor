@@ -1,0 +1,17 @@
+{
+  "name": "tome.scriptor.catch",
+  "author": "AnoubuzThuf",
+  "tier": 1,
+  "item": "scriptor:spellbook_white",
+  "spell": {
+    "subject": "touch",
+    "spells": [
+      {
+        "action": "slow_falling",
+        "descriptors": [
+          "long"
+        ]
+      }
+    ]
+  }
+}
