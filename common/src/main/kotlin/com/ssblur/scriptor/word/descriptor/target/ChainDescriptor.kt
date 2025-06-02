@@ -21,13 +21,11 @@ class ChainDescriptor: Descriptor(), TargetDescriptor {
       val range = 5.0
       val entities: List<LivingEntity> = entityTargetable.level.getEntitiesOfClass(
         LivingEntity::class.java,
-        AABB.ofSize(pos, range, 1.5, range)
+        AABB.ofSize(pos, range, range, range)
       )
       if (entities.size > 1) {
         val filteredEntities = entities.filter { ent ->
           targetables.none{ (it is EntityTargetable && it.targetEntity.`is`(ent)) }
-        }.filter { ent ->
-          owner !is EntityTargetable || !owner.targetEntity.`is`(ent)
         }
         if(filteredEntities.isNotEmpty()) {
           val target = filteredEntities[0]
