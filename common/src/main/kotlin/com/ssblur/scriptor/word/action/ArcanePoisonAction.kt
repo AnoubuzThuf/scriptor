@@ -36,15 +36,19 @@ class ArcanePoisonAction: Action() {
         val strengthCap = 10.0
         var duration: Double = 1.0
         var durationCapPercent: Float = 0f
-        val durationScale = 1.0/4.0
-        val durationCap = 30.0
+        val durationScale = 30
+        val durationCap = 600.0
         for (d in descriptors) {
             if (d is StrengthDescriptor) strength += d.strengthModifier()
             if (d is DurationDescriptor) duration += d.durationModifier()
         }
         val actionWords: List<Action> =  words.filter{ (it != null) and (it is Action)  }.map{ it as Action }
-        val actionMobEffects: List<Holder<MobEffect>> = actionWords.filter{ (it is PotionAction)  }.map{ it as PotionAction }.map{ it.mobEffect }
-
+        val actionMobEffects: Set<Holder<MobEffect>> = actionWords.filter{ (it is PotionAction)  }.map{ it as PotionAction }.map{ it.mobEffect }.toSet()
+        if (actionMobEffects.isNotEmpty() && targetable is EntityTargetable && targetable.targetEntity is LivingEntity) (targetable.targetEntity as LivingEntity).addEffect(
+            MobEffectInstance(
+                FREEZE, 7, 1
+            )
+        )
 
         /**
          * Let each complimentary_effect increase the damage cap and duration cap
@@ -85,7 +89,7 @@ class ArcanePoisonAction: Action() {
         }
 
         strength = max(strength, 1.0)
-        duration = max(duration, 0.5)
+        duration = max(duration, 1.0)
         strength = min(strength*strengthScale, (min(strengthCapPercent, 100f)*strengthCap/100f))
         duration = min(duration*durationScale, min(durationCapPercent, 100f)*durationCap/100f)
 

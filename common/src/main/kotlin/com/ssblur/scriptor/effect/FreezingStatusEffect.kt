@@ -10,12 +10,11 @@ open class FreezingStatusEffect: MobEffect {
     constructor(mobEffectCategory: MobEffectCategory, i: Int): super(mobEffectCategory, i)
 
     override fun applyEffectTick(entity: LivingEntity, amplifier: Int): Boolean {
-        entity.hurt(entity.damageSources().freeze(), 1.0F);
+        entity.setTicksFrozen(Math.min(entity.getTicksRequiredToFreeze() + 3, entity.getTicksFrozen() + 3 + amplifier * 20))
         return true
     }
 
     override fun shouldApplyEffectTickThisTick(i: Int, j: Int): Boolean {
-        val k = 80 shr j
-        return if (k > 0) (i % k == 0) else true
+        return true
     }
 }
