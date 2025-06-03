@@ -1,0 +1,17 @@
+{
+  "name": "tome.scriptor.inferno",
+  "author": "AnoubuzThuf",
+  "tier": 3,
+  "item": "scriptor:spellbook_orange",
+  "spell": {
+    "subject": "storm",
+    "spells": [
+      {
+        "action": "inflame",
+        "descriptors": [
+          "reagent.scriptor.blaze_powder"
+        ]
+      }
+    ]
+  }
+}

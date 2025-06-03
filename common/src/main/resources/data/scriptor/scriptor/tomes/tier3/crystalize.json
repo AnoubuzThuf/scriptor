@@ -1,0 +1,19 @@
+{
+  "name": "tome.scriptor.crystalize",
+  "author": "AnoubuzThuf",
+  "tier": 3,
+  "item": "scriptor:spellbook_lime",
+  "spell": {
+    "subject": "projectile",
+    "spells": [
+      {
+        "action": "place",
+        "descriptors": [
+          "lime",
+          "powerful",
+          "reagent.scriptor.emerald"
+        ]
+      }
+    ]
+  }
+}

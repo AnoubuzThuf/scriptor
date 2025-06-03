@@ -1,0 +1,17 @@
+{
+  "name": "tome.scriptor.steam_powered",
+  "author": "AnoubuzThuf",
+  "tier": 2,
+  "item": "scriptor:spellbook_gray",
+  "spell": {
+    "subject": "self",
+    "spells": [
+      {
+        "action": "haste",
+        "descriptors": [
+          "reagent.scriptor.charcoal"
+        ]
+      }
+    ]
+  }
+}
