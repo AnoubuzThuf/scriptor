@@ -38,10 +38,14 @@ class Spell(val subject: Subject, vararg val spells: PartialSpell) {
       var caster = originalCaster
       var targets = originalTargets
       val deduplicatedDescriptors = spell.deduplicatedDescriptors()
-      for (descriptor in deduplicatedDescriptors) {
-        if (descriptor is TargetDescriptor) targets = descriptor.modifyTargets(targets, caster)
-        if (descriptor is MultiTargetFocusDescriptor) targets = descriptor.modifyTargetsFocus(targets, caster)
-        if (descriptor is GeometricTargetDescriptor) targets = descriptor.modifyTargets(targets, caster, deduplicatedDescriptors)
+      for (i in 0..deduplicatedDescriptors.size-1) {
+        val descriptor = deduplicatedDescriptors.get(i)
+        targets = when (descriptor) {
+          is TargetDescriptor -> descriptor.modifyTargets(targets, caster)
+          is MultiTargetFocusDescriptor -> descriptor.modifyTargetsFocus(targets, caster)
+          is GeometricTargetDescriptor -> descriptor.modifyTargets(targets, caster, i, deduplicatedDescriptors)
+          else -> targets
+        }
         if (descriptor is FocusDescriptor) caster = descriptor.modifyFocus(caster)
       }
       for (target in targets)

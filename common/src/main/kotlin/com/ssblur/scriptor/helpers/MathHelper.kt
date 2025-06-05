@@ -52,16 +52,20 @@ object MathHelper {
     var pos: Vec2
     var mirror_pos: Vec2
     for (i in 0..radius) {
-      pos = Vec2(i.toFloat(), round(sqrt((radius*radius).toFloat() - i*i)))
-      mirror_pos = Vec2(pos.x*-1, pos.y)
+        val preciseY = sqrt((radius*radius).toFloat() - i*i)
+      pos = Vec2(i.toFloat(), round(preciseY))
+      mirror_pos = Vec2(pos.x*-1, round(preciseY))
       positions.add(pos)
       positions.add(mirror_pos)
       for (j in 1..3) {
-        positions.add(rotate_point_anticlockwise(pos, (90 * j).toFloat()))
-        positions.add(rotate_point_anticlockwise(mirror_pos, (90 * j).toFloat()))
+        val posRot = rotate_point_anticlockwise(pos, (90 * j).toFloat())
+        positions.add(Vec2(round(posRot.x), round(posRot.y)))
+        val mirrorPosRot = rotate_point_anticlockwise(mirror_pos, (90 * j).toFloat())
+        positions.add(Vec2(round(mirrorPosRot.x), round(mirrorPosRot.y)))
       }
     }
-    return positions.map{ Vec2(it.x, it.y) }
+    val unique_positions = positions.map{ Vec2(it.x, it.y) }.toSet()
+    return unique_positions.toList()
   }
   /**
    * Calculate the number of blocks required to form the square's border
@@ -80,7 +84,7 @@ object MathHelper {
    * @param diameter: The diameter of the square
    * @return A set of Vec2 coordinates forming the perimiter of a square
    */
-  fun get_square_coords(diameter: Int): ArrayList<Vec2> {
+  fun get_square_coords(diameter: Int): List<Vec2> {
 //    Expect minimum 2x2 diameter square.
     assert(diameter > 1)
     var positions: ArrayList<Vec2> = arrayListOf<Vec2>()
@@ -96,6 +100,8 @@ object MathHelper {
       }
       positions.add(Vec2(pos.first, pos.second))
     }
+    val unique_positions = positions.map{ Vec2(it.x, it.y) }.toSet()
+    return unique_positions.toList()
 
     return positions
   }
