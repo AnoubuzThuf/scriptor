@@ -16,11 +16,15 @@ import com.ssblur.scriptor.word.descriptor.focus.FocusDescriptor
 import com.ssblur.scriptor.word.descriptor.focus.MultiTargetFocusDescriptor
 import com.ssblur.scriptor.word.descriptor.target.GeometricTargetDescriptor
 import com.ssblur.scriptor.word.descriptor.target.TargetDescriptor
+import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
 import net.minecraft.network.chat.Component
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.phys.Vec3
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ExecutionException
 import kotlin.math.pow
@@ -33,10 +37,25 @@ import kotlin.math.pow
 class Spell(val subject: Subject, vararg val spells: PartialSpell) {
   fun castOnTargets(originalCaster: Targetable, originalTargets: List<Targetable>) {
     assert(spells.isNotEmpty())
+    var adjustedList: MutableList<Targetable> = mutableListOf()
+    for (i in 0..originalTargets.size-1) {
+      var adjustedTarget = originalTargets[i]
+      val targetDirection = adjustedTarget.direction
+        if (adjustedTarget !is EntityTargetable) {
+          if (originalTargets[i].facing == Direction.NORTH) {
+            adjustedTarget = Targetable(adjustedTarget.level, adjustedTarget.targetPos.add(Vec3(0.0, 0.0, -1.0)), targetDirection)
+          } else if (originalTargets[i].facing == Direction.WEST) {
+              adjustedTarget = Targetable(adjustedTarget.level, adjustedTarget.targetPos.add(Vec3(-1.0, 0.0, 0.0)), targetDirection)
+            } else if (originalTargets[i].facing == Direction.DOWN) {
+            adjustedTarget = Targetable(adjustedTarget.level, adjustedTarget.targetPos.add(Vec3(0.0, -1.0, 0.0)), targetDirection)
+          }
+        }
+      adjustedList.add(adjustedTarget)
+    }
 
     for (spell in spells) {
       var caster = originalCaster
-      var targets = originalTargets
+      var targets = adjustedList.toList()
       val deduplicatedDescriptors = spell.deduplicatedDescriptors()
       for (i in 0..deduplicatedDescriptors.size-1) {
         val descriptor = deduplicatedDescriptors.get(i)

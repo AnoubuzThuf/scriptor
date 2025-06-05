@@ -25,6 +25,12 @@ open class Targetable {
     this.level = level
   }
 
+  constructor(level: Level, pos: Vec3, direction: Direction?) {
+    targetPos = pos
+    this.level = level
+    this.direction = direction
+  }
+
   constructor(level: Level, pos: Vector3f) {
     targetPos = Vec3(pos.x().toDouble(), pos.y().toDouble(), pos.z().toDouble())
     this.level = level
@@ -59,8 +65,15 @@ open class Targetable {
 
   val offsetBlockPos: BlockPos
     get() {
-      if (direction != null) return targetBlockPos.relative(direction!!.opposite)
-      return targetBlockPos
+      return when (direction) {
+        null -> targetBlockPos
+        Direction.UP -> targetBlockPos.below()
+        Direction.DOWN -> targetBlockPos.above()
+        Direction.NORTH -> targetBlockPos.south()
+        Direction.EAST -> targetBlockPos.west()
+        Direction.SOUTH -> targetBlockPos.north()
+        Direction.WEST -> targetBlockPos.east()
+      }
     }
 
   fun simpleCopy(): Targetable {
