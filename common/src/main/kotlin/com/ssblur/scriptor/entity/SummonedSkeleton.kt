@@ -4,6 +4,7 @@ import com.ssblur.scriptor.entity.goals.*
 import com.ssblur.scriptor.entity.utils.deserializeOwner
 import com.ssblur.scriptor.entity.utils.getAndCacheOwner
 import com.ssblur.scriptor.entity.utils.serializeOwner
+import net.minecraft.core.Holder
 import net.minecraft.core.component.DataComponents
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.sounds.SoundEvent
@@ -21,6 +22,9 @@ import net.minecraft.world.entity.monster.AbstractSkeleton
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
+import net.minecraft.world.item.alchemy.Potion
+import net.minecraft.world.item.alchemy.PotionContents
+import net.minecraft.world.item.alchemy.Potions
 import net.minecraft.world.item.component.DyedItemColor
 import net.minecraft.world.item.enchantment.EnchantmentHelper
 import net.minecraft.world.item.enchantment.providers.VanillaEnchantmentProviders
@@ -32,13 +36,14 @@ import java.util.*
 class SummonedSkeleton(entityType: EntityType<SummonedSkeleton?>?, level: Level): IMagicSummon,
     AbstractSkeleton(entityType, level) {
 
-    fun setup(owner: LivingEntity, tag: CompoundTag, ticks: Int, hasLimitedLife: Boolean = true, power: Int = 1, color: Int = -6265536) {
+    fun setup(owner: LivingEntity, tag: CompoundTag, ticks: Int, hasLimitedLife: Boolean = true, power: Int = 1, color: Int = -6265536, isRanged: Boolean=false) {
         setSummoner(owner)
         xpReward = 0
         this.load(tag)
         this.setLimitedLifeTicks(ticks, hasLimitedLife)
         this.power = power
         this.color = color
+        this.isRanged = isRanged
     }
 
     @get:JvmName("jvm_summoner")
@@ -78,7 +83,7 @@ class SummonedSkeleton(entityType: EntityType<SummonedSkeleton?>?, level: Level)
         this.goalSelector.addGoal(2, RestrictSunGoal(this))
         this.goalSelector.addGoal(3, FleeSunGoal(this, 1.0))
         this.goalSelector.addGoal(3, AvoidEntityGoal(this, Wolf::class.java, 6.0F, 1.0, 1.2))
-        this.goalSelector.addGoal(4, GenericFollowOwnerGoal(this, this::getSummoner, 0.65, 35f, 10f, true, 50f))
+        this.goalSelector.addGoal(4, GenericFollowOwnerGoal(this, this::getSummoner, 1.0, 15f, 5f, false, null))
         this.goalSelector.addGoal(5, WaterAvoidingRandomStrollGoal(this, 1.0))
         this.goalSelector.addGoal(6, LookAtPlayerGoal(this, Player::class.java, 8f))
         this.goalSelector.addGoal(6, RandomLookAroundGoal(this))
@@ -177,11 +182,14 @@ class SummonedSkeleton(entityType: EntityType<SummonedSkeleton?>?, level: Level)
                 this.setDropChance(unequipped.get(i).second, 0.0F);
             }
         }
-        this.setDropChance(EquipmentSlot.MAINHAND, 0.0F);
+
+        this.setDropChance(EquipmentSlot.MAINHAND, 0.0F)
+        this.setDropChance(EquipmentSlot.OFFHAND, 0.0F)
         this.setCanPickUpLoot(false)
 //        Set weapon
         if (!this.isRanged) {
             if (this.power >= 1) {
+                this.setItemSlot(EquipmentSlot.OFFHAND, ItemStack(Items.SHIELD))
                 val weaponPool = if (this.power < 4) {
                     listOf(Items.FISHING_ROD, Items.WOODEN_HOE, Items.WOODEN_SHOVEL, Items.WOODEN_PICKAXE)
                 } else if (this.power in 4..6) {
@@ -197,6 +205,16 @@ class SummonedSkeleton(entityType: EntityType<SummonedSkeleton?>?, level: Level)
             if (this.power >= 1) {
                 val bowPool = listOf(Items.BOW, Items.CROSSBOW)
                 this.setItemSlot(EquipmentSlot.MAINHAND, ItemStack(bowPool.random()))
+            }
+//            Scale power by giving tipped arrows
+            if (this.power >= 4) {
+                val potionPool: Holder<Potion> = listOf(Potions.POISON, Potions.SLOWNESS, Potions.WEAKNESS).random()
+                val arrows: ItemStack = ItemStack(Items.TIPPED_ARROW)
+                arrows.set(DataComponents.POTION_CONTENTS, PotionContents(potionPool))
+                arrows.setCount(this.power * 2)
+                this.setItemSlot(EquipmentSlot.OFFHAND, arrows)
+            } else {
+                this.setItemSlot(EquipmentSlot.OFFHAND, ItemStack(Items.ARROW))
             }
         }
         this.populateDefaultEquipmentEnchantments(serverLevelAccessor, randomSource, difficultyInstance)
@@ -227,7 +245,7 @@ class SummonedSkeleton(entityType: EntityType<SummonedSkeleton?>?, level: Level)
     ) {
         val itemStack = this.getItemBySlot(equipmentSlot)
         val powerModifier = if (this.power > 7) (this.power - 7) / 5f else 0f
-        if (!itemStack.isEmpty() && randomSource.nextFloat() < f * difficultyInstance.getSpecialMultiplier() * powerModifier) {
+        if (!itemStack.isEmpty() && randomSource.nextFloat() < f * powerModifier) {
             EnchantmentHelper.enchantItemFromProvider(
                 itemStack,
                 serverLevelAccessor.registryAccess(),
@@ -239,3 +257,4 @@ class SummonedSkeleton(entityType: EntityType<SummonedSkeleton?>?, level: Level)
         }
     }
 }
+

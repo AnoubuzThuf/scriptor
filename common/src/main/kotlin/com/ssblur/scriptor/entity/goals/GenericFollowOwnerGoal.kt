@@ -20,7 +20,7 @@ class GenericFollowOwnerGoal(
     private val startDistance: Float,
     private val stopDistance: Float,
     canFly: Boolean,
-    private val teleportDistance: Float
+    private val teleportDistance: Float?
 ) : Goal() {
     private var owner: LivingEntity? = null
     private val navigation: PathNavigation
@@ -95,8 +95,11 @@ class GenericFollowOwnerGoal(
     }
 
     fun shouldTryTeleportToOwner(): Boolean {
+        if (teleportDistance == null) {
+            return false
+        }
         val livingentity = this.ownerGetter.get()
-        return livingentity != null && mob.distanceToSqr(livingentity) >= teleportDistance * teleportDistance
+        return livingentity != null && mob.distanceToSqr(livingentity) >= teleportDistance!! * teleportDistance!!
     }
 
     private fun teleportToAroundBlockPos(pPos: BlockPos) {

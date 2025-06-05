@@ -1,0 +1,17 @@
+{
+  "name": "tome.scriptor.long_distance_relationship",
+  "author": "AnoubuzThuf",
+  "tier": 3,
+  "item": "scriptor:spellbook_white",
+  "spell": {
+    "subject": "projectile",
+    "spells": [
+      {
+        "action": "summon_ranged_skeleton",
+        "descriptors": [
+          "white"
+        ]
+      }
+    ]
+  }
+}
