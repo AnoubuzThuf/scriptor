@@ -1,0 +1,17 @@
+{
+  "name": "tome.scriptor.harmless",
+  "author": "AnoubuzThuf",
+  "tier": 2,
+  "spell": {
+    "subject": "projectile",
+    "spells": [
+      {
+        "action": "harm",
+        "descriptors": [
+          "white",
+          "block_only"
+        ]
+      }
+    ]
+  }
+}
