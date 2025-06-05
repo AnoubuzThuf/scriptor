@@ -3,7 +3,6 @@ package com.ssblur.scriptor.word.action
 import com.ssblur.scriptor.api.word.Action
 import com.ssblur.scriptor.api.word.Descriptor
 import com.ssblur.scriptor.api.word.Word
-import com.ssblur.scriptor.entity.ScriptorEntities
 import com.ssblur.scriptor.entity.ScriptorEntities.SUMMONED_VEX
 import com.ssblur.scriptor.entity.SummonedVex
 import com.ssblur.scriptor.helpers.targetable.EntityTargetable
@@ -16,7 +15,6 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.MobSpawnType
-import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.gameevent.GameEvent
 import net.minecraft.world.phys.Vec3
@@ -42,18 +40,19 @@ class SummonVexAction: Action() {
         } else {
           blockPos.relative(targetable.facing)
         }
+        val vecPos: Vec3 = Vec3(blockPos2.x.toDouble(), blockPos2.y.toDouble(), blockPos2.z.toDouble())
         val summonedVex: SummonedVex? = SUMMONED_VEX.get().spawn(
           level, null, null, blockPos2, MobSpawnType.MOB_SUMMONED, true, blockPos.equals(blockPos2) && targetable.facing == Direction.UP
         )
         if (summonedVex != null) {
-//          summonedVex.moveTo(targetable.targetBlockPos, 0f, 0f)
           summonedVex.finalizeSpawn(level, level.getCurrentDifficultyAt(targetable.targetBlockPos), MobSpawnType.MOB_SUMMONED, null)
-//          summonedVex.setPos(targetable.targetBlockPos.x.toDouble(), targetable.targetBlockPos.y.toDouble(), targetable.targetBlockPos.z.toDouble())
           val tag = CompoundTag()
           summonedVex.setup(l, tag, duration.toInt() * 10, true, strength.toInt())
           summonedVex.setBoundOrigin(blockPos2)
+          summonedVex.setPos(vecPos)
           level.addFreshEntity(summonedVex)
           level.gameEvent(GameEvent.ENTITY_PLACE, blockPos2,  GameEvent.Context.of(l))
+          summonedVex.setPos(vecPos)
         }
       }
     }

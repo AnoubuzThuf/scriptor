@@ -1,6 +1,5 @@
 package com.ssblur.scriptor.entity
 
-import com.ssblur.scriptor.entity.ScriptorEntities.SUMMONED_VEX
 import com.ssblur.scriptor.entity.goals.*
 import com.ssblur.scriptor.entity.utils.deserializeOwner
 import com.ssblur.scriptor.entity.utils.getAndCacheOwner
@@ -8,16 +7,18 @@ import com.ssblur.scriptor.entity.utils.serializeOwner
 import net.minecraft.core.BlockPos
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.sounds.SoundEvents
+import net.minecraft.util.RandomSource
+import net.minecraft.world.DifficultyInstance
 import net.minecraft.world.damagesource.DamageSource
-import net.minecraft.world.entity.Entity
-import net.minecraft.world.entity.EntityType
-import net.minecraft.world.entity.LivingEntity
-import net.minecraft.world.entity.Mob
+import net.minecraft.world.entity.*
 import net.minecraft.world.entity.ai.goal.FloatGoal
 import net.minecraft.world.entity.ai.goal.Goal
 import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal
 import net.minecraft.world.entity.monster.Vex
 import net.minecraft.world.entity.player.Player
+import net.minecraft.world.item.Item
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.Items
 import net.minecraft.world.level.Level
 import java.util.*
 
@@ -65,6 +66,19 @@ class SummonedVex(entityType: EntityType<SummonedVex?>?, level: Level): IMagicSu
     fun setLimitedLifeTicks(ticks: Int, hasLimitedLife: Boolean = true) {
         this.limitedLifeTicks = ticks
         this.hasLimitedLife = hasLimitedLife
+    }
+
+    override fun populateDefaultEquipmentSlots(randomSource: RandomSource, difficultyInstance: DifficultyInstance) {
+        val weapon = when (this.power) {
+            in 0..1 -> Items.STICK
+            2 -> Items.WOODEN_SWORD
+            3 -> Items.STONE_SWORD
+            in 4..7 -> Items.IRON_SWORD
+            in 8..12 -> Items.DIAMOND_SWORD
+            else -> Items.NETHERITE_SWORD
+        }
+        this.setItemSlot(EquipmentSlot.MAINHAND, ItemStack(weapon))
+        this.setDropChance(EquipmentSlot.MAINHAND, 0.0f)
     }
 
     override fun registerGoals() {
