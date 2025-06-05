@@ -1,0 +1,17 @@
+{
+  "name": "tome.scriptor.friendship_is_magic",
+  "author": "AnoubuzThuf",
+  "tier": 3,
+  "item": "scriptor:spellbook_gray",
+  "spell": {
+    "subject": "self",
+    "spells": [
+      {
+        "action": "summon_skeleton",
+        "descriptors": [
+          "night"
+        ]
+      }
+    ]
+  }
+}

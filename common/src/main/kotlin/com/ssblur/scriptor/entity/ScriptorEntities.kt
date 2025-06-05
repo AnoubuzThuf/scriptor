@@ -8,11 +8,11 @@ import com.ssblur.unfocused.entity.EntityAttributes.registerEntityAttributes
 import com.ssblur.unfocused.rendering.EntityRendering.registerEntityRenderer
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
-import net.minecraft.client.renderer.entity.EntityRenderer
-import net.minecraft.client.renderer.entity.VexRenderer
+import net.minecraft.client.renderer.entity.SkeletonRenderer
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.MobCategory
 import net.minecraft.world.entity.animal.Sheep
+import net.minecraft.world.entity.monster.Skeleton
 import net.minecraft.world.entity.monster.Vex
 
 
@@ -50,16 +50,28 @@ object ScriptorEntities {
       .sized(0.4f, 0.8f)
       .build("summoned_vex")
   }
+  val SUMMONED_SKELETON = ScriptorMod.registerEntity(
+    "summoned_skeleton"
+  ) {
+    EntityType.Builder.of(
+      { entityType, level -> SummonedSkeleton(entityType, level) },
+      MobCategory.CREATURE
+    )
+      .sized(1.0F, 1.8F).clientTrackingRange(10)
+      .build("summoned_skeleton")
+  }
 
   @Environment(EnvType.CLIENT)
   fun registerRenderers() {
     ScriptorMod.registerEntityRenderer(PROJECTILE_TYPE) { ScriptorProjectileRenderer(it) }
     ScriptorMod.registerEntityRenderer(COLORFUL_SHEEP_TYPE) { ColorfulSheepRenderer(it) }
     ScriptorMod.registerEntityRenderer(SUMMONED_VEX) { SummonedVexRenderer(it) }
+    ScriptorMod.registerEntityRenderer(SUMMONED_SKELETON) { SkeletonRenderer(it) }
   }
 
   fun register() {
     ScriptorMod.registerEntityAttributes(COLORFUL_SHEEP_TYPE) { Sheep.createAttributes() }
     ScriptorMod.registerEntityAttributes(SUMMONED_VEX) { Vex.createAttributes() }
+    ScriptorMod.registerEntityAttributes(SUMMONED_SKELETON) { Skeleton.createAttributes() }
   }
 }

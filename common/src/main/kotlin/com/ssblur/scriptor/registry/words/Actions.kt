@@ -23,6 +23,7 @@ object Actions {
   val HEAL = register("heal", HealAction())
   val SMITE = register("smite", SmiteAction())
   val SUMMON_VEX = register("summon_vex", SummonVexAction())
+  val SUMMON_SKELETON = register("summon_skeleton", SummonSkeletonAction())
   val EXPLOSION = register("explosion", ExplosionAction())
   val GOTO = register("goto", GotoAction())
   val SWAP = register("swap", SwapAction())
