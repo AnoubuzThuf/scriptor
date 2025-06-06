@@ -138,14 +138,27 @@ class Spell(val subject: Subject, vararg val spells: PartialSpell) {
    * @return A number representing cost.
    */
   fun cost(): Double {
+    var total: Double = 0.0
+    for (subspell in spells) {
+      total += subspellCost(subspell)
+    }
+//    Small inefficiency for using multiple actions.
+    total += spells.size
+    return total * finalDiscountMultiplier()
+  }
+
+  fun subspellCost(spell: PartialSpell): Double {
     var sum = 0.0
     var scalar = 1.0
     var discount = 0.0
     var subCount = 0.0
     var sub = 0.0
 
-    for (d in words()) {
-      val cost = d!!.cost()
+    val action = spell.action
+    val descriptors = spell.deduplicatedDescriptors()
+
+    fun handleCost(word: Word?) {
+      val cost = word!!.cost()
       when (cost.type) {
         COSTTYPE.ADDITIVE -> {
           if (sum < 0) {
@@ -153,10 +166,15 @@ class Spell(val subject: Subject, vararg val spells: PartialSpell) {
             sub += cost.cost
           } else sum += cost.cost
         }
-
-        COSTTYPE.MULTIPLICATIVE -> scalar *= cost.cost
+//        Skip discount multipliers here, then apply once at the end.
+        COSTTYPE.MULTIPLICATIVE -> if (cost.cost >= 1.0) scalar *= cost.cost
         COSTTYPE.ADDITIVE_POST -> discount += cost.cost
       }
+    }
+    handleCost(action)
+    handleCost(subject)
+    for (d in descriptors) {
+      handleCost(d)
     }
 
     if (subCount > 0) {
@@ -166,6 +184,26 @@ class Spell(val subject: Subject, vararg val spells: PartialSpell) {
     }
 
     return sum * scalar + discount
+  }
+
+  private fun finalDiscountMultiplier(): Double {
+    var allDiscounts = arrayListOf<Word>()
+    var finalDiscountMulti = 1.0
+    for (spell in spells) {
+      val descriptors = spell.deduplicatedDescriptors()
+      for (word in descriptors) {
+        if (word!!.cost().type == COSTTYPE.MULTIPLICATIVE && word!!.cost().cost < 1.0) {
+          if (word.allowsDuplicates()) {
+            allDiscounts.add(word)
+            finalDiscountMulti *= word.cost().cost
+          } else if (!allDiscounts.contains(word)) {
+            allDiscounts.add(word)
+            finalDiscountMulti *= word.cost().cost
+          }
+        }
+      }
+    }
+    return finalDiscountMulti
   }
 
   private fun words(): Array<Word?> {

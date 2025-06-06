@@ -76,16 +76,16 @@ object Tomes {
         if (t == 3) TOME_3.get().trigger(player)
         if (t == 4) TOME_4.get().trigger(player)
       }
-
-      var maxAttempts = 10
+      val indexList: List<Int> = (0..options.size-1).toList().shuffled()
       var option: MutableMap.MutableEntry<ResourceLocation, TomeResource>
-      do {
-        option = options[random.nextInt(options.size)]
-        maxAttempts--
-      } while (maxAttempts > 0 && known.containsKey(option.key.toShortLanguageKey()))
-      known[option.key.toShortLanguageKey()] = true
-      data.setDirty()
-      return option.value
+      for (index in indexList) {
+        option = options[index]
+        if (!known.containsKey(option.key.toShortLanguageKey())) {
+          known[option.key.toShortLanguageKey()] = true
+          data.setDirty()
+          return option.value
+        }
+      }
     }
     return options[random.nextInt(options.size)].value
   }

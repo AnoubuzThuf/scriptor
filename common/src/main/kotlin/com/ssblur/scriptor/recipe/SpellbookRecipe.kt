@@ -3,6 +3,7 @@ package com.ssblur.scriptor.recipe
 import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import net.minecraft.core.HolderLookup
+import net.minecraft.core.component.DataComponents
 import net.minecraft.network.RegistryFriendlyByteBuf
 import net.minecraft.network.codec.StreamCodec
 import net.minecraft.world.item.ItemStack
@@ -25,6 +26,7 @@ class SpellbookRecipe(var base: Ingredient, var addition: Ingredient, var result
 
     val craftingResult = result.copy()
     craftingResult.applyComponents(craftingBase.components)
+    craftingResult.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, false)
     return craftingResult
   }
 
