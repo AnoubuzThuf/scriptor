@@ -1,5 +1,7 @@
 package com.ssblur.scriptor.helpers
 
+import com.ssblur.scriptor.helpers.targetable.EntityTargetable
+import com.ssblur.scriptor.helpers.targetable.LecternTargetable
 import com.ssblur.scriptor.helpers.targetable.Targetable
 import net.minecraft.core.Direction
 import net.minecraft.world.phys.Vec2
@@ -129,12 +131,27 @@ object MathHelper {
    */
   fun player_view_transform_point(initial_targetable: Targetable, owner: Targetable, point: Vec2): Vec3 {
 
+    val yRotation = if (owner is EntityTargetable) {
+      owner.entityYRotation!!.toInt()
+    } else if (owner is LecternTargetable) {
+      0
+    } else {
+      0
+    }
+    val coarseYRotation = if (owner is EntityTargetable) {
+      owner.entityCoarseYRotation!!.toFloat()
+    } else if (owner is LecternTargetable) {
+      0f
+    } else {
+      0f
+    }
+
     val pos = initial_targetable.targetPos
     val axis = initial_targetable.facing.axis
 
     var newPos: Vec3
     if (axis === Direction.Axis.X) {
-      var x_mult = if (owner.entityYRotation!!.toInt() in 180..360) {
+      var x_mult = if (yRotation in 180..360) {
         1
       } else {
         -1
@@ -145,7 +162,7 @@ object MathHelper {
         pos.z + point.x * x_mult
       )
     } else if (axis === Direction.Axis.Y) {
-      var transformed_point = rotate_point_anticlockwise(point, owner.entityCoarseYRotation!! + 90)
+      var transformed_point = rotate_point_anticlockwise(point, coarseYRotation + 90f)
       newPos = Vec3(
         pos.x + transformed_point.x,
         pos.y,
@@ -153,7 +170,7 @@ object MathHelper {
       )
     }
     else {
-      var x_mult = if (owner.entityYRotation!!.toInt() in 90..270) {
+      var x_mult = if (yRotation in 90..270) {
         1
       } else {
         -1

@@ -27,7 +27,10 @@ import net.minecraft.world.entity.animal.Wolf
 import net.minecraft.world.entity.monster.AbstractSkeleton
 import net.minecraft.world.entity.monster.Creeper
 import net.minecraft.world.entity.monster.Monster
+import net.minecraft.world.entity.monster.Pillager
 import net.minecraft.world.entity.player.Player
+import net.minecraft.world.entity.projectile.ProjectileUtil
+import net.minecraft.world.item.CrossbowItem
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import net.minecraft.world.item.alchemy.Potion
@@ -75,35 +78,68 @@ class SummonedSkeleton(entityType: EntityType<SummonedSkeleton?>?, level: Level)
      */
 
     var randomStrollGoal: WaterAvoidingRandomStrollGoal? = null
+    var restrictSunGoal: RestrictSunGoal? = null
+    var fleeSunGoal: FleeSunGoal? = null
+    var floatGoal: FloatGoal? = null
+    fun setNormalMovementGoals(enabled: Boolean = true) {
+        if (this.restrictSunGoal == null) {
+            this.floatGoal = FloatGoal(this)
+        }
+        if (this.restrictSunGoal == null) {
+            this.restrictSunGoal = RestrictSunGoal(this)
+        }
+        if (this.fleeSunGoal == null) {
+            this.fleeSunGoal = FleeSunGoal(this, 1.0)
+        }
+        if (this.randomStrollGoal == null) {
+            this.randomStrollGoal = WaterAvoidingRandomStrollGoal(this, 1.0)
+        }
+        this.goalSelector.removeGoal(this.restrictSunGoal!!)
+        this.goalSelector.removeGoal(this.fleeSunGoal!!)
+        this.goalSelector.removeGoal(this.randomStrollGoal!!)
+        if (enabled) {
+            this.goalSelector.addGoal(0, this.floatGoal!!)
+            this.goalSelector.addGoal(2, this.restrictSunGoal!!)
+            this.goalSelector.addGoal(3, this.fleeSunGoal!!)
+            this.goalSelector.addGoal(6,this.randomStrollGoal!!)
+        }
+    }
+
     var sentryGoal: MoveTowardsRestrictionGoal? = null
     fun setSentryGoal(enabled: Boolean, pos: BlockPos?, range: Int) {
-        this.setFollowSummonerGoal(false)
+        if (enabled) {
+            this.setFollowSummonerGoal(false)
+//            this.setNormalMovementGoals(false)
+        }
         if (this.sentryGoal == null) {
             this.sentryGoal = MoveTowardsRestrictionGoal(this, 1.0)
         }
         this.goalSelector.removeGoal(this.sentryGoal!!)
         if (enabled) {
-            this.goalSelector.removeGoal(this.randomStrollGoal!!)
-            if (!this.hasRestriction() && pos != null) {
+            if (pos == null) {
+                this.restrictTo(this.blockPosition(), range)
+            } else {
                 this.restrictTo(pos, range)
             }
-            this.goalSelector.addGoal(4, this.sentryGoal!!)
+            this.goalSelector.addGoal(5, this.sentryGoal!!)
+            this.sentryGoal!!.setFlags(EnumSet.of(Goal.Flag.MOVE, Goal.Flag.LOOK));
         } else {
             this.clearRestriction()
+            this.setNormalMovementGoals(true)
         }
     }
 
     var followSummonerGoal: GenericFollowOwnerGoal? = null
     fun setFollowSummonerGoal(enabled: Boolean) {
-        this.setSentryGoal(false, null, 0)
+        if (enabled) {
+            this.setSentryGoal(false, null, 0)
+        }
         if (this.followSummonerGoal == null) {
             this.followSummonerGoal = GenericFollowOwnerGoal(this, this::getSummoner, 1.0, 15f, 5f, false, 50f)
         }
         this.goalSelector.removeGoal(this.followSummonerGoal!!)
         if (enabled) {
-            this.goalSelector.addGoal(5,this.randomStrollGoal!!)
-            this.clearRestriction()
-            this.goalSelector.addGoal(4, this.followSummonerGoal!!)
+            this.goalSelector.addGoal(5, this.followSummonerGoal!!)
         }
     }
 
@@ -125,25 +161,28 @@ class SummonedSkeleton(entityType: EntityType<SummonedSkeleton?>?, level: Level)
     var berserkGoal: NearestAttackableTargetGoal<LivingEntity>? = null
     fun setBerserkGoal(enabled: Boolean) {
         if (this.berserkGoal == null) {
-            this.berserkGoal = NearestAttackableTargetGoal(this, LivingEntity::class.java, 10, true, false,
-                { entity: LivingEntity -> true }
-            )
+            this.berserkGoal = NearestAttackableTargetGoal(this, LivingEntity::class.java, true)
         }
         this.targetSelector.removeGoal(this.berserkGoal!!)
         if (enabled) {
+            this.summoner = null
+            this.targetSelector.removeAllGoals{true}
             this.targetSelector.addGoal(1, this.berserkGoal!!)
         }
     }
 
     override fun tick() {
         super.tick()
-        if (this.hasLimitedLife && --this.limitedLifeTicks <= 0) {
-            spawnPoof(this.level() as ServerLevel, this.blockPosition())
-            this.remove(RemovalReason.DISCARDED)
+        if (!this.level().isClientSide) {
+            if (this.hasLimitedLife && --this.limitedLifeTicks <= 0) {
+                spawnPoof(this.level() as ServerLevel, this.blockPosition())
+                this.remove(RemovalReason.DISCARDED)
 
 //            this.limitedLifeTicks = 20
 //            this.hurt(this.damageSources().starve(), 20.0f)
+            }
         }
+
     }
 
     fun setSummoner(summoner: LivingEntity) {
@@ -161,18 +200,14 @@ class SummonedSkeleton(entityType: EntityType<SummonedSkeleton?>?, level: Level)
     }
 
     override fun registerGoals() {
-        this.randomStrollGoal = WaterAvoidingRandomStrollGoal(this, 1.0)
-        this.goalSelector.addGoal(0, FloatGoal(this))
-        this.goalSelector.addGoal(2, RestrictSunGoal(this))
-        this.goalSelector.addGoal(3, FleeSunGoal(this, 1.0))
+        this.setNormalMovementGoals(true)
         this.goalSelector.addGoal(3, AvoidEntityGoal(this, Wolf::class.java, 6.0F, 1.0, 1.2))
         //        Sentry or Follow Player Goal
-        this.goalSelector.addGoal(5, this.randomStrollGoal!!)
-        this.goalSelector.addGoal(6, LookAtPlayerGoal(this, Player::class.java, 8f))
-        this.goalSelector.addGoal(6, RandomLookAroundGoal(this))
+        this.goalSelector.addGoal(8, LookAtPlayerGoal(this, Player::class.java, 8f))
+        this.goalSelector.addGoal(8, RandomLookAroundGoal(this))
 //        Berserk goal
-        this.targetSelector.addGoal(2, GenericOwnerHurtByTargetGoal(this, this::getSummoner))
-        this.targetSelector.addGoal(4, GenericOwnerHurtTargetGoal(this, this::getSummoner))
+        this.targetSelector.addGoal(0, GenericOwnerHurtByTargetGoal(this, this::getSummoner))
+        this.targetSelector.addGoal(5, GenericOwnerHurtTargetGoal(this, this::getSummoner))
         this.targetSelector.addGoal(6, GenericCopyOwnerTargetGoal(this, this::getSummoner))
         this.targetSelector.addGoal(8, GenericHurtByTargetGoal(this, { entity: Entity? -> entity == getSummoner() }).setAlertOthers())
         this.targetSelector.addGoal(10, GenericProtectOwnerTargetGoal(this, this::getSummoner))
@@ -288,7 +323,8 @@ class SummonedSkeleton(entityType: EntityType<SummonedSkeleton?>?, level: Level)
             }
         } else {
             if (this.power >= 1) {
-                val bowPool = listOf(Items.BOW, Items.CROSSBOW)
+                val bowPool = listOf(Items.BOW)
+//                val bowPool = listOf(Items.BOW, Items.CROSSBOW)
                 this.setItemSlot(EquipmentSlot.MAINHAND, ItemStack(bowPool.random()))
             }
 //            Scale power by giving tipped arrows
@@ -341,5 +377,6 @@ class SummonedSkeleton(entityType: EntityType<SummonedSkeleton?>?, level: Level)
             this.setItemSlot(equipmentSlot, itemStack)
         }
     }
+
 }
 

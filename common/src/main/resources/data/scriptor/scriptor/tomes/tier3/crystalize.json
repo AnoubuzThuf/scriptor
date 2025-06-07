@@ -9,7 +9,6 @@
       {
         "action": "place",
         "descriptors": [
-          "lime",
           "powerful",
           "reagent.scriptor.emerald"
         ]

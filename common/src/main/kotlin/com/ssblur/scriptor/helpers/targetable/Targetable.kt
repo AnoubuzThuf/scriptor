@@ -3,6 +3,7 @@ package com.ssblur.scriptor.helpers.targetable
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.world.level.Level
+import net.minecraft.world.level.block.Block
 import net.minecraft.world.phys.Vec3
 import org.joml.Vector3f
 import kotlin.math.floor
@@ -73,6 +74,19 @@ open class Targetable {
         Direction.EAST -> targetBlockPos.west()
         Direction.SOUTH -> targetBlockPos.north()
         Direction.WEST -> targetBlockPos.east()
+      }
+    }
+
+  val beforeBlockPos: BlockPos
+    get() {
+      return when (direction) {
+        null -> targetBlockPos
+        Direction.UP -> targetBlockPos.above()
+        Direction.DOWN -> targetBlockPos.below()
+        Direction.NORTH -> targetBlockPos.north()
+        Direction.EAST -> targetBlockPos.east()
+        Direction.SOUTH -> targetBlockPos.south()
+        Direction.WEST -> targetBlockPos.west()
       }
     }
 

@@ -16,17 +16,17 @@ import com.ssblur.scriptor.word.descriptor.focus.FocusDescriptor
 import com.ssblur.scriptor.word.descriptor.focus.MultiTargetFocusDescriptor
 import com.ssblur.scriptor.word.descriptor.target.GeometricTargetDescriptor
 import com.ssblur.scriptor.word.descriptor.target.TargetDescriptor
-import net.minecraft.core.BlockPos
+import net.minecraft.ChatFormatting
 import net.minecraft.core.Direction
 import net.minecraft.network.chat.Component
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
-import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.phys.Vec3
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ExecutionException
+import kotlin.math.abs
 import kotlin.math.pow
 
 /**
@@ -35,27 +35,55 @@ import kotlin.math.pow
  * @param spells Groups of descriptors and actions
  */
 class Spell(val subject: Subject, vararg val spells: PartialSpell) {
-  fun castOnTargets(originalCaster: Targetable, originalTargets: List<Targetable>) {
-    assert(spells.isNotEmpty())
+
+  fun correctInitialTargetPositions(originalTargets: List<Targetable>): List<Targetable> {
     var adjustedList: MutableList<Targetable> = mutableListOf()
     for (i in 0..originalTargets.size-1) {
       var adjustedTarget = originalTargets[i]
+      var adjusted: Boolean = false
       val targetDirection = adjustedTarget.direction
-        if (adjustedTarget !is EntityTargetable) {
-          if (originalTargets[i].facing == Direction.NORTH) {
-            adjustedTarget = Targetable(adjustedTarget.level, adjustedTarget.targetPos.add(Vec3(0.0, 0.0, -1.0)), targetDirection)
-          } else if (originalTargets[i].facing == Direction.WEST) {
+      if (adjustedTarget !is EntityTargetable) {
+        for (coord in listOf(adjustedTarget.targetPos.x, adjustedTarget.targetPos.y, adjustedTarget.targetPos.z)) {
+          val check = abs(coord % 1)
+          if (check == 0.0) {
+            if (originalTargets[i].facing == Direction.NORTH) {
+              adjustedTarget = Targetable(adjustedTarget.level, adjustedTarget.targetPos.add(Vec3(0.0, 0.0, -1.0)), targetDirection)
+            } else if (originalTargets[i].facing == Direction.WEST) {
               adjustedTarget = Targetable(adjustedTarget.level, adjustedTarget.targetPos.add(Vec3(-1.0, 0.0, 0.0)), targetDirection)
             } else if (originalTargets[i].facing == Direction.DOWN) {
-            adjustedTarget = Targetable(adjustedTarget.level, adjustedTarget.targetPos.add(Vec3(0.0, -1.0, 0.0)), targetDirection)
+              adjustedTarget = Targetable(adjustedTarget.level, adjustedTarget.targetPos.add(Vec3(0.0, -1.0, 0.0)), targetDirection)
+            }
+            adjusted = true
+            break
           }
         }
+        if (!adjusted) {
+          val newVec = Vec3(adjustedTarget.beforeBlockPos.x.toDouble(), adjustedTarget.beforeBlockPos.y.toDouble(), adjustedTarget.beforeBlockPos.z.toDouble())
+          adjustedTarget = Targetable(adjustedTarget.level, newVec, targetDirection)
+        }
+      }
       adjustedList.add(adjustedTarget)
     }
+    return adjustedList.toList()
+  }
 
+
+  fun castOnTargets(originalCaster: Targetable, originalTargets: List<Targetable>) {
+    assert(spells.isNotEmpty())
+    val adjustedList = this.correctInitialTargetPositions(originalTargets)
+//    if (originalCaster is EntityTargetable && originalCaster.targetEntity is Player) {
+//      if (originalCaster.level.server != null) {
+//        originalCaster.level.server!!.sendSystemMessage(
+//          Component.literal(originalTargets.first().targetPos.toString())
+//        )
+//        originalCaster.level.server!!.sendSystemMessage(
+//          Component.literal((originalTargets.first().targetPos.x % 1).toString())
+//        )
+//      }
+//    }
     for (spell in spells) {
       var caster = originalCaster
-      var targets = adjustedList.toList()
+      var targets = adjustedList
       val deduplicatedDescriptors = spell.deduplicatedDescriptors()
       for (i in 0..deduplicatedDescriptors.size-1) {
         val descriptor = deduplicatedDescriptors.get(i)

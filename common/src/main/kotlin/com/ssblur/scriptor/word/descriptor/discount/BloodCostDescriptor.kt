@@ -23,3 +23,4 @@ class BloodCostDescriptor: Descriptor(), CastDescriptor {
 
   override fun allowsDuplicates() = true
 }
+
