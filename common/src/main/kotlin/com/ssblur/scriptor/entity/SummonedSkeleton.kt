@@ -8,6 +8,7 @@ import net.minecraft.core.BlockPos
 import net.minecraft.core.Holder
 import net.minecraft.core.component.DataComponents
 import net.minecraft.nbt.CompoundTag
+import net.minecraft.server.level.ServerLevel
 import net.minecraft.sounds.SoundEvent
 import net.minecraft.sounds.SoundEvents
 import net.minecraft.util.RandomSource
@@ -137,8 +138,11 @@ class SummonedSkeleton(entityType: EntityType<SummonedSkeleton?>?, level: Level)
     override fun tick() {
         super.tick()
         if (this.hasLimitedLife && --this.limitedLifeTicks <= 0) {
-            this.limitedLifeTicks = 20
-            this.hurt(this.damageSources().starve(), 20.0f)
+            spawnPoof(this.level() as ServerLevel, this.blockPosition())
+            this.remove(RemovalReason.DISCARDED)
+
+//            this.limitedLifeTicks = 20
+//            this.hurt(this.damageSources().starve(), 20.0f)
         }
     }
 
