@@ -4,6 +4,7 @@ import com.ssblur.scriptor.entity.goals.*
 import com.ssblur.scriptor.entity.utils.deserializeOwner
 import com.ssblur.scriptor.entity.utils.getAndCacheOwner
 import com.ssblur.scriptor.entity.utils.serializeOwner
+import net.minecraft.core.BlockPos
 import net.minecraft.core.Holder
 import net.minecraft.core.component.DataComponents
 import net.minecraft.nbt.CompoundTag
@@ -12,13 +13,19 @@ import net.minecraft.sounds.SoundEvents
 import net.minecraft.util.RandomSource
 import net.minecraft.world.DifficultyInstance
 import net.minecraft.world.damagesource.DamageSource
+import net.minecraft.world.effect.MobEffect
+import net.minecraft.world.effect.MobEffectInstance
+import net.minecraft.world.effect.MobEffects
 import net.minecraft.world.entity.*
 import net.minecraft.world.entity.ai.attributes.AttributeInstance
 import net.minecraft.world.entity.ai.attributes.AttributeModifier
 import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.entity.ai.goal.*
+import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal
 import net.minecraft.world.entity.animal.Wolf
 import net.minecraft.world.entity.monster.AbstractSkeleton
+import net.minecraft.world.entity.monster.Creeper
+import net.minecraft.world.entity.monster.Monster
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
@@ -36,7 +43,7 @@ import java.util.*
 class SummonedSkeleton(entityType: EntityType<SummonedSkeleton?>?, level: Level): IMagicSummon,
     AbstractSkeleton(entityType, level) {
 
-    fun setup(owner: LivingEntity, tag: CompoundTag, ticks: Int, hasLimitedLife: Boolean = true, power: Int = 1, color: Int = -6265536, isRanged: Boolean=false) {
+    fun setup(owner: LivingEntity, tag: CompoundTag, ticks: Int, hasLimitedLife: Boolean = true, power: Int = 1, color: Int = -6265536, isRanged: Boolean=false, isInvisible: Boolean=false) {
         setSummoner(owner)
         xpReward = 0
         this.load(tag)
@@ -44,6 +51,10 @@ class SummonedSkeleton(entityType: EntityType<SummonedSkeleton?>?, level: Level)
         this.power = power
         this.color = color
         this.isRanged = isRanged
+        if (isInvisible) {
+            val holder: Holder<MobEffect> = MobEffects.INVISIBILITY
+            this.addEffect(MobEffectInstance(holder, -1))
+        }
     }
 
     @get:JvmName("jvm_summoner")
@@ -55,6 +66,73 @@ class SummonedSkeleton(entityType: EntityType<SummonedSkeleton?>?, level: Level)
     var power: Int = 0
     var color: Int = -6265536
     var isRanged: Boolean = false
+
+    /**
+     * setSentryGoal/setFollowSummonerGoal
+     * setMonsterHunterGoal
+     * setBerserkGoal
+     */
+
+    var randomStrollGoal: WaterAvoidingRandomStrollGoal? = null
+    var sentryGoal: MoveTowardsRestrictionGoal? = null
+    fun setSentryGoal(enabled: Boolean, pos: BlockPos?, range: Int) {
+        this.setFollowSummonerGoal(false)
+        if (this.sentryGoal == null) {
+            this.sentryGoal = MoveTowardsRestrictionGoal(this, 1.0)
+        }
+        this.goalSelector.removeGoal(this.sentryGoal!!)
+        if (enabled) {
+            this.goalSelector.removeGoal(this.randomStrollGoal!!)
+            if (!this.hasRestriction() && pos != null) {
+                this.restrictTo(pos, range)
+            }
+            this.goalSelector.addGoal(4, this.sentryGoal!!)
+        } else {
+            this.clearRestriction()
+        }
+    }
+
+    var followSummonerGoal: GenericFollowOwnerGoal? = null
+    fun setFollowSummonerGoal(enabled: Boolean) {
+        this.setSentryGoal(false, null, 0)
+        if (this.followSummonerGoal == null) {
+            this.followSummonerGoal = GenericFollowOwnerGoal(this, this::getSummoner, 1.0, 15f, 5f, false, 50f)
+        }
+        this.goalSelector.removeGoal(this.followSummonerGoal!!)
+        if (enabled) {
+            this.goalSelector.addGoal(5,this.randomStrollGoal!!)
+            this.clearRestriction()
+            this.goalSelector.addGoal(4, this.followSummonerGoal!!)
+        }
+    }
+
+    var monsterHunterGoal: NearestAttackableTargetGoal<Monster>? = null
+    fun setMonsterHunterGoal(enabled: Boolean) {
+        if (this.monsterHunterGoal == null) {
+            this.monsterHunterGoal = NearestAttackableTargetGoal(this, Monster::class.java, 10, true, false,
+                {
+                    entity: LivingEntity -> entity is Monster && entity !is IMagicSummon && entity !is Creeper
+                }
+            )
+        }
+        this.targetSelector.removeGoal(this.monsterHunterGoal!!)
+        if (enabled) {
+            this.targetSelector.addGoal(11, this.monsterHunterGoal!!)
+        }
+    }
+
+    var berserkGoal: NearestAttackableTargetGoal<LivingEntity>? = null
+    fun setBerserkGoal(enabled: Boolean) {
+        if (this.berserkGoal == null) {
+            this.berserkGoal = NearestAttackableTargetGoal(this, LivingEntity::class.java, 10, true, false,
+                { entity: LivingEntity -> true }
+            )
+        }
+        this.targetSelector.removeGoal(this.berserkGoal!!)
+        if (enabled) {
+            this.targetSelector.addGoal(1, this.berserkGoal!!)
+        }
+    }
 
     override fun tick() {
         super.tick()
@@ -79,19 +157,22 @@ class SummonedSkeleton(entityType: EntityType<SummonedSkeleton?>?, level: Level)
     }
 
     override fun registerGoals() {
+        this.randomStrollGoal = WaterAvoidingRandomStrollGoal(this, 1.0)
         this.goalSelector.addGoal(0, FloatGoal(this))
         this.goalSelector.addGoal(2, RestrictSunGoal(this))
         this.goalSelector.addGoal(3, FleeSunGoal(this, 1.0))
         this.goalSelector.addGoal(3, AvoidEntityGoal(this, Wolf::class.java, 6.0F, 1.0, 1.2))
-        this.goalSelector.addGoal(4, GenericFollowOwnerGoal(this, this::getSummoner, 1.0, 15f, 5f, false, null))
-        this.goalSelector.addGoal(5, WaterAvoidingRandomStrollGoal(this, 1.0))
+        //        Sentry or Follow Player Goal
+        this.goalSelector.addGoal(5, this.randomStrollGoal!!)
         this.goalSelector.addGoal(6, LookAtPlayerGoal(this, Player::class.java, 8f))
         this.goalSelector.addGoal(6, RandomLookAroundGoal(this))
-        this.targetSelector.addGoal(1, GenericOwnerHurtByTargetGoal(this, this::getSummoner))
-        this.targetSelector.addGoal(2, GenericOwnerHurtTargetGoal(this, this::getSummoner))
-        this.targetSelector.addGoal(3, GenericCopyOwnerTargetGoal(this, this::getSummoner))
-        this.targetSelector.addGoal(4, GenericHurtByTargetGoal(this, { entity: Entity? -> entity == getSummoner() }).setAlertOthers())
-        this.targetSelector.addGoal(5, GenericProtectOwnerTargetGoal(this, this::getSummoner))
+//        Berserk goal
+        this.targetSelector.addGoal(2, GenericOwnerHurtByTargetGoal(this, this::getSummoner))
+        this.targetSelector.addGoal(4, GenericOwnerHurtTargetGoal(this, this::getSummoner))
+        this.targetSelector.addGoal(6, GenericCopyOwnerTargetGoal(this, this::getSummoner))
+        this.targetSelector.addGoal(8, GenericHurtByTargetGoal(this, { entity: Entity? -> entity == getSummoner() }).setAlertOthers())
+        this.targetSelector.addGoal(10, GenericProtectOwnerTargetGoal(this, this::getSummoner))
+//        monsterHunterGoal = 11
     }
 
 

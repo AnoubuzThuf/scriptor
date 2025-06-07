@@ -1,0 +1,17 @@
+{
+  "name": "tome.scriptor.trial_by_combat",
+  "author": "AnoubuzThuf",
+  "tier": 3,
+  "item": "scriptor:spellbook_red",
+  "spell": {
+    "subject": "storm",
+    "spells": [
+      {
+        "action": "summon_skeleton",
+        "descriptors": [
+          "summon_behaviour_berserk"
+        ]
+      }
+    ]
+  }
+}

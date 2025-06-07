@@ -7,9 +7,11 @@
     "subject": "projectile",
     "spells": [
       {
-        "action": "summon_ranged_skeleton",
+        "action": "summon_skeleton",
         "descriptors": [
-          "white"
+          "white",
+          "summon_property_ranged",
+          "summon_behaviour_sentry"
         ]
       }
     ]

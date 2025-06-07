@@ -4,11 +4,15 @@ import com.ssblur.scriptor.api.word.Action
 import com.ssblur.scriptor.api.word.Descriptor
 import com.ssblur.scriptor.api.word.Word
 import com.ssblur.scriptor.color.CustomColors.getColor
+import com.ssblur.scriptor.entity.SUMMON_BEHAVIOURS
+import com.ssblur.scriptor.entity.SUMMON_PROPERTIES
 import com.ssblur.scriptor.entity.ScriptorEntities.SUMMONED_SKELETON
 import com.ssblur.scriptor.helpers.targetable.EntityTargetable
 import com.ssblur.scriptor.helpers.targetable.Targetable
 import com.ssblur.scriptor.word.descriptor.duration.DurationDescriptor
 import com.ssblur.scriptor.word.descriptor.power.StrengthDescriptor
+import com.ssblur.scriptor.word.descriptor.summon.SummonBehaviourDescriptor
+import com.ssblur.scriptor.word.descriptor.summon.SummonPropertyDescriptor
 import net.minecraft.core.BlockPos
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.server.level.ServerLevel
@@ -28,6 +32,10 @@ class SummonSkeletonAction: Action() {
       if (d is StrengthDescriptor) strength += d.strengthModifier()
       if (d is DurationDescriptor) duration += d.durationModifier()
     }
+    val behaviours: List<SUMMON_BEHAVIOURS> = descriptors.filter{it is SummonBehaviourDescriptor}.map{it as SummonBehaviourDescriptor}.map{it.behaviour}
+    val summonProperties: List<SUMMON_PROPERTIES> = descriptors.filter{it is SummonPropertyDescriptor}.map{it as SummonPropertyDescriptor}.map{it.summonProperties}
+
+
     if (caster is EntityTargetable) {
       if (caster.targetEntity is LivingEntity) {
         val l = caster.targetEntity as LivingEntity
@@ -41,11 +49,22 @@ class SummonSkeletonAction: Action() {
         val vecPos: Vec3 = Vec3(blockPos2.x.toDouble(), blockPos2.y.toDouble(), blockPos2.z.toDouble())
         val summonedSkeleton = SUMMONED_SKELETON.get().create(level, null, blockPos2, MobSpawnType.MOB_SUMMONED, false, false)!!
         val tag = CompoundTag()
-        summonedSkeleton.setup(l, tag, duration.toInt() * 20, true, strength.toInt(), getColor(descriptors))
+        summonedSkeleton.setup(l, tag, duration.toInt() * 20, true, strength.toInt(), getColor(descriptors),
+          SUMMON_PROPERTIES.RANGED in summonProperties, SUMMON_PROPERTIES.INVISIBLE in summonProperties)
         summonedSkeleton.finalizeSpawn(level, level.getCurrentDifficultyAt(blockPos2), MobSpawnType.MOB_SUMMONED, null)
         summonedSkeleton.setPos(vecPos)
         level.addFreshEntity(summonedSkeleton)
         level.gameEvent(GameEvent.ENTITY_PLACE, blockPos2,  GameEvent.Context.of(l))
+
+        for (behaviour in behaviours) {
+          when (behaviour) {
+              SUMMON_BEHAVIOURS.SENTRY -> summonedSkeleton.setSentryGoal(true, blockPos2, 1)
+              SUMMON_BEHAVIOURS.FOLLOWER -> summonedSkeleton.setFollowSummonerGoal(true)
+              SUMMON_BEHAVIOURS.HUNTER -> summonedSkeleton.setMonsterHunterGoal(true)
+              SUMMON_BEHAVIOURS.BERSERK -> summonedSkeleton.setBerserkGoal(true)
+              else -> continue
+          }
+        }
         summonedSkeleton.setPos(vecPos)
       }
     }

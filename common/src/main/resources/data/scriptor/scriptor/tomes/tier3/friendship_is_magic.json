@@ -9,7 +9,9 @@
       {
         "action": "summon_skeleton",
         "descriptors": [
-          "night"
+          "night",
+          "summon_behaviour_hunter",
+          "summon_behaviour_follower"
         ]
       }
     ]

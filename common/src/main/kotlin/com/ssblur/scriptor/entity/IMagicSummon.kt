@@ -10,6 +10,14 @@ import net.minecraft.world.entity.OwnableEntity
 import net.minecraft.world.level.GameRules
 import net.minecraft.world.level.Level
 
+enum class SUMMON_BEHAVIOURS {
+    SENTRY, FOLLOWER, HUNTER, BERSERK
+}
+
+enum class SUMMON_PROPERTIES {
+    RANGED, INVISIBLE
+}
+
 interface IMagicSummon {
     fun getSummoner(): LivingEntity?
 

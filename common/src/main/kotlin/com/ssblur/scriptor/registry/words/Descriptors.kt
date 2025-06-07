@@ -1,8 +1,12 @@
 package com.ssblur.scriptor.registry.words
 
+import com.ssblur.scriptor.entity.SUMMON_BEHAVIOURS
+import com.ssblur.scriptor.entity.SUMMON_PROPERTIES
 import com.ssblur.scriptor.registry.words.WordRegistry.register
 import com.ssblur.scriptor.word.descriptor.SpeedDurationDescriptor
 import com.ssblur.scriptor.word.descriptor.duration.SimpleDurationDescriptor
+import com.ssblur.scriptor.word.descriptor.summon.SummonBehaviourDescriptor
+import com.ssblur.scriptor.word.descriptor.summon.SummonPropertyDescriptor
 import com.ssblur.scriptor.word.descriptor.target.ChainDescriptor
 import com.ssblur.scriptor.word.descriptor.target.CircleDescriptor
 import com.ssblur.scriptor.word.descriptor.target.CollideWithWaterDescriptor
@@ -44,4 +48,31 @@ object Descriptors {
 
   val NETHER = register("nether", NetherDescriptor())
   val COLLIDE_WITH_WATER = register("collide_with_water", CollideWithWaterDescriptor)
+//  Summon Behaviours
+
+  val SUMMON_BEHAVIOUR_SENTRY = register(
+    "summon_behaviour_sentry",
+    SummonBehaviourDescriptor(0, SUMMON_BEHAVIOURS.SENTRY)
+  )
+  val SUMMON_BEHAVIOUR_FOLLOWER = register(
+    "summon_behaviour_follower",
+    SummonBehaviourDescriptor(0, SUMMON_BEHAVIOURS.FOLLOWER)
+  )
+  val SUMMON_BEHAVIOUR_HUNTER = register(
+    "summon_behaviour_hunter",
+    SummonBehaviourDescriptor(0, SUMMON_BEHAVIOURS.HUNTER)
+  )
+  val SUMMON_BEHAVIOUR_BERSERK = register(
+    "summon_behaviour_berserk",
+    SummonBehaviourDescriptor(0, SUMMON_BEHAVIOURS.BERSERK)
+  )
+//  Summon Properties
+  val SUMMON_PROPERTY_RANGED = register(
+    "summon_property_ranged",
+  SummonPropertyDescriptor(4, SUMMON_PROPERTIES.RANGED)
+  )
+  val SUMMON_PROPERTY_INVISIBLE = register(
+    "summon_property_invisible",
+    SummonPropertyDescriptor(4, SUMMON_PROPERTIES.INVISIBLE)
+  )
 }

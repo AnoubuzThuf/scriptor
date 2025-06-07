@@ -9,6 +9,7 @@
     "action:bound_pickaxe",
     "action:dolphins_grace",
     "action:blind",
-    "action:slow_falling"
+    "action:slow_falling",
+    "descriptor:summon_property_invisible"
   ]
 }
