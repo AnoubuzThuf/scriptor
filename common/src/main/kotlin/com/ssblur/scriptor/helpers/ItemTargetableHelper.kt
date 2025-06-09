@@ -43,6 +43,9 @@ object ItemTargetableHelper {
   }
 
   fun depositItemStack(targetable: Targetable, itemStack: ItemStack) {
+    if (itemStack.count < 1) {
+      return
+    }
     if (targetable is InventoryTargetable) {
       if (targetable.container != null) {
         var slot: Int = targetable.getFirstMatchingSlotNotEmpty(itemStack)
@@ -52,9 +55,13 @@ object ItemTargetableHelper {
             item.grow(itemStack.count)
             return
           } else {
-            val diff = item.maxStackSize - item.count
-            item.grow(diff)
-            itemStack.shrink(diff)
+            val diff = (item.count + itemStack.count) - item.maxStackSize
+            if (diff == 0) {
+              item.grow(itemStack.count)
+              return
+            }
+            item.grow(item.maxStackSize - item.count)
+            itemStack.shrink(item.maxStackSize - item.count)
           }
         }
 
