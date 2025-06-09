@@ -1,0 +1,17 @@
+{
+  "name": "tome.scriptor.rust",
+  "author": "AnoubuzThuf",
+  "tier": 2,
+  "spell": {
+    "subject": "self",
+    "spells": [
+      {
+        "action": "break",
+        "descriptors": [
+          "white",
+          "entity_only"
+        ]
+      }
+    ]
+  }
+}
