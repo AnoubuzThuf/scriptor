@@ -51,7 +51,8 @@ class Spell(val subject: Subject, vararg val spells: PartialSpell) {
             } else if (originalTargets[i].facing == Direction.WEST) {
               adjustedTarget = Targetable(adjustedTarget.level, adjustedTarget.targetPos.add(Vec3(-1.0, 0.0, 0.0)), targetDirection)
             } else if (originalTargets[i].facing == Direction.DOWN) {
-              adjustedTarget = Targetable(adjustedTarget.level, adjustedTarget.targetPos.add(Vec3(0.0, -1.0, 0.0)), targetDirection)
+              adjustedTarget =
+                Targetable(adjustedTarget.level, adjustedTarget.targetPos.add(Vec3(0.0, -1.0, 0.0)), targetDirection)
             }
             adjusted = true
             break

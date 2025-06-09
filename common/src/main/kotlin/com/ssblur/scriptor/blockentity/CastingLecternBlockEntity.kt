@@ -5,9 +5,11 @@ import com.ssblur.scriptor.config.ScriptorConfig
 import com.ssblur.scriptor.data.saved_data.DictionarySavedData
 import com.ssblur.scriptor.helpers.LimitedBookSerializer
 import com.ssblur.scriptor.helpers.targetable.LecternTargetable
+import com.ssblur.scriptor.helpers.targetable.Targetable
 import com.ssblur.scriptor.item.casters.CasterCrystal
 import com.ssblur.scriptor.network.client.ParticleNetwork
 import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
 import net.minecraft.core.HolderLookup
 import net.minecraft.core.NonNullList
 import net.minecraft.core.component.DataComponents
@@ -24,6 +26,7 @@ import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.phys.Vec3
 import kotlin.math.max
 
 class CastingLecternBlockEntity(blockPos: BlockPos, blockState: BlockState):
@@ -100,8 +103,7 @@ class CastingLecternBlockEntity(blockPos: BlockPos, blockState: BlockState):
           }
           val state = server.getBlockState(blockPos)
           val direction = state.getValue(CastingLecternBlock.FACING).opposite
-          val pos = blockPos.center
-          val target = LecternTargetable(getLevel()!!, pos).setFacing(direction)
+          val target = LecternTargetable(getLevel()!!, blockPos, direction)
           if (focus.item is CasterCrystal) {
             val crystal = focus.item as CasterCrystal
             val foci = crystal.getTargetables(focus, server)

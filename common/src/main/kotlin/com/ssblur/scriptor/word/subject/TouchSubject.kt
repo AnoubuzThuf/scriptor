@@ -22,7 +22,7 @@ class TouchSubject: Subject() {
         spell.deduplicatedDescriptorsForSubjects().contains(CollideWithWaterDescriptor)
       ) { target: Targetable -> result.complete(listOf(target)) }
     } else if (caster is LecternTargetable) {
-      val pos = caster.targetBlockPos.relative(caster.facing)
+      val pos = caster.beforeBlockPos
       val entities = caster.level.getEntitiesOfClass(
         LivingEntity::class.java,
         AABB.ofSize(
@@ -37,7 +37,11 @@ class TouchSubject: Subject() {
         )
       )
 
-      if (entities.isEmpty()) result.complete(listOf(Targetable(caster.level, pos)))
+      if (entities.isEmpty()) result.complete(listOf(Targetable(caster.level, Vec3(
+        pos.x.toDouble() + 0.5,
+        pos.y.toDouble(),
+        pos.z.toDouble() + 0.5
+      ))))
       else result.complete(entities.stream().map { EntityTargetable(it) }.toList())
     } else {
       result.complete(java.util.List.of(caster.simpleCopy()))

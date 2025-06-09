@@ -4,6 +4,7 @@ import com.ssblur.scriptor.api.word.Descriptor
 import com.ssblur.scriptor.helpers.MathHelper
 import com.ssblur.scriptor.helpers.targetable.Targetable
 import net.minecraft.core.Direction
+import net.minecraft.network.chat.Component
 import net.minecraft.world.phys.Vec2
 import net.minecraft.world.phys.Vec3
 import org.apache.commons.lang3.function.TriConsumer
@@ -65,6 +66,17 @@ class OffsetDescriptor(val cost: Double): Descriptor(), TargetDescriptor {
         MathHelper.player_view_transform_point(targetable, owner, Vec2(1f, 0f))
       }
       targetable.targetPos = pos
+//      if (owner.level.server != null) {
+//        owner.level.server!!.sendSystemMessage(
+//          Component.literal("////////")
+//        )
+//        owner.level.server!!.sendSystemMessage(
+//          Component.literal(pos.x.toString() + " " + pos.y.toString() + " " + pos.z.toString())
+//        )
+//        owner.level.server!!.sendSystemMessage(
+//          Component.literal("\\\\\\\\\\\\\\")
+//        )
+//      }
       output.add(targetable)
     })
     return this

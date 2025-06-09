@@ -1,7 +1,9 @@
 package com.ssblur.scriptor.helpers.targetable
 
+import com.ssblur.scriptor.block.CastingLecternBlock
 import com.ssblur.scriptor.blockentity.CastingLecternBlockEntity
 import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
 import net.minecraft.world.Container
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.Vec3
@@ -10,6 +12,12 @@ import org.joml.Vector3f
 @Suppress("unused")
 class LecternTargetable: Targetable, InventoryTargetable {
   override var targetedSlot: Int
+
+
+  constructor(level: Level, pos: BlockPos, direction: Direction?):
+          super(level, Vec3(pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble()), direction) {
+    targetedSlot = 0
+  }
 
   constructor(level: Level, pos: Vec3): super(level, pos) {
     targetedSlot = 0

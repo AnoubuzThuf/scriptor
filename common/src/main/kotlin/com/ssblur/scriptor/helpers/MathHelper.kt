@@ -4,6 +4,7 @@ import com.ssblur.scriptor.helpers.targetable.EntityTargetable
 import com.ssblur.scriptor.helpers.targetable.LecternTargetable
 import com.ssblur.scriptor.helpers.targetable.Targetable
 import net.minecraft.core.Direction
+import net.minecraft.network.chat.Component
 import net.minecraft.world.phys.Vec2
 import net.minecraft.world.phys.Vec3
 import kotlin.math.PI
@@ -120,6 +121,13 @@ object MathHelper {
       point.x * sin(radians) + point.y * cos(radians),
     )
   }
+  fun rotate_point_clockwise(point: Vec2, degrees: Float): Vec2 {
+    val radians = (degrees * (PI / 180f)).toFloat()
+    return Vec2(
+      point.x * cos(radians) + point.y * sin(radians),
+      point.x * sin(radians) * -1 + point.y * cos(radians),
+    )
+  }
   /**
    * Transforms a point according to the player's horizontal view direction (North, East, South, West)
    * and the targeted face of the initial block target. This has the effect of affecting points relative
@@ -130,24 +138,11 @@ object MathHelper {
    * @return The transformed Vec3 point
    */
   fun player_view_transform_point(initial_targetable: Targetable, owner: Targetable, point: Vec2): Vec3 {
-
-    val yRotation = if (owner is EntityTargetable) {
-      owner.entityYRotation!!.toInt()
-    } else if (owner is LecternTargetable) {
-      0
-    } else {
-      0
-    }
-    val coarseYRotation = if (owner is EntityTargetable) {
-      owner.entityCoarseYRotation!!.toFloat()
-    } else if (owner is LecternTargetable) {
-      0f
-    } else {
-      0f
-    }
-
     val pos = initial_targetable.targetPos
     val axis = initial_targetable.facing.axis
+
+    val yRotation = owner.entityYRotation().toInt()
+    val coarseYRotation = owner.entityCoarseYRotation()
 
     var newPos: Vec3
     if (axis === Direction.Axis.X) {
@@ -163,13 +158,38 @@ object MathHelper {
       )
     } else if (axis === Direction.Axis.Y) {
       var transformed_point = rotate_point_anticlockwise(point, coarseYRotation + 90f)
+//      if (owner.level.server != null) {
+//        owner.level.server!!.sendSystemMessage(
+//          Component.literal("+++++++++")
+//        )
+//        owner.level.server!!.sendSystemMessage(
+//          Component.literal(axis.toString())
+//        )
+//        owner.level.server!!.sendSystemMessage(
+//          Component.literal(owner.direction.toString())
+//        )
+//        owner.level.server!!.sendSystemMessage(
+//          Component.literal(owner.entityYRotation().toString())
+//        )
+//        owner.level.server!!.sendSystemMessage(
+//          Component.literal(coarseYRotation.toString())
+//        )
+//        owner.level.server!!.sendSystemMessage(
+//          Component.literal(pos.x.toString() + " " + pos.y.toString())
+//        )
+//        owner.level.server!!.sendSystemMessage(
+//          Component.literal(transformed_point.x.toString() + " " + transformed_point.y.toString())
+//        )
+//        owner.level.server!!.sendSystemMessage(
+//          Component.literal("////////////")
+//        )
+//      }
       newPos = Vec3(
         pos.x + transformed_point.x,
         pos.y,
         pos.z + transformed_point.y
       )
-    }
-    else {
+    } else {
       var x_mult = if (yRotation in 90..270) {
         1
       } else {
@@ -177,6 +197,7 @@ object MathHelper {
       }
       newPos = Vec3(pos.x + point.x * x_mult, pos.y + point.y, pos.z)
     }
+
     return newPos
   }
 }

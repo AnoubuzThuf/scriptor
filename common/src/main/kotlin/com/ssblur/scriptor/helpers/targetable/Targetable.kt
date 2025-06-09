@@ -1,5 +1,7 @@
 package com.ssblur.scriptor.helpers.targetable
 
+import com.ssblur.scriptor.block.CastingLecternBlock
+import com.ssblur.scriptor.blockentity.CastingLecternBlockEntity
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.world.level.Level
@@ -49,15 +51,21 @@ open class Targetable {
   val targetBlockPos: BlockPos
     get() = BlockPos(floor(targetPos.x).toInt(), floor(targetPos.y).toInt(), floor(targetPos.z).toInt())
 
-  val facing: Direction
+  open val facing: Direction
     get() {
       if (direction != null) return direction!!
       return Direction.UP
     }
 
-  open val entityYRotation: Float? = null
+  open fun entityYRotation(): Float = when (this.facing) {
+    Direction.NORTH -> 180f
+    Direction.SOUTH -> 0f
+    Direction.EAST -> 270f
+    Direction.WEST -> 90f
+    else -> 0f
+  }
 
-  open val entityCoarseYRotation: Float? = null
+  open fun entityCoarseYRotation(): Float = this.entityYRotation()
 
   fun setFacing(direction: Direction?): Targetable {
     this.direction = direction
@@ -91,8 +99,7 @@ open class Targetable {
     }
 
   fun simpleCopy(): Targetable {
-    val out = Targetable(level, targetPos)
-    out.setFacing(facing)
+    val out = Targetable(level, targetPos, facing)
     return out
   }
 }
