@@ -1,15 +1,19 @@
 {
-  "name": "tome.scriptor.harmless",
+  "name": "tome.scriptor.flame_ward",
   "author": "AnoubuzThuf",
   "tier": 2,
   "spell": {
-    "subject": "projectile",
+    "subject": "self",
     "spells": [
       {
-        "action": "harm",
+        "action": "inflame",
         "descriptors": [
-          "white",
-          "block_only"
+          "block_only",
+          "square",
+          "square",
+          "move_left",
+          "move_down",
+          "move_down"
         ]
       }
     ]

@@ -1,23 +1,16 @@
 {
-  "name": "tome.scriptor.sacrificial_lightning",
-  "author": "Zephyr the Pained",
-  "item": "scriptor:spellbook_black",
+  "name": "tome.scriptor.sacrificial_color",
+  "author": "AnoubuzThuf",
+  "item": "scriptor:spellbook_red",
   "tier": 2,
   "spell": {
     "subject": "projectile",
     "spells": [
       {
-        "action": "smite",
+        "action": "color",
         "descriptors": [
           "blood_cost",
-          "blood_cost",
-          "blood_cost",
-          "blood_cost",
-          "blood_cost",
-          "blood_cost",
-          "blood_cost",
-          "blood_cost",
-          "blood_cost"
+          "red"
         ]
       }
     ]

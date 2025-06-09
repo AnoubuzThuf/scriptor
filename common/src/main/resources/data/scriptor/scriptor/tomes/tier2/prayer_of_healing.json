@@ -6,9 +6,10 @@
     "subject": "self",
     "spells": [
       {
-        "action": "break",
+        "action": "heal",
         "descriptors": [
-          "white",
+          "circle",
+          "move_backwards",
           "entity_only"
         ]
       }
