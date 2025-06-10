@@ -103,7 +103,7 @@ class CastingLecternBlockEntity(blockPos: BlockPos, blockState: BlockState):
           }
           val state = server.getBlockState(blockPos)
           val direction = state.getValue(CastingLecternBlock.FACING).opposite
-          val target = LecternTargetable(getLevel()!!, blockPos, direction)
+          val target = LecternTargetable(getLevel()!!, blockPos, direction, item)
           if (focus.item is CasterCrystal) {
             val crystal = focus.item as CasterCrystal
             val foci = crystal.getTargetables(focus, server)

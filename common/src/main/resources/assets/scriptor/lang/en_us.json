@@ -217,6 +217,8 @@
   "action.scriptor.rain": "This spell summons a storm.",
   "action.scriptor.poison": "This spell poisons the target.",
   "action.scriptor.arcane_poison": "This spell inflicts a weak poison on the target. Some other actions can increase its potency.",
+  "action.scriptor.mark": "This spell marks a location.",
+  "action.scriptor.recall": "This spell teleports to a marked location.",
   "action.scriptor.levitate": "This spell makes the target float.",
   "action.scriptor.blind": "This spell blinds the target.",
   "action.scriptor.absorption": "This spell shields the target.",

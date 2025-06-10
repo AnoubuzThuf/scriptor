@@ -9,6 +9,8 @@ import com.ssblur.scriptor.word.action.potions.FreezeAction
 import com.ssblur.scriptor.word.action.potions.LightAction
 import com.ssblur.scriptor.word.action.teleport.BringAction
 import com.ssblur.scriptor.word.action.teleport.GotoAction
+import com.ssblur.scriptor.word.action.teleport.MarkAction
+import com.ssblur.scriptor.word.action.teleport.RecallAction
 import com.ssblur.scriptor.word.action.teleport.SwapAction
 import net.minecraft.core.registries.Registries
 import net.minecraft.resources.ResourceLocation
@@ -26,6 +28,8 @@ object Actions {
   val SUMMON_SKELETON = register("summon_skeleton", SummonSkeletonAction())
 //  val SUMMON_RANGED_SKELETON = register("summon_ranged_skeleton", SummonRangedSkeletonAction())
   val EXPLOSION = register("explosion", ExplosionAction())
+  val MARK = register("mark", MarkAction())
+  val RECALL = register("recall", RecallAction())
   val GOTO = register("goto", GotoAction())
   val SWAP = register("swap", SwapAction())
   val BRING = register("bring", BringAction())

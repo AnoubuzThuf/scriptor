@@ -4,10 +4,12 @@ import com.mojang.serialization.Codec
 import com.ssblur.scriptor.ScriptorMod
 import net.minecraft.core.component.DataComponentType
 import net.minecraft.network.codec.ByteBufCodecs
+import net.minecraft.world.phys.Vec3
 import java.util.function.Consumer
 
 object ScriptorDataComponents {
   val EXPIRES: DataComponentType<Long> = registerLong("expires")
+  val TELEPORT_WAYPOINT: DataComponentType<String> = registerString("teleport_waypoint")
   val COMMUNITY_MODE: DataComponentType<Boolean> = registerBool("community_mode")
   val CHARGES: DataComponentType<Int> = registerInt("charge")
   val TOOL_MINING_LEVEL: DataComponentType<Int> = registerInt("tool_mining_level")

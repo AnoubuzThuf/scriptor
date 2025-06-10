@@ -17,6 +17,8 @@
     "descriptor:purple",
     "descriptor:brown",
     "descriptor:dark_gray",
-    "descriptor:block_only"
+    "descriptor:block_only",
+    "action:mark",
+    "action:recall"
   ]
 }

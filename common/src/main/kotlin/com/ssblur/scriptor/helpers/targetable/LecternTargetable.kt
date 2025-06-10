@@ -5,6 +5,7 @@ import com.ssblur.scriptor.blockentity.CastingLecternBlockEntity
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.world.Container
+import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.Vec3
 import org.joml.Vector3f
@@ -12,7 +13,14 @@ import org.joml.Vector3f
 @Suppress("unused")
 class LecternTargetable: Targetable, InventoryTargetable {
   override var targetedSlot: Int
+  var spellbook: ItemStack? = null
 
+
+  constructor(level: Level, pos: BlockPos, direction: Direction?, spellbook: ItemStack?):
+          super(level, Vec3(pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble()), direction) {
+    targetedSlot = 0
+    this.spellbook = spellbook
+  }
 
   constructor(level: Level, pos: BlockPos, direction: Direction?):
           super(level, Vec3(pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble()), direction) {
