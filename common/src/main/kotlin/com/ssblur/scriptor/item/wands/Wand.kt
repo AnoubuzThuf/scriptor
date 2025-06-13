@@ -25,6 +25,7 @@ import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.TooltipFlag
 import net.minecraft.world.level.Level
+import kotlin.math.floor
 
 open class Wand(properties: Properties,
                 val maxCost: Int = ScriptorConfig.VOCAL_MAX_COST(),
@@ -48,8 +49,17 @@ open class Wand(properties: Properties,
 
       val spell = computeIfAbsent(level).parse(sentence)
       if (spell != null) {
+        val initial_cost = spell.cost()
 
-        var cost = Math.round(spell.cost() * 30).toInt()
+        val spellIsCompatible = ((permittedActions == null) || (spell.containedActions().all{it in permittedActions!!}))
+
+        if ((maxCost in 0..< floor(initial_cost).toInt()) || !spellIsCompatible) {
+          player.sendSystemMessage(Component.translatable("extra.scriptor.wand_fizzle"))
+          ScriptorAdvancements.FIZZLE.get().trigger(player as ServerPlayer)
+          return InteractionResultHolder.fail(player.getItemInHand(interactionHand))
+        }
+
+        var cost = Math.round(initial_cost * 30).toInt()
         var costScale = 1.0f
         for (instance in player.activeEffects)
           if (instance.effect.value() is EmpoweredStatusEffect)
@@ -57,13 +67,7 @@ open class Wand(properties: Properties,
               costScale *= (instance.effect.value() as EmpoweredStatusEffect).scale
         cost = Math.round((cost.toFloat()) * costScale * costMultiplier)
 
-        val spellIsCompatible = ((permittedActions == null) || (spell.containedActions().all{it in permittedActions!!}))
 
-        if ((maxCost in 0..<cost) || !spellIsCompatible) {
-          player.sendSystemMessage(Component.translatable("extra.scriptor.fizzle"))
-          ScriptorAdvancements.FIZZLE.get().trigger(player as ServerPlayer)
-          return InteractionResultHolder.fail(player.getItemInHand(interactionHand))
-        }
 
         val adjustedCost = Math.round(cost * (ScriptorConfig.VOCAL_COOLDOWN_MULTIPLIER() / 100.0)).toInt()
         if (!player.isCreative) {
