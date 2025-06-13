@@ -3,6 +3,7 @@ package com.ssblur.scriptor.events
 import com.ssblur.scriptor.ScriptorDamage.overload
 import com.ssblur.scriptor.config.ScriptorConfig
 import com.ssblur.scriptor.data.saved_data.DictionarySavedData.Companion.computeIfAbsent
+import com.ssblur.scriptor.data.saved_data.LastCastSpellSavedData
 import com.ssblur.scriptor.effect.EmpoweredStatusEffect
 import com.ssblur.scriptor.effect.ScriptorEffects.HOARSE
 import com.ssblur.scriptor.effect.ScriptorEffects.MUTE
@@ -58,7 +59,14 @@ object SpellChat {
             if (adjustedCost > ScriptorConfig.VOCAL_DAMAGE_THRESHOLD())
               player.hurt(overload(player)!!, (adjustedCost - ScriptorConfig.VOCAL_DAMAGE_THRESHOLD() * 0.75f) / 100f)
           }
-          if (player.health > 0) spell.cast(EntityTargetable(player))
+          if (player.health > 0) {
+            spell.cast(EntityTargetable(player))
+            val lastCastSpell: LastCastSpellSavedData? = LastCastSpellSavedData.Companion.computeIfAbsent(player)
+            if (lastCastSpell != null) {
+              lastCastSpell.spell_text = sentence
+              lastCastSpell.setDirty()
+            }
+          }
           if (!ScriptorConfig.SHOW_SPELLS_IN_CHAT()) return@register it.cancel()
         }
       }

@@ -13,6 +13,7 @@ object ScriptorDamage {
   val SACRIFICE: ResourceKey<DamageType> =
     ResourceKey.create(Registries.DAMAGE_TYPE, ScriptorMod.location("sacrifice"))
   val OVERLOAD: ResourceKey<DamageType> = ResourceKey.create(Registries.DAMAGE_TYPE, ScriptorMod.location("overload"))
+  val OVERLOAD_NO_FLINCH: ResourceKey<DamageType> = ResourceKey.create(Registries.DAMAGE_TYPE, ScriptorMod.location("overload_no_flinch"))
 
   @JvmStatic
   fun sacrifice(entity: Entity): DamageSource {
@@ -33,6 +34,19 @@ object ScriptorDamage {
       DamageSource(
         damageTypes.getHolderOrThrow(
           OVERLOAD
+        ), entity
+      )
+    }
+      .orElse(null)
+  }
+
+  @JvmStatic
+  fun overload_no_flinch(entity: Entity): DamageSource? {
+    val level = entity.level()
+    return level.registryAccess().registry(Registries.DAMAGE_TYPE).map { damageTypes: Registry<DamageType> ->
+      DamageSource(
+        damageTypes.getHolderOrThrow(
+          OVERLOAD_NO_FLINCH
         ), entity
       )
     }

@@ -1,6 +1,7 @@
 package com.ssblur.scriptor.item
 
 import com.ssblur.scriptor.ScriptorMod.registerItem
+import com.ssblur.scriptor.config.ScriptorConfig
 import com.ssblur.scriptor.item.books.*
 import com.ssblur.scriptor.item.casters.CoordinateCasterCrystal
 import com.ssblur.scriptor.item.casters.PlayerCasterCrystal
@@ -9,6 +10,7 @@ import com.ssblur.scriptor.item.tools.EngravingTool
 import com.ssblur.scriptor.item.tools.bound.BoundAxe
 import com.ssblur.scriptor.item.tools.bound.BoundSword
 import com.ssblur.scriptor.item.tools.bound.BoundTool
+import com.ssblur.scriptor.item.wands.Wand
 import com.ssblur.unfocused.helper.ColorHelper
 import com.ssblur.unfocused.tab.CreativeTabs.tab
 import net.minecraft.tags.BlockTags
@@ -54,6 +56,12 @@ object ScriptorItems {
   val SCRAP = registerItem("scrap") { Scrap(Item.Properties()) }
   val CHALK = registerItem("chalk") { Chalk(Item.Properties()) }
       .tab(ScriptorTabs.SCRIPTOR_TAB)
+  val GOLD_WAND = registerItem("gold_wand") { Wand(Item.Properties(), maxCost = ScriptorConfig.CASTING_LECTERN_MAX_COST()) }
+    .tab(ScriptorTabs.SCRIPTOR_TAB)
+  val EMERALD_WAND = registerItem("emerald_wand") { Wand(Item.Properties(), maxCost = ScriptorConfig.TOME_MAX_COST()) }
+    .tab(ScriptorTabs.SCRIPTOR_TAB)
+  val NETHER_WAND = registerItem("nether_wand") { Wand(Item.Properties(), maxCost = ScriptorConfig.VOCAL_MAX_COST()) }
+    .tab(ScriptorTabs.SCRIPTOR_TAB)
   val ENGRAVING_TOOL = registerItem("engraving_tool") { EngravingTool(Item.Properties()) }
     .tab(ScriptorTabs.SCRIPTOR_TAB)
   val DICTIONARY = registerItem("dictionary") {

@@ -2,6 +2,7 @@ package com.ssblur.scriptor.word
 
 import com.ssblur.scriptor.ScriptorMod.LOGGER
 import com.ssblur.scriptor.advancement.ScriptorAdvancements
+import com.ssblur.scriptor.api.word.Action
 import com.ssblur.scriptor.api.word.Descriptor
 import com.ssblur.scriptor.api.word.Subject
 import com.ssblur.scriptor.api.word.Word
@@ -256,4 +257,6 @@ class Spell(val subject: Subject, vararg val spells: PartialSpell) {
 
   fun deduplicatedDescriptorsForSubjects(): Array<Descriptor> =
     spells.flatMap { it.descriptors.toList() }.distinct().toTypedArray()
+
+  fun containedActions(): Array<Action> = spells.map {it.action}.distinct().toTypedArray()
 }
