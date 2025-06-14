@@ -1,18 +1,12 @@
 package com.ssblur.scriptor.item.wands
 
-import com.ssblur.scriptor.ScriptorDamage.overload
-import com.ssblur.scriptor.ScriptorDamage.overload_no_flinch
 import com.ssblur.scriptor.advancement.ScriptorAdvancements
 import com.ssblur.scriptor.api.word.Word
 import com.ssblur.scriptor.config.ScriptorConfig
 import com.ssblur.scriptor.data.saved_data.DictionarySavedData.Companion.computeIfAbsent
 import com.ssblur.scriptor.data.saved_data.LastCastSpellSavedData
 import com.ssblur.scriptor.effect.EmpoweredStatusEffect
-import com.ssblur.scriptor.effect.ScriptorEffects.HOARSE
-import com.ssblur.scriptor.effect.ScriptorEffects.MUTE
 import com.ssblur.scriptor.helpers.targetable.EntityTargetable
-import net.minecraft.ChatFormatting
-import net.minecraft.core.component.DataComponents
 import net.minecraft.network.chat.Component
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
@@ -23,7 +17,6 @@ import net.minecraft.world.effect.MobEffects
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
-import net.minecraft.world.item.TooltipFlag
 import net.minecraft.world.level.Level
 import kotlin.math.floor
 
@@ -78,14 +71,19 @@ open class Wand(properties: Properties,
                 2 * (adjustedCost - ScriptorConfig.VOCAL_HUNGER_THRESHOLD())
               )
             )
-          if (adjustedCost > ScriptorConfig.VOCAL_DAMAGE_THRESHOLD())
-            player.hurt(overload_no_flinch(player)!!, (adjustedCost - ScriptorConfig.VOCAL_DAMAGE_THRESHOLD() * 0.75f) / 100f)
+//          if (adjustedCost > ScriptorConfig.VOCAL_DAMAGE_THRESHOLD())
+//            player.hurt(overload_no_flinch(player)!!, (adjustedCost - ScriptorConfig.VOCAL_DAMAGE_THRESHOLD() * 0.75f) / 100f)
         }
         if (player.health > 0) {
           spell.cast(EntityTargetable(player))
+          this.addCooldown(player, adjustedCost * 7)
         }
       }
     }
     return InteractionResultHolder.success(player.getItemInHand(interactionHand))
+  }
+
+  fun addCooldown(player: Player, time: Int) {
+    player.cooldowns.addCooldown(this, time)
   }
 }
