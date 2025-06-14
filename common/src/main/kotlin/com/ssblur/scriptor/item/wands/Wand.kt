@@ -1,89 +1,70 @@
 package com.ssblur.scriptor.item.wands
 
-import com.ssblur.scriptor.advancement.ScriptorAdvancements
 import com.ssblur.scriptor.api.word.Word
 import com.ssblur.scriptor.config.ScriptorConfig
-import com.ssblur.scriptor.data.saved_data.DictionarySavedData.Companion.computeIfAbsent
-import com.ssblur.scriptor.data.saved_data.LastCastSpellSavedData
-import com.ssblur.scriptor.effect.EmpoweredStatusEffect
-import com.ssblur.scriptor.helpers.targetable.EntityTargetable
-import net.minecraft.network.chat.Component
+import com.ssblur.scriptor.data.components.ScriptorDataComponents
+import com.ssblur.scriptor.helpers.WandHelper
+import com.ssblur.scriptor.item.books.BookOfBooks
+import com.ssblur.scriptor.network.server.ScriptorNetworkC2S
 import net.minecraft.server.level.ServerLevel
-import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.InteractionResultHolder
-import net.minecraft.world.effect.MobEffectInstance
-import net.minecraft.world.effect.MobEffects
+import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.player.Player
+import net.minecraft.world.inventory.ClickAction
+import net.minecraft.world.inventory.Slot
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
-import kotlin.math.floor
+import kotlin.collections.plus
 
 open class Wand(properties: Properties,
                 val maxCost: Int = ScriptorConfig.VOCAL_MAX_COST(),
                 val costMultiplier: Float = 1f,
                 val permittedActions: List<Word>? = null
 ): Item(properties) {
+  init {
+    WandHelper.WANDS += this
+  }
 
-    override fun use(
+  override fun use(
     level: Level,
     player: Player,
     interactionHand: InteractionHand
   ): InteractionResultHolder<ItemStack> {
-    if (level is ServerLevel) {
-      val lastCastSpellData = LastCastSpellSavedData.computeIfAbsent(player)
-      if ((lastCastSpellData == null) || (lastCastSpellData.getSpell() == null)) {
-        player.sendSystemMessage(Component.literal("A wand re-casts the last spell cast through the chat."))
-        return InteractionResultHolder.fail(player.getItemInHand(interactionHand))
-      }
+    if (level.isClientSide) return InteractionResultHolder.success(player.getItemInHand(interactionHand))
 
-      val sentence: String = lastCastSpellData.getSpell()!!
+    val item = player.getItemInHand(interactionHand)
+    WandHelper.castFromItem(item, player, maxCost, costMultiplier, permittedActions)
 
-      val spell = computeIfAbsent(level).parse(sentence)
-      if (spell != null) {
-        val initial_cost = spell.cost()
-
-        val spellIsCompatible = ((permittedActions == null) || (spell.containedActions().all{it in permittedActions!!}))
-
-        if ((maxCost in 0..< floor(initial_cost).toInt()) || !spellIsCompatible) {
-          player.sendSystemMessage(Component.translatable("extra.scriptor.wand_fizzle"))
-          ScriptorAdvancements.FIZZLE.get().trigger(player as ServerPlayer)
-          return InteractionResultHolder.fail(player.getItemInHand(interactionHand))
-        }
-
-        var cost = Math.round(initial_cost * 30).toInt()
-        var costScale = 1.0f
-        for (instance in player.activeEffects)
-          if (instance.effect.value() is EmpoweredStatusEffect)
-            for (i in 0..instance.amplifier)
-              costScale *= (instance.effect.value() as EmpoweredStatusEffect).scale
-        cost = Math.round((cost.toFloat()) * costScale * costMultiplier)
-
-
-
-        val adjustedCost = Math.round(cost * (ScriptorConfig.VOCAL_COOLDOWN_MULTIPLIER() / 100.0)).toInt()
-        if (!player.isCreative) {
-          if (adjustedCost > ScriptorConfig.VOCAL_HUNGER_THRESHOLD())
-            player.addEffect(
-              MobEffectInstance(
-                MobEffects.HUNGER,
-                2 * (adjustedCost - ScriptorConfig.VOCAL_HUNGER_THRESHOLD())
-              )
-            )
-//          if (adjustedCost > ScriptorConfig.VOCAL_DAMAGE_THRESHOLD())
-//            player.hurt(overload_no_flinch(player)!!, (adjustedCost - ScriptorConfig.VOCAL_DAMAGE_THRESHOLD() * 0.75f) / 100f)
-        }
-        if (player.health > 0) {
-          spell.cast(EntityTargetable(player))
-          this.addCooldown(player, adjustedCost * 7)
-        }
-      }
-    }
-    return InteractionResultHolder.success(player.getItemInHand(interactionHand))
+    return InteractionResultHolder.fail(player.getItemInHand(interactionHand))
   }
 
-  fun addCooldown(player: Player, time: Int) {
-    player.cooldowns.addCooldown(this, time)
+  override fun overrideStackedOnOther(
+    itemStack: ItemStack,
+    slot: Slot,
+    clickAction: ClickAction,
+    player: Player
+  ): Boolean {
+    if (itemStack[ScriptorDataComponents.INVENTORY_CAST] == true && clickAction == ClickAction.SECONDARY && !slot.item.isEmpty && slot.item.item !is BookOfBooks) {
+
+      if (player.cooldowns.isOnCooldown(this)) return true
+      val level = player.level()
+      if (!level.isClientSide) return true
+      if (player.isCreative) return false // TODO
+      else {
+        ScriptorNetworkC2S.useWand(ScriptorNetworkC2S.UseBook(slot.index))
+      }
+      return true
+    }
+    return false
+  }
+
+  override fun inventoryTick(itemStack: ItemStack, level: Level, entity: Entity, i: Int, bl: Boolean) {
+    if (entity is Player) {
+      if(!level.isClientSide && itemStack[ScriptorDataComponents.INVENTORY_CAST] == null)
+        itemStack[ScriptorDataComponents.INVENTORY_CAST] = WandHelper.isInventoryCaster(entity, level as ServerLevel)
+    }
+    super.inventoryTick(itemStack, level, entity, i, bl)
   }
 }

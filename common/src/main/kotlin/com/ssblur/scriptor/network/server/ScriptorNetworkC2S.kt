@@ -7,6 +7,7 @@ import com.ssblur.scriptor.blockentity.EngravingBlockEntity
 import com.ssblur.scriptor.data.components.BookOfBooksData
 import com.ssblur.scriptor.data.components.ScriptorDataComponents
 import com.ssblur.scriptor.data.saved_data.DictionarySavedData.Companion.computeIfAbsent
+import com.ssblur.scriptor.data.saved_data.LastCastSpellSavedData
 import com.ssblur.scriptor.helpers.LimitedBookSerializer.decodeText
 import com.ssblur.scriptor.item.books.BookOfBooks
 import com.ssblur.scriptor.item.tools.Chalk
@@ -14,6 +15,7 @@ import com.ssblur.scriptor.network.client.ScriptorNetworkS2C
 import com.ssblur.scriptor.word.subject.InventorySubject
 import com.ssblur.unfocused.network.NetworkManager
 import net.minecraft.core.component.DataComponents
+import net.minecraft.network.chat.Component
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.item.ItemStack
@@ -128,6 +130,33 @@ object ScriptorNetworkC2S {
         (spell.subject as InventorySubject).castOnItem(spell, player, item)
         player.cooldowns.addCooldown(carried.item, Math.round(spell.cost() * 7).toInt())
       }
+    }
+  }
+
+  val useWand = NetworkManager.registerC2S(location("server_cursor_use_wand"), UseBook::class) { payload, player ->
+    val level = player.level()
+    if (level !is ServerLevel) {
+      return@registerC2S
+    }
+    val slot: Int = payload.slot
+    val item = player.containerMenu.items[slot]
+    val carried = player.containerMenu.carried
+
+    if (carried.isEmpty) return@registerC2S
+    val lastCastSpellData = LastCastSpellSavedData.computeIfAbsent(player)
+    val text = if ((lastCastSpellData != null) && (lastCastSpellData.getSpell() != null)) {
+      lastCastSpellData.getSpell()!!
+    } else {
+      null
+    }
+    if (text == null) {
+      return@registerC2S
+    }
+
+    val spell = computeIfAbsent(level).parse(text) ?: return@registerC2S
+    if (spell.subject is InventorySubject) {
+      (spell.subject as InventorySubject).castOnItem(spell, player, item)
+      player.cooldowns.addCooldown(carried.item, Math.round(spell.cost() * 7).toInt())
     }
   }
 
