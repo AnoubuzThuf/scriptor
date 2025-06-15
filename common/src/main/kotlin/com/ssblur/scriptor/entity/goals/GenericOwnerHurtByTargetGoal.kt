@@ -37,7 +37,7 @@ class GenericOwnerHurtByTargetGoal(private val entity: Mob, private val owner: S
             return i != this.timestamp && this.canAttack(
                 lastHurtBy,
                 TargetingConditions.DEFAULT
-            ) && !(lastHurtBy is IMagicSummon && lastHurtBy.getSummoner() === owner)
+            ) && !(lastHurtBy is IMagicSummon && lastHurtBy.getSummonerAlt() === owner)
         }
     }
 

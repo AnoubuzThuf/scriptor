@@ -32,7 +32,7 @@ class SummonSkeletonAction: Action() {
       if (d is StrengthDescriptor) strength += d.strengthModifier()
       if (d is DurationDescriptor) duration += d.durationModifier()
     }
-    val behaviours: List<SUMMON_BEHAVIOURS> = descriptors.filter{it is SummonBehaviourDescriptor}.map{it as SummonBehaviourDescriptor}.map{it.behaviour}
+    val behaviourDescriptors: List<SummonBehaviourDescriptor> = descriptors.filter{it is SummonBehaviourDescriptor}.map{it as SummonBehaviourDescriptor}
     val summonProperties: List<SUMMON_PROPERTIES> = descriptors.filter{it is SummonPropertyDescriptor}.map{it as SummonPropertyDescriptor}.map{it.summonProperty}
 
 
@@ -48,25 +48,11 @@ class SummonSkeletonAction: Action() {
         }
         val vecPos: Vec3 = Vec3(blockPos2.x.toDouble(), blockPos2.y.toDouble(), blockPos2.z.toDouble())
         val summonedSkeleton = SUMMONED_SKELETON.get().create(level, null, blockPos2, MobSpawnType.MOB_SUMMONED, false, false)!!
-        val tag = CompoundTag()
-        summonedSkeleton.setup(l, tag, duration.toInt() * 20, true, strength.toInt(), getColor(descriptors),
+        summonedSkeleton.setSummonParams(l,  duration.toInt() * 20, true, strength.toInt(), getColor(descriptors), behaviourDescriptors, level,
           SUMMON_PROPERTIES.RANGED in summonProperties, SUMMON_PROPERTIES.INVISIBLE in summonProperties)
-
-        for (behaviour in behaviours) {
-          when (behaviour) {
-            SUMMON_BEHAVIOURS.SENTRY -> summonedSkeleton.setSentryGoal(true, blockPos2, 0)
-            SUMMON_BEHAVIOURS.FOLLOWER -> summonedSkeleton.setFollowSummonerGoal(true)
-            SUMMON_BEHAVIOURS.HUNTER -> summonedSkeleton.setMonsterHunterGoal(true)
-            SUMMON_BEHAVIOURS.BERSERK -> summonedSkeleton.setBerserkGoal(true)
-            else -> continue
-          }
-        }
 
         summonedSkeleton.finalizeSpawn(level, level.getCurrentDifficultyAt(blockPos2), MobSpawnType.MOB_SUMMONED, null)
         summonedSkeleton.setPos(vecPos)
-//        level.addFreshEntity(summonedSkeleton)
-//        level.gameEvent(GameEvent.ENTITY_PLACE, blockPos2,  GameEvent.Context.of(l))
-
         level.addFreshEntity(summonedSkeleton)
         level.gameEvent(GameEvent.ENTITY_PLACE, blockPos2,  GameEvent.Context.of(l))
         summonedSkeleton.setPos(vecPos)

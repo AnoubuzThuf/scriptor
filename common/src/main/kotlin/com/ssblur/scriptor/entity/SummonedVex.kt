@@ -1,22 +1,30 @@
 package com.ssblur.scriptor.entity
 
 import com.ssblur.scriptor.entity.goals.*
-import com.ssblur.scriptor.entity.utils.deserializeOwner
-import com.ssblur.scriptor.entity.utils.getAndCacheOwner
-import com.ssblur.scriptor.entity.utils.serializeOwner
+import com.ssblur.scriptor.word.descriptor.summon.SummonBehaviourDescriptor
+import net.minecraft.Util
 import net.minecraft.core.BlockPos
 import net.minecraft.nbt.CompoundTag
+import net.minecraft.network.chat.Component
+import net.minecraft.server.level.ServerLevel
 import net.minecraft.sounds.SoundEvents
 import net.minecraft.util.RandomSource
 import net.minecraft.world.DifficultyInstance
-import net.minecraft.world.damagesource.DamageSource
-import net.minecraft.world.entity.*
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.EntityType
+import net.minecraft.world.entity.EquipmentSlot
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.Mob
 import net.minecraft.world.entity.ai.goal.FloatGoal
 import net.minecraft.world.entity.ai.goal.Goal
+import net.minecraft.world.entity.ai.goal.GoalSelector
 import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal
+import net.minecraft.world.entity.ai.goal.MoveTowardsRestrictionGoal
+import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal
+import net.minecraft.world.entity.monster.Creeper
+import net.minecraft.world.entity.monster.Monster
 import net.minecraft.world.entity.monster.Vex
 import net.minecraft.world.entity.player.Player
-import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import net.minecraft.world.level.Level
@@ -26,46 +34,173 @@ import java.util.*
 class SummonedVex(entityType: EntityType<SummonedVex?>?, level: Level): IMagicSummon,
     Vex(entityType, level) {
 
-    fun setup(owner: LivingEntity, tag: CompoundTag, ticks: Int, hasLimitedLife: Boolean = true, power: Int = 1) {
-        setSummoner(owner)
-        xpReward = 0
-        this.load(tag)
-        this.setLimitedLifeTicks(ticks, hasLimitedLife)
-        this.power = power
-//                float f = (float)this.getAttributeValue(Attributes.ATTACK_DAMAGE);
+//    @get:JvmName("jvm_summoner")
+//    @set:JvmName("jvm_summoner")
+    override var summoner: LivingEntity? = null
+
+    override var summonerUUID: UUID? = null
+
+    var limitedLifeTicks: Int = 0
+    var hasLimitedLife: Boolean = false
+    var power: Int = 0
+    var color: Int = -6265536
+    //    Don't want to have ranged Vexes
+    var isRanged: Boolean = false
+
+    override var AI_ROUTINE_INDEX: Int? = null
+
+    fun setSummonParams(summoner: LivingEntity?, limitedLifeTicks: Int = 100, hasLimitedLife: Boolean = true, power: Int, color: Int = -6265536, behaviourDescriptors: List<SummonBehaviourDescriptor>? = null, level: Level?) {
+        if (level != null && !level.isClientSide) {
+            setSummonerAlt(summoner)
+            this.limitedLifeTicks = limitedLifeTicks
+            this.hasLimitedLife = hasLimitedLife
+            this.color = color
+            this.power = power
+            if (behaviourDescriptors == null) {
+                setAiRoutineIndex(calculateAiRoutineIndex(null))
+            } else {
+                setAiRoutineIndex(calculateAiRoutineIndex(behaviourDescriptors.map{it.behaviour}))
+            }
+            val tag = CompoundTag()
+            this.addAdditionalSaveData(tag)
+            this.goalSelector.removeAllGoals { true }
+            this.targetSelector.removeAllGoals { true }
+
+            this.registerGoals()
+//            for (g in this.targetSelector.availableGoals) {
+//                this.level().players().first().sendSystemMessage(Component.literal("P9a " + g.goal::class.java.toString()))
+//            }
+		}
     }
 
-    @get:JvmName("jvm_summoner")
-    @set:JvmName("jvm_summoner")
-    var summoner: LivingEntity? = null
-    var summonerUUID: UUID? = null
-    var limitedLifeTicks: Int = 0
-    var hasLimitedLife: Boolean = true
-    var power: Int = 0
-
-    override fun tick() {
-        this.noPhysics = true
-        super.tick()
-        this.noPhysics = false
-        this.setNoGravity(true)
-        if (this.hasLimitedLife && --this.limitedLifeTicks <= 0) {
-            this.limitedLifeTicks = 20
-            this.hurt(this.damageSources().starve(), 10.0f)
+    override fun readAdditionalSaveData(compoundTag: CompoundTag) {
+        super.readAdditionalSaveData(compoundTag)
+        if (compoundTag.contains("AiRoutineIndex")) {
+            this.AI_ROUTINE_INDEX = (compoundTag.getInt("AiRoutineIndex"))
+        }
+        if (compoundTag.contains("SummonerUUID")) {
+            val uuid = compoundTag.getUUID("SummonerUUID")
+            if (uuid != null) {
+                this.summonerUUID = compoundTag.getUUID("SummonerUUID")
+            }
+        } else {
+            null
         }
     }
 
-    fun setSummoner(summoner: LivingEntity) {
-        this.summoner = summoner
-        this.summonerUUID = summoner.uuid
+    override fun addAdditionalSaveData(compound: CompoundTag) {
+        super.addAdditionalSaveData(compound)
+
+        val aiRoutineIndex = this.AI_ROUTINE_INDEX
+        if (aiRoutineIndex != null) {
+            compound.putInt("AiRoutineIndex", aiRoutineIndex)
+        }
+        if (this.summoner != null) {
+            compound.putUUID("SummonerUUID", this.summoner!!.uuid)
+        } else {
+            if (this.summonerUUID == null || this.summonerUUID == Util.NIL_UUID) {
+                compound.putUUID("SummonerUUID", Util.NIL_UUID)
+            } else {
+                compound.putUUID("SummonerUUID", this.summonerUUID!!)
+            }
+        }
     }
 
-    override fun getSummoner(): LivingEntity? {
-        return getAndCacheOwner(level(), summoner, summonerUUID)
+    override fun tick() {this.noPhysics = true
+        this.noPhysics = false
+        this.setNoGravity(true)
+        super.tick()
+        this.noPhysics = false
+        this.setNoGravity(true)
+        if (!this.level().isClientSide) {
+            if (this.hasLimitedLife && --this.limitedLifeTicks <= 0) {
+                spawnPoof(this.level() as ServerLevel, this.blockPosition())
+                this.remove(RemovalReason.DISCARDED)
+            }
+        }
     }
 
-    fun setLimitedLifeTicks(ticks: Int, hasLimitedLife: Boolean = true) {
-        this.limitedLifeTicks = ticks
-        this.hasLimitedLife = hasLimitedLife
+    override fun getBaseExperienceReward(): Int {
+        return 0
+    }
+
+    override fun registerGoals() {
+        val routine_index = this.AI_ROUTINE_INDEX
+        if (routine_index == null) {
+            return
+        }
+//        GOALS
+//        PRIORITY 0
+        this.goalSelector.addGoal(0, FloatGoal(this))
+//        PRIORITY 4
+        this.goalSelector.addGoal(4, SummonedVexChargeAttackGoal())
+//        PRIORITY 5
+        if (routine_index in 8..11) {
+            this.goalSelector.addGoal(5, MoveTowardsRestrictionGoal(this, 4.0))
+        }
+        if (routine_index in 4..7) {
+            this.goalSelector.addGoal(5, GenericFollowOwnerGoal(this, this::getSummonerAlt, 1.0, 15.0f, 10.0f, true, 50f))
+        }
+//        PRIORITY 5
+        this.goalSelector.addGoal(8, LookAtPlayerGoal(this, Player::class.java, 3.0f, 1.0f))
+        this.goalSelector.addGoal(8, LookAtPlayerGoal(this, Mob::class.java, 8.0f))
+//        PRIORITY 6
+        if (routine_index in 0 .. 7) {
+            this.goalSelector.addGoal(9, this.SummonedVexRandomMoveGoal())
+        }
+
+//        TARGETS
+//        Priority 0
+        if (routine_index in BERSERK_INDEXES) {
+            this.targetSelector.addGoal(0, NearestAttackableTargetGoal(this, LivingEntity::class.java, 10, true, false,
+                {
+                        entity: LivingEntity -> true
+                }
+            ))
+            return
+        } else {
+            this.targetSelector.addGoal(0, GenericOwnerHurtByTargetGoal(this, this::getSummonerAlt))
+            this.targetSelector.addGoal(1, GenericOwnerHurtTargetGoal(this, this::getSummonerAlt))
+            this.targetSelector.addGoal(2, GenericCopyOwnerTargetGoal(this, this::getSummonerAlt))
+            this.targetSelector.addGoal(3, GenericHurtByTargetGoal(this, { entity: Entity? -> entity == getSummonerAlt() }).setAlertOthers())
+//            this.targetSelector.addGoal(10, GenericProtectOwnerTargetGoal(this, this::getSummoner))
+        }
+
+
+//        Priority 5
+        if (routine_index in MONSTER_HUNT_INDEXES) {
+            this.targetSelector.addGoal(5, NearestAttackableTargetGoal(this, Monster::class.java, 10, true, false,
+                {
+                        entity: LivingEntity -> entity is Monster && entity !is IMagicSummon && entity !is Creeper
+                }
+            ))
+        }
+        if (routine_index in OTHER_PLAYER_HUNT_INDEXES) {
+//            Hunt non-allied summons before players
+            this.targetSelector.addGoal(5, NearestAttackableTargetGoal(this, Monster::class.java, 10, true, false,
+                {
+                        entity: LivingEntity -> entity is IMagicSummon && !isAlliedHelper(entity) && entity !is Creeper
+                }
+            ))
+        }
+//        Priority 6
+        if (routine_index in OTHER_PLAYER_HUNT_INDEXES) {
+            this.targetSelector.addGoal(6, NearestAttackableTargetGoal(this, Monster::class.java, 10, true, false,
+                {
+                        entity: LivingEntity ->
+                    if (this.getSummonerAlt() == null) {
+                        entity is Player
+                    } else {
+                        entity is Player && entity != this.getSummonerAlt()
+                    }
+                }
+            ))
+        }
+    }
+
+    override fun shouldDespawnInPeaceful(): Boolean {
+        return false
+
     }
 
     override fun populateDefaultEquipmentSlots(randomSource: RandomSource, difficultyInstance: DifficultyInstance) {
@@ -81,55 +216,8 @@ class SummonedVex(entityType: EntityType<SummonedVex?>?, level: Level): IMagicSu
         this.setDropChance(EquipmentSlot.MAINHAND, 0.0f)
     }
 
-    override fun registerGoals() {
-        this.goalSelector.addGoal(0, FloatGoal(this))
-        this.goalSelector.addGoal(4, this.VexChargeAttackGoal())
-        this.goalSelector.addGoal(7, GenericFollowOwnerGoal(this, this::getSummoner, 0.65, 35f, 10f, true, 50f))
-        this.goalSelector.addGoal(9, LookAtPlayerGoal(this, Player::class.java, 3.0f, 1.0f))
-        this.goalSelector.addGoal(10, LookAtPlayerGoal(this, Mob::class.java, 8.0f))
-        this.goalSelector.addGoal(16, this.VexRandomMoveGoal())
-
-        this.targetSelector.addGoal(1, GenericOwnerHurtByTargetGoal(this, this::getSummoner))
-        this.targetSelector.addGoal(2, GenericOwnerHurtTargetGoal(this, this::getSummoner))
-        this.targetSelector.addGoal(3, GenericCopyOwnerTargetGoal(this, this::getSummoner))
-        this.targetSelector.addGoal(4, GenericHurtByTargetGoal(this, { entity: Entity? -> entity == getSummoner() }).setAlertOthers())
-        this.targetSelector.addGoal(5, GenericProtectOwnerTargetGoal(this, this::getSummoner))
-
-    }
-
-    override fun isPreventingPlayerRest(pPlayer: Player?): Boolean {
-        return !this.isAlliedTo(pPlayer!!)
-    }
-
-    fun finalSpeed(): Double {
-        return 1.0 * this.power
-    }
-
-    override fun die(damageSource: DamageSource) {
-        this.onDeathHelper()
-        super.die(damageSource)
-    }
-
-    override fun readAdditionalSaveData(compoundTag: CompoundTag) {
-        super.readAdditionalSaveData(compoundTag)
-        this.summonerUUID = deserializeOwner(compoundTag)
-    }
-
-    override fun addAdditionalSaveData(compoundTag: CompoundTag) {
-        super.addAdditionalSaveData(compoundTag)
-        serializeOwner(compoundTag, this.summonerUUID)
-    }
-
-    override fun isAlliedTo(entity: Entity): Boolean {
-        return super.isAlliedTo(entity) || this.isAlliedHelper(entity)
-    }
-
-    override fun shouldDespawnInPeaceful(): Boolean {
-        return false
-    }
-
-    inner class VexChargeAttackGoal: Goal() {
-        fun VexChargeAttackGoal() {
+    inner class SummonedVexChargeAttackGoal: Goal() {
+        fun SummonedVexChargeAttackGoal() {
             this.setFlags(EnumSet.of(Goal.Flag.MOVE))
         }
 
@@ -153,7 +241,7 @@ class SummonedVex(entityType: EntityType<SummonedVex?>?, level: Level): IMagicSu
             val livingentity = this@SummonedVex.getTarget()
             if (livingentity != null) {
                 val vec3 = livingentity.getEyePosition()
-                this@SummonedVex.moveControl.setWantedPosition(vec3.x, vec3.y, vec3.z, finalSpeed())
+                this@SummonedVex.moveControl.setWantedPosition(vec3.x, vec3.y, vec3.z, 1.0)
             }
 
             this@SummonedVex.setIsCharging(true)
@@ -184,14 +272,14 @@ class SummonedVex(entityType: EntityType<SummonedVex?>?, level: Level): IMagicSu
                     val d0 = this@SummonedVex.distanceToSqr(livingentity)
                     if (d0 < 9.0) {
                         val vec3 = livingentity.getEyePosition()
-                        this@SummonedVex.moveControl.setWantedPosition(vec3.x, vec3.y, vec3.z, finalSpeed())
+                        this@SummonedVex.moveControl.setWantedPosition(vec3.x, vec3.y, vec3.z, 1.0)
                     }
                 }
             }
         }
     }
 
-    inner class VexRandomMoveGoal : Goal() {
+    inner class SummonedVexRandomMoveGoal : Goal() {
         /**
          * Copy of private random move goal in vex
          */
@@ -235,7 +323,7 @@ class SummonedVex(entityType: EntityType<SummonedVex?>?, level: Level): IMagicSu
                         blockpos1.getX().toDouble() + 0.5,
                         blockpos1.getY().toDouble() + 0.5,
                         blockpos1.getZ().toDouble() + 0.5,
-                        0.25 * finalSpeed()
+                        0.25
                     )
                     if (this@SummonedVex.getTarget() == null) {
                         this@SummonedVex.getLookControl().setLookAt(
@@ -251,4 +339,5 @@ class SummonedVex(entityType: EntityType<SummonedVex?>?, level: Level): IMagicSu
             }
         }
     }
+
 }

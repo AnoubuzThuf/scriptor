@@ -42,7 +42,7 @@ class GenericProtectOwnerTargetGoal(entity: Mob?, private val owner: Supplier<Li
                     Predicate { mob: Mob? ->
                         target != null &&
                                 (target!!
-                                    .getUUID() == owner.getUUID() || (target is IMagicSummon && target.getSummoner() != null && target.getSummoner()!!
+                                    .getUUID() == owner.getUUID() || (target is IMagicSummon && target.getSummonerAlt() != null && target.getSummonerAlt()!!
                                     .getUUID() == owner.getUUID()))
                     }
                 )

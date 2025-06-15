@@ -19,7 +19,7 @@ class GenericCopyOwnerTargetGoal(pMob: PathfinderMob?, private val ownerGetter: 
         val owner = ownerGetter.get()
         if (owner is Mob && owner.getTarget() != null) {
             val target = owner.getTarget()
-            return owner is Mob && owner.getTarget() != null && !(target is IMagicSummon && target.getSummoner() === owner)
+            return owner is Mob && owner.getTarget() != null && !(target is IMagicSummon && target.getSummonerAlt() === owner)
         }
         return false
     }
