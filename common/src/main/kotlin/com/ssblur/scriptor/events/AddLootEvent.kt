@@ -42,6 +42,7 @@ object AddLootEvent {
       LootItemRecord(ResourceLocation.tryBuild("minecraft", "chests/abandoned_mineshaft"), 0.6f),
       LootItemRecord(ResourceLocation.tryBuild("minecraft", "chests/ruined_portal"), 0.3f),
       LootItemRecord(ResourceLocation.tryBuild("minecraft", "chests/simple_dungeon"), 0.6f),
+      LootItemRecord(ResourceLocation.tryBuild("minecraft", "chests/trial_chambers/reward_common"), 0.2f),
     )
     pools[TOME_TIER1] = tier1
     pools[SCRAP_TIER1] = tier1
@@ -59,6 +60,9 @@ object AddLootEvent {
       LootItemRecord(ResourceLocation.tryBuild("minecraft", "chests/shipwreck_treasure"), 0.8f),
       LootItemRecord(ResourceLocation.tryBuild("minecraft", "chests/ancient_city"), 0.8f),
       LootItemRecord(ResourceLocation.tryBuild("minecraft", "chests/ancient_city_ice_box"), 0.6f),
+      LootItemRecord(ResourceLocation.tryBuild("minecraft", "chests/trial_chambers/reward_rare"), 0.4f),
+      LootItemRecord(ResourceLocation.tryBuild("minecraft", "chests/trial_chambers/reward_unique"), 0.2f),
+      LootItemRecord(ResourceLocation.tryBuild("minecraft", "chests/trial_chambers/reward_ominous_common"), 0.2f),
     )
     pools[TOME_TIER2] = tier2
     pools[SCRAP_TIER2] = tier2
@@ -76,6 +80,9 @@ object AddLootEvent {
       LootItemRecord(ResourceLocation.tryBuild("minecraft", "chests/ancient_city"), 0.8f),
       LootItemRecord(ResourceLocation.tryBuild("minecraft", "chests/ancient_city_ice_box"), 0.6f),
       LootItemRecord(ResourceLocation.tryBuild("minecraft", "chests/nether_bridge"), 0.6f),
+      LootItemRecord(ResourceLocation.tryBuild("minecraft", "chests/trial_chambers/reward_unique"), 0.2f),
+      LootItemRecord(ResourceLocation.tryBuild("minecraft", "chests/trial_chambers/reward_ominous_rare"), 0.4f),
+      LootItemRecord(ResourceLocation.tryBuild("minecraft", "chests/trial_chambers/reward_ominous_unique"), 0.8f),
     )
     pools[TOME_TIER3] = tier3
     pools[SCRAP_TIER3] = tier3
