@@ -16,5 +16,6 @@ object ScriptorEffects {
   val SILVER_TONGUE: RegistrySupplier<MobEffect> = registerEffect("silver_tongue") { EmpoweredStatusEffect(0.8f) }
   val FREEZE: RegistrySupplier<MobEffect> = registerEffect("freeze") { FreezingStatusEffect() }
   val ARCANE_POISON: RegistrySupplier<MobEffect> = registerEffect("arcane_poison") { ArcanePoisonStatusEffect() }
+  val VOODOO_EFFECT: RegistrySupplier<MobEffect> = registerEffect("voodoo") { VoodooStatusEffect() }
   fun register() {}
 }

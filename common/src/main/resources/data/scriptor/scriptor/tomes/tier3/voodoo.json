@@ -1,0 +1,17 @@
+{
+  "name": "tome.scriptor.voodoo",
+  "author": "AnoubuzThuf",
+  "tier": 3,
+  "item": "scriptor:spellbook_orange",
+  "spell": {
+    "subject": "touch",
+    "spells": [
+      {
+        "action": "voodoo_harm_other",
+        "descriptors": [
+          "long"
+        ]
+      }
+    ]
+  }
+}

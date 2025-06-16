@@ -1,0 +1,55 @@
+package com.ssblur.scriptor.word.action
+
+import com.ssblur.scriptor.api.word.Action
+import com.ssblur.scriptor.api.word.Descriptor
+import com.ssblur.scriptor.api.word.Word
+import com.ssblur.scriptor.data.saved_data.VoodooSpellSavedData
+import com.ssblur.scriptor.effect.ScriptorEffects.ARCANE_POISON
+import com.ssblur.scriptor.effect.ScriptorEffects.FREEZE
+import com.ssblur.scriptor.effect.ScriptorEffects.VOODOO_EFFECT
+import com.ssblur.scriptor.helpers.targetable.EntityTargetable
+import com.ssblur.scriptor.helpers.targetable.Targetable
+import com.ssblur.scriptor.word.action.potions.PotionAction
+import com.ssblur.scriptor.word.descriptor.duration.DurationDescriptor
+import com.ssblur.scriptor.word.descriptor.power.StrengthDescriptor
+import net.minecraft.world.effect.MobEffect
+import net.minecraft.world.effect.MobEffectInstance
+import net.minecraft.world.entity.LivingEntity
+import kotlin.math.floor
+import kotlin.math.max
+import net.minecraft.core.Holder
+import net.minecraft.world.effect.MobEffects
+import kotlin.math.min
+import kotlin.math.sqrt
+
+class VoodooHarmSelfAction: Action() {
+    override fun apply(caster: Targetable, targetable: Targetable, descriptors: Array<Descriptor>, words: Array<Word?>) {
+        if (caster is EntityTargetable && caster.targetEntity is LivingEntity) {
+            val casterEntity = caster.targetEntity as LivingEntity
+            var strength: Double = 1.0
+            var duration: Double = 1.0
+            for (d in descriptors) {
+                if (d is StrengthDescriptor) strength += d.strengthModifier()
+                if (d is DurationDescriptor) duration += d.durationModifier()
+            }
+
+            strength = sqrt(strength) * 10
+
+            if (targetable is EntityTargetable && targetable.targetEntity is LivingEntity) {
+                val benefitor = targetable.targetEntity as LivingEntity
+                val victim = casterEntity
+                benefitor.addEffect(
+                    MobEffectInstance(
+                        VOODOO_EFFECT, Math.round(duration).toInt(), floor(strength).toInt()
+                    ))
+                val voodooVictimIdHolder = VoodooSpellSavedData.computeIfAbsent(benefitor)
+                if (voodooVictimIdHolder != null) {
+                    voodooVictimIdHolder.voodooSubjectUuid = victim.uuid
+                    voodooVictimIdHolder.setDirty()
+                }
+            }
+        }
+    }
+
+    override fun cost() = Cost(2.0, COSTTYPE.ADDITIVE)
+}

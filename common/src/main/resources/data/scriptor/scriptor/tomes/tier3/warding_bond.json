@@ -1,0 +1,17 @@
+{
+  "name": "tome.scriptor.warding_bond",
+  "author": "AnoubuzThuf",
+  "tier": 3,
+  "item": "scriptor:spellbook_orange",
+  "spell": {
+    "subject": "touch",
+    "spells": [
+      {
+        "action": "voodoo_harm_self",
+        "descriptors": [
+          "long"
+        ]
+      }
+    ]
+  }
+}

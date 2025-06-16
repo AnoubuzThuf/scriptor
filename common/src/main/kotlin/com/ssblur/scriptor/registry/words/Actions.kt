@@ -26,6 +26,8 @@ object Actions {
   val SMITE = register("smite", SmiteAction())
   val SUMMON_VEX = register("summon_vex", SummonVexAction())
   val SUMMON_SKELETON = register("summon_skeleton", SummonSkeletonAction())
+  val VOODOO_HARM_SELF = register("voodoo_harm_self", VoodooHarmSelfAction())
+  val VOODOO_HARM_OTHER = register("voodoo_harm_other", VoodooHarmOtherAction())
 //  val SUMMON_RANGED_SKELETON = register("summon_ranged_skeleton", SummonRangedSkeletonAction())
   val EXPLOSION = register("explosion", ExplosionAction())
   val MARK = register("mark", MarkAction())

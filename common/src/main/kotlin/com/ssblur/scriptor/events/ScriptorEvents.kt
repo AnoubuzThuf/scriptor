@@ -50,6 +50,7 @@ object ScriptorEvents {
         }
       }
     }
+    VoodooDamageEvent
     SpellChat
     PlayerTick
     AddLootEvent
