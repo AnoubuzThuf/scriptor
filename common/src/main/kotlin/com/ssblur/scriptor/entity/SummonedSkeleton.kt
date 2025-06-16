@@ -82,12 +82,12 @@ class SummonedSkeleton(entityType: EntityType<SummonedSkeleton?>?, level: Level)
             } else {
                 setAiRoutineIndex(calculateAiRoutineIndex(behaviourDescriptors.map{it.behaviour}))
             }
-            val tag = CompoundTag()
-            this.addAdditionalSaveData(tag)
             this.goalSelector.removeAllGoals { true }
             this.targetSelector.removeAllGoals { true }
-
             this.registerGoals()
+
+            val tag = CompoundTag()
+            this.addAdditionalSaveData(tag)
         }
     }
 
@@ -104,6 +104,7 @@ class SummonedSkeleton(entityType: EntityType<SummonedSkeleton?>?, level: Level)
         } else {
             null
         }
+        this.reassessWeaponGoal()
     }
 
     override fun addAdditionalSaveData(compound: CompoundTag) {
@@ -153,10 +154,11 @@ class SummonedSkeleton(entityType: EntityType<SummonedSkeleton?>?, level: Level)
         this.goalSelector.addGoal(2, AvoidEntityGoal(this, Wolf::class.java, 6.0F, 1.0, 1.2))
 //        PRIORITY 3
 //        PRIORITY 4
-//        Skeleton Ranged Attack Goal TODO
+//        Skeleton Ranged Attack Goal
 //        PRIORITY 5
         if (routine_index in 8..11) {
-            this.goalSelector.addGoal(5, MoveTowardsRestrictionGoal(this, 4.0))
+            val moveTowardsRestrictionGoal = GenericSentryGoal(this, 1.0, true)
+            this.goalSelector.addGoal(5, moveTowardsRestrictionGoal)
         }
         if (routine_index in 4..7) {
             this.goalSelector.addGoal(5, GenericFollowOwnerGoal(this, this::getSummonerAlt, 1.0, 10.0f, 5.0f, false, 50f))

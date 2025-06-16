@@ -34,7 +34,7 @@ class SummonSkeletonAction: Action() {
     }
     val behaviourDescriptors: List<SummonBehaviourDescriptor> = descriptors.filter{it is SummonBehaviourDescriptor}.map{it as SummonBehaviourDescriptor}
     val summonProperties: List<SUMMON_PROPERTIES> = descriptors.filter{it is SummonPropertyDescriptor}.map{it as SummonPropertyDescriptor}.map{it.summonProperty}
-
+    val isSentry: Boolean = behaviourDescriptors.any{ it.behaviour == SUMMON_BEHAVIOURS.SENTRY  }
 
     if (caster is EntityTargetable) {
       if (caster.targetEntity is LivingEntity) {
@@ -53,6 +53,9 @@ class SummonSkeletonAction: Action() {
 
         summonedSkeleton.finalizeSpawn(level, level.getCurrentDifficultyAt(blockPos2), MobSpawnType.MOB_SUMMONED, null)
         summonedSkeleton.setPos(vecPos)
+        if (isSentry) {
+          summonedSkeleton.restrictTo(blockPos2, 2)
+        }
         level.addFreshEntity(summonedSkeleton)
         level.gameEvent(GameEvent.ENTITY_PLACE, blockPos2,  GameEvent.Context.of(l))
         summonedSkeleton.setPos(vecPos)

@@ -10,14 +10,9 @@ import net.minecraft.server.level.ServerLevel
 import net.minecraft.sounds.SoundEvents
 import net.minecraft.util.RandomSource
 import net.minecraft.world.DifficultyInstance
-import net.minecraft.world.entity.Entity
-import net.minecraft.world.entity.EntityType
-import net.minecraft.world.entity.EquipmentSlot
-import net.minecraft.world.entity.LivingEntity
-import net.minecraft.world.entity.Mob
+import net.minecraft.world.entity.*
 import net.minecraft.world.entity.ai.goal.FloatGoal
 import net.minecraft.world.entity.ai.goal.Goal
-import net.minecraft.world.entity.ai.goal.GoalSelector
 import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal
 import net.minecraft.world.entity.ai.goal.MoveTowardsRestrictionGoal
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal
@@ -41,7 +36,7 @@ class SummonedVex(entityType: EntityType<SummonedVex?>?, level: Level): IMagicSu
     override var summonerUUID: UUID? = null
 
     var limitedLifeTicks: Int = 0
-    var hasLimitedLife: Boolean = false
+    var hasLimitedLife: Boolean = true
     var power: Int = 0
     var color: Int = -6265536
     //    Don't want to have ranged Vexes
@@ -61,15 +56,18 @@ class SummonedVex(entityType: EntityType<SummonedVex?>?, level: Level): IMagicSu
             } else {
                 setAiRoutineIndex(calculateAiRoutineIndex(behaviourDescriptors.map{it.behaviour}))
             }
-            val tag = CompoundTag()
-            this.addAdditionalSaveData(tag)
             this.goalSelector.removeAllGoals { true }
             this.targetSelector.removeAllGoals { true }
 
             this.registerGoals()
 //            for (g in this.targetSelector.availableGoals) {
-//                this.level().players().first().sendSystemMessage(Component.literal("P9a " + g.goal::class.java.toString()))
+//                this.level().players().first().sendSystemMessage(Component.literal("target " + g.goal::class.java.toString()))
 //            }
+//            for (g in this.goalSelector.availableGoals) {
+//                this.level().players().first().sendSystemMessage(Component.literal("goal " + g.goal::class.java.toString()))
+//            }
+            val tag = CompoundTag()
+            this.addAdditionalSaveData(tag)
 		}
     }
 
@@ -136,15 +134,18 @@ class SummonedVex(entityType: EntityType<SummonedVex?>?, level: Level): IMagicSu
         this.goalSelector.addGoal(4, SummonedVexChargeAttackGoal())
 //        PRIORITY 5
         if (routine_index in 8..11) {
-            this.goalSelector.addGoal(5, MoveTowardsRestrictionGoal(this, 4.0))
+            val moveTowardsRestrictionGoal = GenericSentryGoal(this, 0.6, true)
+            this.goalSelector.addGoal(5, moveTowardsRestrictionGoal)
+            moveTowardsRestrictionGoal.setFlags(EnumSet.of<Goal.Flag?>(Goal.Flag.MOVE, Goal.Flag.LOOK))
         }
         if (routine_index in 4..7) {
             this.goalSelector.addGoal(5, GenericFollowOwnerGoal(this, this::getSummonerAlt, 1.0, 15.0f, 10.0f, true, 50f))
         }
-//        PRIORITY 5
+//        PRIORITY 8
         this.goalSelector.addGoal(8, LookAtPlayerGoal(this, Player::class.java, 3.0f, 1.0f))
         this.goalSelector.addGoal(8, LookAtPlayerGoal(this, Mob::class.java, 8.0f))
-//        PRIORITY 6
+
+//        PRIORITY 9
         if (routine_index in 0 .. 7) {
             this.goalSelector.addGoal(9, this.SummonedVexRandomMoveGoal())
         }
@@ -217,8 +218,8 @@ class SummonedVex(entityType: EntityType<SummonedVex?>?, level: Level): IMagicSu
     }
 
     inner class SummonedVexChargeAttackGoal: Goal() {
-        fun SummonedVexChargeAttackGoal() {
-            this.setFlags(EnumSet.of(Goal.Flag.MOVE))
+        init {
+            this.setFlags(EnumSet.of(Goal.Flag.MOVE, Goal.Flag.LOOK));
         }
 
         override fun canUse(): Boolean {

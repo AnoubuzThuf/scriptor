@@ -4,6 +4,7 @@ import com.ssblur.scriptor.api.word.Action
 import com.ssblur.scriptor.api.word.Descriptor
 import com.ssblur.scriptor.api.word.Word
 import com.ssblur.scriptor.color.CustomColors.getColor
+import com.ssblur.scriptor.entity.SUMMON_BEHAVIOURS
 import com.ssblur.scriptor.entity.SUMMON_PROPERTIES
 import com.ssblur.scriptor.entity.ScriptorEntities.SUMMONED_SKELETON
 import com.ssblur.scriptor.entity.ScriptorEntities.SUMMONED_VEX
@@ -37,6 +38,8 @@ class SummonVexAction: Action() {
       if (d is DurationDescriptor) duration += d.durationModifier()
     }
     val behaviourDescriptors: List<SummonBehaviourDescriptor> = descriptors.filter{it is SummonBehaviourDescriptor}.map{it as SummonBehaviourDescriptor}
+    val isSentry: Boolean = behaviourDescriptors.any{ it.behaviour == SUMMON_BEHAVIOURS.SENTRY  }
+    val isFollower: Boolean = behaviourDescriptors.any{ it.behaviour == SUMMON_BEHAVIOURS.FOLLOWER }
 
     if (caster is EntityTargetable) {
       if (caster.targetEntity is LivingEntity) {
@@ -52,6 +55,11 @@ class SummonVexAction: Action() {
         val summonedVex: SummonedVex = SUMMONED_VEX.get().create(
           level, null, blockPos2, MobSpawnType.MOB_SUMMONED, false, false
         )!!
+        if (isSentry) {
+          summonedVex.restrictTo(blockPos2, 2)
+        } else if (!isFollower) {
+          summonedVex.boundOrigin = blockPos2
+        }
         summonedVex.setSummonParams(l,  duration.toInt() * 20, true, strength.toInt(), getColor(descriptors), behaviourDescriptors, level)
 
         summonedVex.finalizeSpawn(level, level.getCurrentDifficultyAt(blockPos2), MobSpawnType.MOB_SUMMONED, null)

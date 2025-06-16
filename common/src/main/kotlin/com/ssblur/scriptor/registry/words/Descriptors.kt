@@ -62,6 +62,10 @@ object Descriptors {
     "summon_behaviour_hunter",
     SummonBehaviourDescriptor(0, SUMMON_BEHAVIOURS.HUNTER)
   )
+  val SUMMON_BEHAVIOUR_PLAYER_HUNTER = register(
+    "summon_behaviour_player_hunter",
+    SummonBehaviourDescriptor(0, SUMMON_BEHAVIOURS.PLAYER_HUNTER)
+  )
   val SUMMON_BEHAVIOUR_BERSERK = register(
     "summon_behaviour_berserk",
     SummonBehaviourDescriptor(0, SUMMON_BEHAVIOURS.BERSERK)
