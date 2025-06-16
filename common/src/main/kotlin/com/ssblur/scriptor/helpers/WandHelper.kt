@@ -92,6 +92,7 @@ object WandHelper {
       if (player.health > 0)
         spell.cast(SpellbookTargetable(itemStack, player, player.inventory.selected).withTargetItem(false))
       if (!player.isCreative) {
+        player.cooldowns.addCooldown(itemStack.item, Math.round(adjustedCost * 3.5).toInt())
         cooldownFunc(player, Math.round(adjustedCost * 3.5).toInt())
         return true
       }

@@ -20,7 +20,7 @@ import kotlin.collections.plus
 
 open class Wand(properties: Properties,
                 val maxCost: Int = ScriptorConfig.VOCAL_MAX_COST(),
-                val costMultiplier: Float = 1f,
+                val costMultiplier: Float? = null,
                 val permittedActions: List<Word>? = null
 ): Item(properties) {
   init {

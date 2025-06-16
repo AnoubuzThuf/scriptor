@@ -19,14 +19,14 @@ class VoodooHarmOtherAction: Action() {
         if (caster is EntityTargetable && caster.targetEntity is LivingEntity) {
             val casterEntity = caster.targetEntity as LivingEntity
             var strength: Double = 1.0
-            var duration: Double = 1.0
+            var duration: Double = 5.0
             for (d in descriptors) {
                 if (d is StrengthDescriptor) strength += d.strengthModifier()
                 if (d is DurationDescriptor) duration += d.durationModifier()
             }
 
             strength = sqrt(strength) * 10
-
+            duration = duration * 20
             if (targetable is EntityTargetable && targetable.targetEntity is LivingEntity) {
                 val benefitor = casterEntity
                 val victim = targetable.targetEntity as LivingEntity
