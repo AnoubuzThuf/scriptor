@@ -10,6 +10,7 @@
         "action": "regeneration",
         "descriptors": [
           "permanent",
+          "experience_cost",
           "experience_cost"
         ]
       }

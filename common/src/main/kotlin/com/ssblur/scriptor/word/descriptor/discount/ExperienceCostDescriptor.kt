@@ -16,8 +16,8 @@ class ExperienceCostDescriptor: Descriptor(), CastDescriptor {
   override fun cannotCast(caster: Targetable?): Boolean {
     if (caster is EntityTargetable && caster.targetEntity is Player) {
       val living = caster.targetEntity as Player
-      if (living.experienceLevel >= 1) {
-        living.giveExperienceLevels(-1)
+      if (living.experienceLevel >= 15) {
+        living.giveExperienceLevels(-15)
         return false
       }
     }
