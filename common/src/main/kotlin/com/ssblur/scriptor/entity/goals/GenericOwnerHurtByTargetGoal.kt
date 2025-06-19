@@ -1,6 +1,7 @@
 package com.ssblur.scriptor.entity.goals
 
 import com.ssblur.scriptor.entity.IMagicSummon
+import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.Mob
 import net.minecraft.world.entity.ai.goal.target.TargetGoal
@@ -32,6 +33,7 @@ class GenericOwnerHurtByTargetGoal(private val entity: Mob, private val owner: S
             this.ownerLastHurtBy = owner.getLastHurtByMob()
             val lastHurtBy = this.ownerLastHurtBy
             if (lastHurtBy == null || lastHurtBy!!.isAlliedTo(mob)) return false
+            if (lastHurtBy.uuid == owner.uuid) return false
             val i = owner.getLastHurtByMobTimestamp()
 
             return i != this.timestamp && this.canAttack(
@@ -45,7 +47,11 @@ class GenericOwnerHurtByTargetGoal(private val entity: Mob, private val owner: S
      * Execute a one shot task or start executing a continuous task
      */
     override fun start() {
+
         this.mob.setTarget(this.ownerLastHurtBy)
+        if (this.owner.get()!!.uuid == this.ownerLastHurtBy!!.uuid) {
+            this.owner.get()!!.sendSystemMessage(Component.literal(this::class.java.toString()))
+        }
         this.mob.getBrain()
             .setMemoryWithExpiry<LivingEntity?>(MemoryModuleType.ATTACK_TARGET, this.ownerLastHurtBy, 200L)
         val owner = this.owner.get()

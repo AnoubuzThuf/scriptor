@@ -14,8 +14,8 @@ import net.minecraft.world.entity.*
 import net.minecraft.world.entity.ai.goal.FloatGoal
 import net.minecraft.world.entity.ai.goal.Goal
 import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal
-import net.minecraft.world.entity.ai.goal.MoveTowardsRestrictionGoal
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal
+import net.minecraft.world.entity.ai.goal.target.TargetGoal
 import net.minecraft.world.entity.monster.Creeper
 import net.minecraft.world.entity.monster.Monster
 import net.minecraft.world.entity.monster.Vex
@@ -47,6 +47,9 @@ class SummonedVex(entityType: EntityType<SummonedVex?>?, level: Level): IMagicSu
     fun setSummonParams(summoner: LivingEntity?, limitedLifeTicks: Int = 100, hasLimitedLife: Boolean = true, power: Int, color: Int = -6265536, behaviourDescriptors: List<SummonBehaviourDescriptor>? = null, level: Level?) {
         if (level != null && !level.isClientSide) {
             setSummonerAlt(summoner)
+//            if (this.getSummonerAlt() == null) {
+//                this.level().players().first().sendSystemMessage(Component.literal("Summoner is null " + summoner!!.uuid.toString()))
+//            }
             this.limitedLifeTicks = limitedLifeTicks
             this.hasLimitedLife = hasLimitedLife
             this.color = color
@@ -108,6 +111,15 @@ class SummonedVex(entityType: EntityType<SummonedVex?>?, level: Level): IMagicSu
         this.noPhysics = false
         this.setNoGravity(true)
         super.tick()
+
+//        if (this.getSummonerAlt() != null) {
+//            for (g in this.targetSelector.availableGoals) {
+//                if (g.isRunning) {
+//                    this.getSummonerAlt()!!.sendSystemMessage(Component.literal("goal " + g::class.java.toString()))
+//                }
+//            }
+//        }
+
         this.noPhysics = false
         this.setNoGravity(true)
         if (!this.level().isClientSide) {
@@ -127,6 +139,9 @@ class SummonedVex(entityType: EntityType<SummonedVex?>?, level: Level): IMagicSu
         if (routine_index == null) {
             return
         }
+//        if (this.getSummonerAlt() != null) {
+//            this.getSummonerAlt()!!.sendSystemMessage(Component.literal("INDEX " + routine_index.toString()))
+//        }
 //        GOALS
 //        PRIORITY 0
         this.goalSelector.addGoal(0, FloatGoal(this))
@@ -163,7 +178,7 @@ class SummonedVex(entityType: EntityType<SummonedVex?>?, level: Level): IMagicSu
             this.targetSelector.addGoal(0, GenericOwnerHurtByTargetGoal(this, this::getSummonerAlt))
             this.targetSelector.addGoal(1, GenericOwnerHurtTargetGoal(this, this::getSummonerAlt))
             this.targetSelector.addGoal(2, GenericCopyOwnerTargetGoal(this, this::getSummonerAlt))
-            this.targetSelector.addGoal(3, GenericHurtByTargetGoal(this, { entity: Entity? -> entity == getSummonerAlt() }).setAlertOthers())
+            this.targetSelector.addGoal(3, GenericHurtByTargetGoal(this, { entity: Entity? -> if (getSummonerAlt() != null && entity != null) entity.uuid == getSummonerAlt()!!.uuid else false }).setAlertOthers())
 //            this.targetSelector.addGoal(10, GenericProtectOwnerTargetGoal(this, this::getSummoner))
         }
 

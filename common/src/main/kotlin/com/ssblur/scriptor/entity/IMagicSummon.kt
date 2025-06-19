@@ -81,12 +81,12 @@ interface IMagicSummon {
     fun level(): EntityGetter
 
     fun getSummonerAlt(): LivingEntity? {
-        if (this.summoner != null) {
+//        if (this.summoner != null) {
 //            if (this.level().players().size > 0) {
-//                this.level().players().first().sendSystemMessage(Component.literal("Summoner " + this.summoner!!.uuid.toString()))
+//                this.level().players().first().sendSystemMessage(Component.literal("Summoner id match " + (this.summoner!!.uuid == this.level().players().first().uuid).toString()))
 //            }
-            return this.summoner
-        }
+//            return this.summoner
+//        }
         val summonerUUID = this.summonerUUID
         if (summonerUUID != null && summonerUUID != Util.NIL_UUID) {
             this.summoner = this.level().getPlayerByUUID(summonerUUID)

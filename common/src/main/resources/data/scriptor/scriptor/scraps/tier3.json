@@ -11,11 +11,11 @@
     "action:blind",
     "action:slow_falling",
     "descriptor:summon_property_invisible",
-    "descriptor.scriptor.summon_behaviour_sentry",
-    "descriptor.scriptor.summon_behaviour_follower",
-    "descriptor.scriptor.summon_behaviour_hunter",
-    "descriptor.scriptor.summon_behaviour_player_hunter",
-    "descriptor.scriptor.summon_behaviour_berserk",
-    "descriptor.scriptor.summon_property_ranged"
+    "descriptor.summon_behaviour_sentry",
+    "descriptor.summon_behaviour_follower",
+    "descriptor.summon_behaviour_hunter",
+    "descriptor.summon_behaviour_player_hunter",
+    "descriptor.summon_behaviour_berserk",
+    "descriptor.summon_property_ranged"
   ]
 }

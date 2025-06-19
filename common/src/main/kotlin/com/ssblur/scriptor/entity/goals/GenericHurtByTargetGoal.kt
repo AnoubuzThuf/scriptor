@@ -1,5 +1,6 @@
 package com.ssblur.scriptor.entity.goals
 
+import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.*
 import net.minecraft.world.entity.ai.goal.target.TargetGoal
 import net.minecraft.world.entity.ai.memory.MemoryModuleType
@@ -58,6 +59,9 @@ class GenericHurtByTargetGoal(pMob: PathfinderMob?, var toIgnoreDamage: Predicat
      */
     override fun start() {
         this.mob.setTarget(this.mob.getLastHurtByMob())
+        if (this.mob.level().players().first().uuid == this.mob.getLastHurtByMob()!!.uuid) {
+            this.mob.level().players().first().sendSystemMessage(Component.literal(this::class.java.toString()))
+        }
         this.mob.getBrain()
             .setMemoryWithExpiry<LivingEntity?>(MemoryModuleType.ATTACK_TARGET, this.mob.getLastHurtByMob(), 200L)
 
