@@ -82,7 +82,9 @@ object PotionActions {
       MobEffects.DAMAGE_RESISTANCE,
       50.0,
       1.0 / 3.0,
-      Word.Cost(8.0, Word.COSTTYPE.ADDITIVE)
+      Word.Cost(8.0, Word.COSTTYPE.ADDITIVE),
+//      Prevent invincibility
+      4.0
     )
   )
   val FIRE_RESISTANCE_POTION = register(

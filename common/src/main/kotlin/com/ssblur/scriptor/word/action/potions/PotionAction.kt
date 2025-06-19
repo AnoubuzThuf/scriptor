@@ -18,7 +18,8 @@ open class PotionAction(
   var mobEffect: Holder<MobEffect>,
   var durationScale: Double,
   var strengthScale: Double,
-  var cost: Cost
+  var cost: Cost,
+  val strengthCap: Double? = null
 ): Action() {
   override fun apply(caster: Targetable, targetable: Targetable, descriptors: Array<Descriptor>, words: Array<Word?>) {
     var strength = 0.0
@@ -31,6 +32,10 @@ open class PotionAction(
     strength = max(strength, 0.0)
     strength *= strengthScale
     duration *= durationScale
+
+    if (strengthCap != null && strength > strengthCap) {
+      strength = strengthCap
+    }
 
     // Maybe add poison-tipped enchant?
     if (targetable is EntityTargetable && targetable.targetEntity is LivingEntity) (targetable.targetEntity as LivingEntity).addEffect(
