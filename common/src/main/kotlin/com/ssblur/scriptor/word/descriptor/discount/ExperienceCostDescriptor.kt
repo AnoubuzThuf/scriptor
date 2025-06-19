@@ -11,7 +11,7 @@ import net.minecraft.world.entity.player.Player
 
 class ExperienceCostDescriptor: Descriptor(), CastDescriptor {
 //  Each use costs 10 levels
-  override fun cost() = Cost(-333.0, COSTTYPE.ADDITIVE_POST)
+  override fun cost() = Cost(-200.0, COSTTYPE.ADDITIVE_POST)
 
   override fun cannotCast(caster: Targetable?): Boolean {
     if (caster is EntityTargetable && caster.targetEntity is Player) {
