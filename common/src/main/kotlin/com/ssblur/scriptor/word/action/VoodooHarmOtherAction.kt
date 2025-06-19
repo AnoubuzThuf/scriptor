@@ -8,9 +8,11 @@ import com.ssblur.scriptor.effect.ScriptorEffects.VOODOO_EFFECT
 import com.ssblur.scriptor.helpers.targetable.EntityTargetable
 import com.ssblur.scriptor.helpers.targetable.Targetable
 import com.ssblur.scriptor.word.descriptor.duration.DurationDescriptor
+import com.ssblur.scriptor.word.descriptor.duration.PermanentDurationDescriptor
 import com.ssblur.scriptor.word.descriptor.power.StrengthDescriptor
 import net.minecraft.world.effect.MobEffectInstance
 import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.player.Player
 import kotlin.math.floor
 import kotlin.math.sqrt
 
@@ -27,6 +29,13 @@ class VoodooHarmOtherAction: Action() {
 
             strength = sqrt(strength) * 10
             duration = duration * 20
+
+            if (targetable is EntityTargetable && targetable.targetEntity is LivingEntity && targetable.targetEntity !is Player) {
+                if (descriptors.any {it is PermanentDurationDescriptor }) {
+                    duration = -1.0
+                }
+            }
+
             if (targetable is EntityTargetable && targetable.targetEntity is LivingEntity) {
                 val benefitor = casterEntity
                 val victim = targetable.targetEntity as LivingEntity

@@ -12,6 +12,7 @@ import com.ssblur.scriptor.entity.SummonedVex
 import com.ssblur.scriptor.helpers.targetable.EntityTargetable
 import com.ssblur.scriptor.helpers.targetable.Targetable
 import com.ssblur.scriptor.word.descriptor.duration.DurationDescriptor
+import com.ssblur.scriptor.word.descriptor.duration.PermanentDurationDescriptor
 import com.ssblur.scriptor.word.descriptor.power.StrengthDescriptor
 import com.ssblur.scriptor.word.descriptor.summon.SummonBehaviourDescriptor
 import com.ssblur.scriptor.word.descriptor.summon.SummonPropertyDescriptor
@@ -33,6 +34,7 @@ class SummonVexAction: Action() {
     val level = targetable.level as ServerLevel
     var strength = 0.0
     var duration = 10.0
+    val hasLimitedLife = descriptors.none {it is PermanentDurationDescriptor }
     for (d in descriptors) {
       if (d is StrengthDescriptor) strength += d.strengthModifier()
       if (d is DurationDescriptor) duration += d.durationModifier()
@@ -60,7 +62,7 @@ class SummonVexAction: Action() {
         } else if (!isFollower) {
           summonedVex.boundOrigin = blockPos2
         }
-        summonedVex.setSummonParams(l,  duration.toInt() * 20, true, strength.toInt(), getColor(descriptors), behaviourDescriptors, level)
+        summonedVex.setSummonParams(l,  duration.toInt() * 20, hasLimitedLife, strength.toInt(), getColor(descriptors), behaviourDescriptors, level)
 
         summonedVex.finalizeSpawn(level, level.getCurrentDifficultyAt(blockPos2), MobSpawnType.MOB_SUMMONED, null)
         summonedVex.setPos(vecPos)

@@ -10,6 +10,7 @@ import com.ssblur.scriptor.entity.ScriptorEntities.SUMMONED_SKELETON
 import com.ssblur.scriptor.helpers.targetable.EntityTargetable
 import com.ssblur.scriptor.helpers.targetable.Targetable
 import com.ssblur.scriptor.word.descriptor.duration.DurationDescriptor
+import com.ssblur.scriptor.word.descriptor.duration.PermanentDurationDescriptor
 import com.ssblur.scriptor.word.descriptor.power.StrengthDescriptor
 import com.ssblur.scriptor.word.descriptor.summon.SummonBehaviourDescriptor
 import com.ssblur.scriptor.word.descriptor.summon.SummonPropertyDescriptor
@@ -28,10 +29,12 @@ class SummonSkeletonAction: Action() {
     val level = targetable.level as ServerLevel
     var strength = 0.0
     var duration = 20.0
+    val hasLimitedLife = descriptors.none {it is PermanentDurationDescriptor }
     for (d in descriptors) {
       if (d is StrengthDescriptor) strength += d.strengthModifier()
       if (d is DurationDescriptor) duration += d.durationModifier()
     }
+
     val behaviourDescriptors: List<SummonBehaviourDescriptor> = descriptors.filter{it is SummonBehaviourDescriptor}.map{it as SummonBehaviourDescriptor}
     val summonProperties: List<SUMMON_PROPERTIES> = descriptors.filter{it is SummonPropertyDescriptor}.map{it as SummonPropertyDescriptor}.map{it.summonProperty}
     val isSentry: Boolean = behaviourDescriptors.any{ it.behaviour == SUMMON_BEHAVIOURS.SENTRY  }
@@ -48,7 +51,7 @@ class SummonSkeletonAction: Action() {
         }
         val vecPos: Vec3 = Vec3(blockPos2.x.toDouble(), blockPos2.y.toDouble(), blockPos2.z.toDouble())
         val summonedSkeleton = SUMMONED_SKELETON.get().create(level, null, blockPos2, MobSpawnType.MOB_SUMMONED, false, false)!!
-        summonedSkeleton.setSummonParams(l,  duration.toInt() * 20, true, strength.toInt(), getColor(descriptors), behaviourDescriptors, level,
+        summonedSkeleton.setSummonParams(l,  duration.toInt() * 20, hasLimitedLife, strength.toInt(), getColor(descriptors), behaviourDescriptors, level,
           SUMMON_PROPERTIES.RANGED in summonProperties, SUMMON_PROPERTIES.INVISIBLE in summonProperties)
 
         summonedSkeleton.finalizeSpawn(level, level.getCurrentDifficultyAt(blockPos2), MobSpawnType.MOB_SUMMONED, null)

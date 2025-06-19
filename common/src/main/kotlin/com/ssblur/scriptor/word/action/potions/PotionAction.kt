@@ -6,11 +6,13 @@ import com.ssblur.scriptor.api.word.Descriptor
 import com.ssblur.scriptor.helpers.targetable.EntityTargetable
 import com.ssblur.scriptor.helpers.targetable.Targetable
 import com.ssblur.scriptor.word.descriptor.duration.DurationDescriptor
+import com.ssblur.scriptor.word.descriptor.duration.PermanentDurationDescriptor
 import com.ssblur.scriptor.word.descriptor.power.StrengthDescriptor
 import net.minecraft.core.Holder
 import net.minecraft.world.effect.MobEffect
 import net.minecraft.world.effect.MobEffectInstance
 import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.player.Player
 import kotlin.math.floor
 import kotlin.math.max
 
@@ -32,6 +34,12 @@ open class PotionAction(
     strength = max(strength, 0.0)
     strength *= strengthScale
     duration *= durationScale
+
+    if (targetable is EntityTargetable && targetable.targetEntity is LivingEntity && targetable.targetEntity !is Player) {
+      if (descriptors.any {it is PermanentDurationDescriptor }) {
+        duration = -1.0
+      }
+    }
 
     if (strengthCap != null && strength > strengthCap) {
       strength = strengthCap

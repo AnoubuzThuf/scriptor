@@ -9,6 +9,10 @@ object DiscountDescriptors {
     "blood_cost",
     BloodCostDescriptor()
   )
+  val EXPERIENCE_COST = register(
+    "experience_cost",
+    ExperienceCostDescriptor()
+  )
   val CHEAP = register("cheap", CheapDescriptor())
   val HEALTHY = register(
     "healthy",

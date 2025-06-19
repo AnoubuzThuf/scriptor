@@ -11,6 +11,7 @@ import com.ssblur.scriptor.helpers.targetable.EntityTargetable
 import com.ssblur.scriptor.helpers.targetable.Targetable
 import com.ssblur.scriptor.word.action.potions.PotionAction
 import com.ssblur.scriptor.word.descriptor.duration.DurationDescriptor
+import com.ssblur.scriptor.word.descriptor.duration.PermanentDurationDescriptor
 import com.ssblur.scriptor.word.descriptor.power.StrengthDescriptor
 import net.minecraft.world.effect.MobEffect
 import net.minecraft.world.effect.MobEffectInstance
@@ -19,6 +20,7 @@ import kotlin.math.floor
 import kotlin.math.max
 import net.minecraft.core.Holder
 import net.minecraft.world.effect.MobEffects
+import net.minecraft.world.entity.player.Player
 import kotlin.math.min
 import kotlin.math.sqrt
 
@@ -35,6 +37,11 @@ class VoodooHarmSelfAction: Action() {
 
             strength = sqrt(strength) * 10
             duration = duration * 20
+
+            if (descriptors.any {it is PermanentDurationDescriptor }) {
+                duration = -1.0
+            }
+
             if (targetable is EntityTargetable && targetable.targetEntity is LivingEntity) {
                 val benefitor = targetable.targetEntity as LivingEntity
                 val victim = casterEntity

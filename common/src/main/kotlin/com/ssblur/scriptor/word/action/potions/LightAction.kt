@@ -9,11 +9,13 @@ import com.ssblur.scriptor.color.CustomColors.getColor
 import com.ssblur.scriptor.helpers.targetable.EntityTargetable
 import com.ssblur.scriptor.helpers.targetable.Targetable
 import com.ssblur.scriptor.word.descriptor.duration.DurationDescriptor
+import com.ssblur.scriptor.word.descriptor.duration.PermanentDurationDescriptor
 import net.minecraft.sounds.SoundEvents
 import net.minecraft.sounds.SoundSource
 import net.minecraft.world.effect.MobEffectInstance
 import net.minecraft.world.effect.MobEffects
 import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.player.Player
 
 class LightAction: Action() {
   override fun apply(caster: Targetable, targetable: Targetable, descriptors: Array<Descriptor>, words: Array<Word?>) {
@@ -21,9 +23,16 @@ class LightAction: Action() {
     for (d in descriptors) {
       if (d is DurationDescriptor) seconds = (seconds + 3 * d.durationModifier()).toInt()
     }
+    seconds = seconds * 20
+
+    if (targetable is EntityTargetable && targetable.targetEntity is LivingEntity && targetable.targetEntity !is Player) {
+      if (descriptors.any {it is PermanentDurationDescriptor }) {
+        seconds = -1
+      }
+    }
 
     if (targetable is EntityTargetable && targetable.targetEntity is LivingEntity) {
-      (targetable.targetEntity as LivingEntity).addEffect(MobEffectInstance(MobEffects.GLOWING, seconds * 20))
+      (targetable.targetEntity as LivingEntity).addEffect(MobEffectInstance(MobEffects.GLOWING, seconds))
       return
     }
 

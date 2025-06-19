@@ -4,6 +4,7 @@ import com.ssblur.scriptor.entity.SUMMON_BEHAVIOURS
 import com.ssblur.scriptor.entity.SUMMON_PROPERTIES
 import com.ssblur.scriptor.registry.words.WordRegistry.register
 import com.ssblur.scriptor.word.descriptor.SpeedDurationDescriptor
+import com.ssblur.scriptor.word.descriptor.duration.PermanentDurationDescriptor
 import com.ssblur.scriptor.word.descriptor.duration.SimpleDurationDescriptor
 import com.ssblur.scriptor.word.descriptor.summon.SummonBehaviourDescriptor
 import com.ssblur.scriptor.word.descriptor.summon.SummonPropertyDescriptor
@@ -34,6 +35,10 @@ object Descriptors {
         7.0
       ).allowDuplication()
     )
+  val PERMANENT = register(
+    "permanent",
+    PermanentDurationDescriptor()
+  )
   val SLOW = register(
     "slow",
     SpeedDurationDescriptor(2, 4.0, 0.75)
