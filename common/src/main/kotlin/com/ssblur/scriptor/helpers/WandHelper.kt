@@ -8,9 +8,7 @@ import com.ssblur.scriptor.config.ScriptorConfig
 import com.ssblur.scriptor.data.saved_data.DictionarySavedData.Companion.computeIfAbsent
 import com.ssblur.scriptor.data.saved_data.LastCastSpellSavedData
 import com.ssblur.scriptor.effect.EmpoweredStatusEffect
-import com.ssblur.scriptor.helpers.LimitedBookSerializer.decodeText
-import com.ssblur.scriptor.helpers.targetable.SpellbookTargetable
-import net.minecraft.core.component.DataComponents
+import com.ssblur.scriptor.helpers.targetable.WandTargetable
 import net.minecraft.network.chat.Component
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
@@ -19,7 +17,6 @@ import net.minecraft.sounds.SoundSource
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
-import net.minecraft.world.level.Level
 
 object WandHelper {
   var WANDS: List<Item> = ArrayList()
@@ -90,7 +87,7 @@ object WandHelper {
       if (adjustedCost > ScriptorConfig.VOCAL_DAMAGE_THRESHOLD())
         player.hurt(overload_no_flinch(player)!!, (adjustedCost.toFloat() - ScriptorConfig.VOCAL_DAMAGE_THRESHOLD() * 0.75f) / 200f)
       if (player.health > 0)
-        spell.cast(SpellbookTargetable(itemStack, player, player.inventory.selected).withTargetItem(false))
+        spell.cast(WandTargetable(itemStack, player, player.inventory.selected).withTargetItem(false))
       if (!player.isCreative) {
         player.cooldowns.addCooldown(itemStack.item, Math.round(adjustedCost * 3.5).toInt())
         cooldownFunc(player, Math.round(adjustedCost * 3.5).toInt())

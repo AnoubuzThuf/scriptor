@@ -9,6 +9,7 @@ import com.ssblur.scriptor.helpers.targetable.EntityTargetable
 import com.ssblur.scriptor.helpers.targetable.LecternTargetable
 import com.ssblur.scriptor.helpers.targetable.SpellbookTargetable
 import com.ssblur.scriptor.helpers.targetable.Targetable
+import com.ssblur.scriptor.helpers.targetable.WandTargetable
 import com.ssblur.scriptor.network.client.ParticleNetwork
 import com.ssblur.scriptor.word.descriptor.target.NetherDescriptor
 import net.minecraft.network.chat.Component
@@ -64,7 +65,7 @@ class RecallAction: SwapAction() {
             } else {
                 null
             }
-        } else if (caster is EntityTargetable) {
+        } else if (caster is WandTargetable || caster is EntityTargetable) {
             val casterEntity = caster.targetEntity
             if (casterEntity is Player) {
                 computeIfAbsent(casterEntity)!!.coordinate
