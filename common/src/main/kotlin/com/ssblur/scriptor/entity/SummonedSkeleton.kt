@@ -75,6 +75,10 @@ class SummonedSkeleton(entityType: EntityType<SummonedSkeleton?>?, level: Level)
             this.power = power
             this.color = color
 
+            if (summoner != null) {
+                this.setCustomName(Component.literal(summoner.getCustomName()!!.getString() + "'s Summoned Skeleton"))
+            }
+
             this.isRanged = isRanged
             if (isInvisible) {
                 val holder: Holder<MobEffect> = MobEffects.INVISIBILITY
@@ -184,7 +188,7 @@ class SummonedSkeleton(entityType: EntityType<SummonedSkeleton?>?, level: Level)
 //        PRIORITY 2
         this.goalSelector.addGoal(2, AvoidEntityGoal(this, Wolf::class.java, 6.0F, 1.0, 1.2))
         if (routine_index in 4..7) {
-            this.goalSelector.addGoal(2, GenericFollowOwnerGoal(this, this::getSummonerAlt, 1.0, 10.0f, 5.0f, false, 50f))
+            this.goalSelector.addGoal(2, GenericFollowOwnerGoal(this, this::getSummonerAlt, 1.0, 10f, 2f, false, 50f))
         }
 //        PRIORITY 3
         this.goalSelector.addGoal(3, FleeSunGoal(this, 1.0))
@@ -237,7 +241,7 @@ class SummonedSkeleton(entityType: EntityType<SummonedSkeleton?>?, level: Level)
         }
 //        Priority 6
         if (routine_index in OTHER_PLAYER_HUNT_INDEXES) {
-            this.targetSelector.addGoal(6, NearestAttackableTargetGoal(this, Monster::class.java, 10, true, false,
+            this.targetSelector.addGoal(6, NearestAttackableTargetGoal(this, Player::class.java, 10, true, false,
                 {
                         entity: LivingEntity ->
                     if (this.getSummonerAlt() == null) {

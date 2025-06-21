@@ -28,7 +28,7 @@ class GenericSentryGoal(
     }
 
     override fun canUse(): Boolean {
-        return (!this.mob.navigation.isDone())
+        return (!this.mob.isWithinRestriction)
     }
 
     override fun canContinueToUse(): Boolean {

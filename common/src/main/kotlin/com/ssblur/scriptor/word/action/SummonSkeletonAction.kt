@@ -57,7 +57,7 @@ class SummonSkeletonAction: Action() {
         summonedSkeleton.finalizeSpawn(level, level.getCurrentDifficultyAt(blockPos2), MobSpawnType.MOB_SUMMONED, null)
         summonedSkeleton.setPos(vecPos)
         if (isSentry) {
-          summonedSkeleton.restrictTo(blockPos2, 2)
+          summonedSkeleton.restrictTo(blockPos2, 1)
         }
         level.addFreshEntity(summonedSkeleton)
         level.gameEvent(GameEvent.ENTITY_PLACE, blockPos2,  GameEvent.Context.of(l))

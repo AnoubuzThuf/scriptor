@@ -59,7 +59,7 @@ class SummonVexAction: Action() {
           level, null, blockPos2, MobSpawnType.MOB_SUMMONED, false, false
         )!!
         if (isSentry) {
-          summonedVex.restrictTo(blockPos2, 2)
+          summonedVex.restrictTo(blockPos2, 1)
         } else if (!isFollower) {
           summonedVex.boundOrigin = blockPos2
         }

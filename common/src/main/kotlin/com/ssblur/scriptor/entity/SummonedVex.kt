@@ -5,6 +5,7 @@ import com.ssblur.scriptor.word.descriptor.summon.SummonBehaviourDescriptor
 import net.minecraft.Util
 import net.minecraft.core.BlockPos
 import net.minecraft.nbt.CompoundTag
+import net.minecraft.network.chat.Component
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.sounds.SoundEvents
 import net.minecraft.util.RandomSource
@@ -59,12 +60,14 @@ class SummonedVex(entityType: EntityType<SummonedVex?>?, level: Level): IMagicSu
             this.limitedLifeTicks = limitedLifeTicks
             this.color = color
             this.power = power
+            if (summoner != null) {
+                this.setCustomName(Component.literal(summoner.getCustomName()!!.getString() + "'s Summoned Vex"))
+            }
             if (behaviourDescriptors == null) {
                 setAiRoutineIndex(calculateAiRoutineIndex(null))
             } else {
                 setAiRoutineIndex(calculateAiRoutineIndex(behaviourDescriptors.map{it.behaviour}))
             }
-            initSummon()
 //            for (g in this.targetSelector.availableGoals) {
 //                this.level().players().first().sendSystemMessage(Component.literal("target " + g.goal::class.java.toString()))
 //            }
@@ -73,6 +76,7 @@ class SummonedVex(entityType: EntityType<SummonedVex?>?, level: Level): IMagicSu
 //            }
             val tag = CompoundTag()
             this.addAdditionalSaveData(tag)
+            this.readAdditionalSaveData(tag)
 		}
     }
 
@@ -167,7 +171,7 @@ class SummonedVex(entityType: EntityType<SummonedVex?>?, level: Level): IMagicSu
             moveTowardsRestrictionGoal.setFlags(EnumSet.of<Goal.Flag?>(Goal.Flag.MOVE, Goal.Flag.LOOK))
         }
         if (routine_index in 4..7) {
-            this.goalSelector.addGoal(5, GenericFollowOwnerGoal(this, this::getSummonerAlt, 1.0, 15.0f, 10.0f, true, 50f))
+            this.goalSelector.addGoal(5, GenericFollowOwnerGoal(this, this::getSummonerAlt, 1.5, 5f, 2f, true, 50f))
         }
 //        PRIORITY 8
         this.goalSelector.addGoal(8, LookAtPlayerGoal(this, Player::class.java, 3.0f, 1.0f))
@@ -212,7 +216,7 @@ class SummonedVex(entityType: EntityType<SummonedVex?>?, level: Level): IMagicSu
         }
 //        Priority 6
         if (routine_index in OTHER_PLAYER_HUNT_INDEXES) {
-            this.targetSelector.addGoal(6, NearestAttackableTargetGoal(this, Monster::class.java, 10, true, false,
+            this.targetSelector.addGoal(6, NearestAttackableTargetGoal(this, Player::class.java, 10, true, false,
                 {
                         entity: LivingEntity ->
                     if (this.getSummonerAlt() == null) {
