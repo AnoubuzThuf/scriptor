@@ -41,11 +41,11 @@ object Descriptors {
   )
   val SLOW = register(
     "slow",
-    SpeedDurationDescriptor(2, 4.0, 0.75)
+    SpeedDurationDescriptor(2, 2.0, 0.75).allowDuplication()
   )
   val FAST = register(
     "fast",
-    SpeedDurationDescriptor(2, -4.0, 1.25)
+    SpeedDurationDescriptor(2, -4.0, 1.25).allowDuplication()
   )
   val CHAIN = register("chain", ChainDescriptor())
   val SQUARE = register("square", SquareDescriptor())
