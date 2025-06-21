@@ -35,6 +35,7 @@ object Actions {
   val GOTO = register("goto", GotoAction())
   val SWAP = register("swap", SwapAction())
   val BRING = register("bring", BringAction())
+  val LAUNCH = register("launch", LaunchAction())
   val BREAK = register("break", BreakBlockAction())
   val DRY = register("dry", DryAction())
   val PLACE = register("place", PlaceBlockAction())

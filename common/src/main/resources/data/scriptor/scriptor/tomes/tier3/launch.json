@@ -1,0 +1,15 @@
+{
+  "name": "tome.scriptor.launch",
+  "author": "AnoubuzThuf",
+  "tier": 3,
+  "item": "scriptor:spellbook_yellow",
+  "spell": {
+    "subject": "projectile",
+    "spells": [
+      {
+        "action": "launch",
+        "descriptors": []
+      }
+    ]
+  }
+}
