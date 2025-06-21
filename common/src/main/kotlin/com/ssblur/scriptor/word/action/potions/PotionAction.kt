@@ -34,6 +34,7 @@ open class PotionAction(
     strength = max(strength, 0.0)
     strength *= strengthScale
     duration *= durationScale
+    duration = duration.coerceAtLeast(1.0)
 
     if (targetable is EntityTargetable && targetable.targetEntity is LivingEntity && targetable.targetEntity !is Player) {
       if (descriptors.any {it is PermanentDurationDescriptor }) {

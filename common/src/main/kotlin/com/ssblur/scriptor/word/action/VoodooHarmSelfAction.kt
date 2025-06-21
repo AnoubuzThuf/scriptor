@@ -38,6 +38,8 @@ class VoodooHarmSelfAction: Action() {
             strength = sqrt(strength) * 10
             duration = duration * 20
 
+            duration = duration.coerceAtLeast(1.0)
+
             if (descriptors.any {it is PermanentDurationDescriptor }) {
                 duration = -1.0
             }

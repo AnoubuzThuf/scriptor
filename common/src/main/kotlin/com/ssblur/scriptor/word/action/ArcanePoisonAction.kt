@@ -93,6 +93,8 @@ class ArcanePoisonAction: Action() {
         strength = min(strength*strengthScale, (min(strengthCapPercent, 100f)*strengthCap/100f))
         duration = min(duration*durationScale, min(durationCapPercent, 100f)*durationCap/100f)
 
+        duration = duration.coerceAtLeast(1.0)
+
         if (targetable is EntityTargetable && targetable.targetEntity is LivingEntity) (targetable.targetEntity as LivingEntity).addEffect(
             MobEffectInstance(
                 ARCANE_POISON, Math.round(duration).toInt(), floor(strength).toInt()

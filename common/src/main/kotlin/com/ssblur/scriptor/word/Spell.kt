@@ -13,6 +13,7 @@ import com.ssblur.scriptor.helpers.targetable.Targetable
 import com.ssblur.scriptor.network.client.ParticleNetwork
 import com.ssblur.scriptor.word.descriptor.AfterCastDescriptor
 import com.ssblur.scriptor.word.descriptor.CastDescriptor
+import com.ssblur.scriptor.word.descriptor.SpeedDescriptor
 import com.ssblur.scriptor.word.descriptor.focus.FocusDescriptor
 import com.ssblur.scriptor.word.descriptor.focus.MultiTargetFocusDescriptor
 import com.ssblur.scriptor.word.descriptor.target.GeometricTargetDescriptor
@@ -25,6 +26,7 @@ import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.phys.Vec3
+import org.spongepowered.asm.mixin.injection.Desc
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ExecutionException
 import kotlin.math.abs
@@ -257,6 +259,8 @@ class Spell(val subject: Subject, vararg val spells: PartialSpell) {
 
   fun deduplicatedDescriptorsForSubjects(): Array<Descriptor> =
     spells.flatMap { it.descriptors.toList() }.distinct().toTypedArray()
+
+  fun speedDescriptorsForSubjects(): List<SpeedDescriptor> = spells.flatMap {it.descriptors.toList()}.toTypedArray().filter{it is SpeedDescriptor}.map{it as SpeedDescriptor}
 
   fun containedActions(): Array<Action> = spells.map {it.action}.distinct().toTypedArray()
 }

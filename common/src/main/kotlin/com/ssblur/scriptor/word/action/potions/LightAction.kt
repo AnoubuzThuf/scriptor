@@ -25,6 +25,8 @@ class LightAction: Action() {
     }
     seconds = seconds * 20
 
+    seconds = seconds.coerceAtLeast(1)
+
     if (targetable is EntityTargetable && targetable.targetEntity is LivingEntity && targetable.targetEntity !is Player) {
       if (descriptors.any {it is PermanentDurationDescriptor }) {
         seconds = -1

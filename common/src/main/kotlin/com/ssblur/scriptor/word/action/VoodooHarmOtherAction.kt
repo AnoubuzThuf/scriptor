@@ -30,6 +30,8 @@ class VoodooHarmOtherAction: Action() {
             strength = sqrt(strength) * 10
             duration = duration * 20
 
+            duration = duration.coerceAtLeast(1.0)
+
             if (targetable is EntityTargetable && targetable.targetEntity is LivingEntity && targetable.targetEntity !is Player) {
                 if (descriptors.any {it is PermanentDurationDescriptor }) {
                     duration = -1.0

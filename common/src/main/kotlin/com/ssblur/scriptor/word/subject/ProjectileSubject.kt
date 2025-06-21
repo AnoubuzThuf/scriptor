@@ -24,9 +24,13 @@ class ProjectileSubject: Subject() {
     var collidesWithWater = false
     for (d in spell.deduplicatedDescriptorsForSubjects()) {
       if (d is DurationDescriptor) duration += d.durationModifier()
-      if (d is SpeedDescriptor) speed *= d.speedModifier()
+//      if (d is SpeedDescriptor) speed *= d.speedModifier()
       if (d == CollideWithWaterDescriptor) collidesWithWater = true
     }
+    for (d in spell.speedDescriptorsForSubjects()) {
+      speed *= d.speedModifier()
+    }
+
     speed *= 0.8
 
     val projectile = ScriptorEntities.PROJECTILE_TYPE.get().create(caster.level)!!

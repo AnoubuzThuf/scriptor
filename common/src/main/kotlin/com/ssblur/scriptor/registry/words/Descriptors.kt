@@ -41,7 +41,7 @@ object Descriptors {
   )
   val SLOW = register(
     "slow",
-    SpeedDurationDescriptor(2, 2.0, 0.75).allowDuplication()
+    SpeedDurationDescriptor(2, 2.0, 1.25).allowDuplication()
   )
   val FAST = register(
     "fast",

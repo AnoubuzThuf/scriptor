@@ -75,7 +75,11 @@ class MeteorSubject: Subject() {
     var speed = 0.6
     for (d in spell.deduplicatedDescriptorsForSubjects()) {
       if (d is DurationDescriptor) duration += d.durationModifier()
-      if (d is SpeedDescriptor) speed *= d.speedModifier()
+//      if (d is SpeedDescriptor) speed *= d.speedModifier()
+    }
+
+    for (d in spell.speedDescriptorsForSubjects()) {
+      speed *= d.speedModifier()
     }
     speed *= 0.8
 
