@@ -45,7 +45,7 @@ object Scraps {
       TOME.get().trigger(player as ServerPlayer)
       if (options.size <= known.size) return options[random.nextInt(options.size)].value.keys.random()
 
-      var maxAttempts = 10
+      var maxAttempts = 40
       var resource: MutableMap.MutableEntry<ResourceLocation, ScrapResource>
       var index: Int
       var key: ResourceLocation
