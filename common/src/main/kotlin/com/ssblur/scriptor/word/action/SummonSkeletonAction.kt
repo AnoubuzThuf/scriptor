@@ -28,12 +28,12 @@ class SummonSkeletonAction: Action() {
   override fun apply(caster: Targetable, targetable: Targetable, descriptors: Array<Descriptor>, words: Array<Word?>) {
     val level = targetable.level as ServerLevel
     var strength = 0.0
-    var duration = 20.0
-    val hasLimitedLife = descriptors.none {it is PermanentDurationDescriptor }
+    var duration: Double = 20.0
     for (d in descriptors) {
       if (d is StrengthDescriptor) strength += d.strengthModifier()
       if (d is DurationDescriptor) duration += d.durationModifier()
     }
+    val finalDuration = if (descriptors.none {it is PermanentDurationDescriptor }) duration.toInt() * 20 else null
 
     val behaviourDescriptors: List<SummonBehaviourDescriptor> = descriptors.filter{it is SummonBehaviourDescriptor}.map{it as SummonBehaviourDescriptor}
     val summonProperties: List<SUMMON_PROPERTIES> = descriptors.filter{it is SummonPropertyDescriptor}.map{it as SummonPropertyDescriptor}.map{it.summonProperty}
@@ -51,7 +51,7 @@ class SummonSkeletonAction: Action() {
         }
         val vecPos: Vec3 = Vec3(blockPos2.x.toDouble(), blockPos2.y.toDouble(), blockPos2.z.toDouble())
         val summonedSkeleton = SUMMONED_SKELETON.get().create(level, null, blockPos2, MobSpawnType.MOB_SUMMONED, false, false)!!
-        summonedSkeleton.setSummonParams(l,  duration.toInt() * 20, hasLimitedLife, strength.toInt(), getColor(descriptors), behaviourDescriptors, level,
+        summonedSkeleton.setSummonParams(l,  finalDuration, strength.toInt(), getColor(descriptors), behaviourDescriptors, level,
           SUMMON_PROPERTIES.RANGED in summonProperties, SUMMON_PROPERTIES.INVISIBLE in summonProperties)
 
         summonedSkeleton.finalizeSpawn(level, level.getCurrentDifficultyAt(blockPos2), MobSpawnType.MOB_SUMMONED, null)
@@ -65,5 +65,5 @@ class SummonSkeletonAction: Action() {
       }
     }
   }
-  override fun cost() = Cost(16.0, COSTTYPE.ADDITIVE)
+  override fun cost() = Cost(12.0, COSTTYPE.ADDITIVE)
 }

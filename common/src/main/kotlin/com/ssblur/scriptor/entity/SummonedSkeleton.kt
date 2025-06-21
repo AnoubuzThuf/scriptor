@@ -6,6 +6,7 @@ import net.minecraft.Util
 import net.minecraft.core.Holder
 import net.minecraft.core.component.DataComponents
 import net.minecraft.nbt.CompoundTag
+import net.minecraft.network.chat.Component
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.sounds.SoundEvent
 import net.minecraft.sounds.SoundEvents
@@ -18,6 +19,7 @@ import net.minecraft.world.effect.MobEffects
 import net.minecraft.world.entity.*
 import net.minecraft.world.entity.ai.attributes.AttributeInstance
 import net.minecraft.world.entity.ai.attributes.AttributeModifier
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier
 import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.entity.ai.goal.*
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal
@@ -49,8 +51,7 @@ class SummonedSkeleton(entityType: EntityType<SummonedSkeleton?>?, level: Level)
 
     override var summonerUUID: UUID? = null
 
-    var limitedLifeTicks: Int = 0
-    var hasLimitedLife: Boolean = true
+    var limitedLifeTicks: Int? = 0
     var power: Int = 0
     var color: Int = -6265536
     //    Don't want to have ranged Vexes
@@ -58,16 +59,19 @@ class SummonedSkeleton(entityType: EntityType<SummonedSkeleton?>?, level: Level)
 
     override var AI_ROUTINE_INDEX: Int? = null
 
-    fun setLimitedLife(i: Int) {
-        this.hasLimitedLife = true
-        this.limitedLifeTicks = i
+    fun initSummon() {
+        if (this.level() != null && !this.level().isClientSide) {
+            this.goalSelector.removeAllGoals { true }
+            this.targetSelector.removeAllGoals { true }
+            this.registerGoals()
+            this.reassessWeaponGoal()
+        }
     }
 
-    fun setSummonParams(summoner: LivingEntity?, limitedLifeTicks: Int = 100, hasLimitedLife: Boolean = true, power: Int = 0, color: Int = -6265536, behaviourDescriptors: List<SummonBehaviourDescriptor>? = null, level: Level?, isRanged: Boolean = false, isInvisible: Boolean = false) {
+    fun setSummonParams(summoner: LivingEntity?, limitedLifeTicks: Int? = null, power: Int = 0, color: Int = -6265536, behaviourDescriptors: List<SummonBehaviourDescriptor>? = null, level: Level?, isRanged: Boolean = false, isInvisible: Boolean = false) {
         if (level != null && !level.isClientSide) {
             setSummonerAlt(summoner)
             this.limitedLifeTicks = limitedLifeTicks
-            this.hasLimitedLife = hasLimitedLife
             this.power = power
             this.color = color
 
@@ -82,12 +86,20 @@ class SummonedSkeleton(entityType: EntityType<SummonedSkeleton?>?, level: Level)
             } else {
                 setAiRoutineIndex(calculateAiRoutineIndex(behaviourDescriptors.map{it.behaviour}))
             }
-            this.goalSelector.removeAllGoals { true }
-            this.targetSelector.removeAllGoals { true }
-            this.registerGoals()
 
             val tag = CompoundTag()
             this.addAdditionalSaveData(tag)
+            this.readAdditionalSaveData(tag)
+
+//            if (this.getSummonerAlt() != null) {
+//                for (t in this.goalSelector.availableGoals) {
+//                    this.getSummonerAlt()!!.sendSystemMessage(Component.literal("Goals: " + t.goal::class.java.toString()))
+//                }
+//                for (t in this.targetSelector.availableGoals) {
+//                    this.getSummonerAlt()!!.sendSystemMessage(Component.literal("Target Goals: " + t.goal::class.java.toString()))
+//                }
+//
+//            }
         }
     }
 
@@ -95,6 +107,9 @@ class SummonedSkeleton(entityType: EntityType<SummonedSkeleton?>?, level: Level)
         super.readAdditionalSaveData(compoundTag)
         if (compoundTag.contains("AiRoutineIndex")) {
             this.AI_ROUTINE_INDEX = (compoundTag.getInt("AiRoutineIndex"))
+        }
+        if (compoundTag.contains("lifetimeLimitedTicks")) {
+            this.limitedLifeTicks = (compoundTag.getInt("lifetimeLimitedTicks"))
         }
         if (compoundTag.contains("SummonerUUID")) {
             val uuid = compoundTag.getUUID("SummonerUUID")
@@ -104,11 +119,16 @@ class SummonedSkeleton(entityType: EntityType<SummonedSkeleton?>?, level: Level)
         } else {
             null
         }
+        this.initSummon()
         this.reassessWeaponGoal()
     }
 
     override fun addAdditionalSaveData(compound: CompoundTag) {
         super.addAdditionalSaveData(compound)
+        val limitedTicks = this.limitedLifeTicks
+        if (limitedTicks != null) {
+            compound.putInt("lifetimeLimitedTicks", limitedTicks)
+        }
 
         val aiRoutineIndex = this.AI_ROUTINE_INDEX
         if (aiRoutineIndex != null) {
@@ -128,10 +148,22 @@ class SummonedSkeleton(entityType: EntityType<SummonedSkeleton?>?, level: Level)
     override fun tick() {
         super.tick()
         if (!this.level().isClientSide) {
-            if (this.hasLimitedLife && --this.limitedLifeTicks <= 0) {
+//            if (this.getSummonerAlt() != null) {
+//                this.target
+//                for (t in this.goalSelector.availableGoals) {
+//                    this.getSummonerAlt()!!.sendSystemMessage(Component.literal("Goals: " + t.goal::class.java.toString()))
+//                }
+//                for (t in this.targetSelector.availableGoals) {
+//                    this.getSummonerAlt()!!.sendSystemMessage(Component.literal("Target Goals: " + t.goal::class.java.toString()))
+//                }
+//            }
+
+            var remainingTicks = this.limitedLifeTicks
+            if (remainingTicks != null && --remainingTicks <= 0) {
                 spawnPoof(this.level() as ServerLevel, this.blockPosition())
                 this.remove(RemovalReason.DISCARDED)
             }
+            this.limitedLifeTicks = remainingTicks
         }
     }
 
@@ -150,35 +182,33 @@ class SummonedSkeleton(entityType: EntityType<SummonedSkeleton?>?, level: Level)
 //        PRIORITY 1
         this.goalSelector.addGoal(1, RestrictSunGoal(this))
 //        PRIORITY 2
-        this.goalSelector.addGoal(2, FleeSunGoal(this, 1.0))
         this.goalSelector.addGoal(2, AvoidEntityGoal(this, Wolf::class.java, 6.0F, 1.0, 1.2))
+        if (routine_index in 4..7) {
+            this.goalSelector.addGoal(2, GenericFollowOwnerGoal(this, this::getSummonerAlt, 1.0, 10.0f, 5.0f, false, 50f))
+        }
 //        PRIORITY 3
+        this.goalSelector.addGoal(3, FleeSunGoal(this, 1.0))
 //        PRIORITY 4
 //        Skeleton Ranged Attack Goal
 //        PRIORITY 5
         if (routine_index in 8..11) {
             val moveTowardsRestrictionGoal = GenericSentryGoal(this, 1.0, true)
             this.goalSelector.addGoal(5, moveTowardsRestrictionGoal)
+            moveTowardsRestrictionGoal.setFlags(EnumSet.of<Goal.Flag?>(Goal.Flag.MOVE, Goal.Flag.LOOK))
         }
-        if (routine_index in 4..7) {
-            this.goalSelector.addGoal(5, GenericFollowOwnerGoal(this, this::getSummonerAlt, 1.0, 10.0f, 5.0f, false, 50f))
-        }
-//        PRIORITY 5
         this.goalSelector.addGoal(8, LookAtPlayerGoal(this, Player::class.java, 3.0f, 1.0f))
         this.goalSelector.addGoal(8, RandomLookAroundGoal(this))
 //        PRIORITY 6
         if (routine_index in 0 .. 7) {
-            this.goalSelector.addGoal(6,WaterAvoidingRandomStrollGoal(this, 1.0))
+            this.goalSelector.addGoal(9,WaterAvoidingRandomStrollGoal(this, 1.0))
         }
 
 //        TARGETS
 //        Priority 0
         if (routine_index in BERSERK_INDEXES) {
-            this.targetSelector.addGoal(0, NearestAttackableTargetGoal(this, LivingEntity::class.java, 10, true, false,
-                {
-                        entity: LivingEntity -> true
-                }
-            ))
+            this.targetSelector.addGoal(0, GenericHurtByTargetGoal(this, { entity: Entity? -> false }))
+            this.targetSelector.addGoal(1, NearestAttackableTargetGoal(this, Player::class.java, 5, false, false, null))
+            this.targetSelector.addGoal(2, NearestAttackableTargetGoal(this, LivingEntity::class.java, 5, false, false, null))
             return
         } else {
             this.targetSelector.addGoal(0, GenericOwnerHurtByTargetGoal(this, this::getSummonerAlt))
@@ -221,7 +251,7 @@ class SummonedSkeleton(entityType: EntityType<SummonedSkeleton?>?, level: Level)
     }
 
     override fun isPreventingPlayerRest(pPlayer: Player): Boolean {
-        return !this.isAlliedTo(pPlayer)
+        return !this.isAlliedHelper(pPlayer)
     }
 
     override fun getAmbientSound(): SoundEvent {
@@ -238,10 +268,6 @@ class SummonedSkeleton(entityType: EntityType<SummonedSkeleton?>?, level: Level)
 
     fun getStepSound(): SoundEvent {
         return SoundEvents.SKELETON_STEP
-    }
-
-    override fun isAlliedTo(entity: Entity): Boolean {
-        return super.isAlliedTo(entity) || this.isAlliedHelper(entity)
     }
 
     override fun shouldDespawnInPeaceful(): Boolean {
@@ -365,6 +391,5 @@ class SummonedSkeleton(entityType: EntityType<SummonedSkeleton?>?, level: Level)
             this.setItemSlot(equipmentSlot, itemStack)
         }
     }
-
 }
 

@@ -20,9 +20,7 @@ class GenericSentryGoal(
     private val allowTeleport: Boolean = true
 ) : Goal() {
     private val navigation: PathNavigation
-    private var timeToRecalcPath = 0
-    private var timesRecalcluated = 0
-    private val permittedTimesRecalculated = 100
+    private var timeBeforeTeleport = 0
 
     init {
         this.navigation = mob.getNavigation()
@@ -30,16 +28,19 @@ class GenericSentryGoal(
     }
 
     override fun canUse(): Boolean {
-        return (this.mob.isWithinRestriction())
+        return (!this.mob.navigation.isDone())
     }
 
     override fun canContinueToUse(): Boolean {
-        return (this.navigation.isDone() || this.mob.isWithinRestriction())
+        return !this.navigation.isDone()
     }
 
     override fun start() {
-        this.timesRecalcluated = 0
-        this.timeToRecalcPath = 0
+        this.timeBeforeTeleport = 1200
+        this.mob.getMoveControl().setWantedPosition(this.mob.restrictCenter.x.toDouble(),
+            this.mob.restrictCenter.y.toDouble(),
+            this.mob.restrictCenter.z.toDouble(),
+            this.speedModifier)
     }
 
     override fun stop() {
@@ -50,24 +51,15 @@ class GenericSentryGoal(
         this.mob.getLookControl().setLookAt(
             Vec3(
                 this.mob.restrictCenter.x.toDouble(),
-                this.mob.restrictCenter.y.toDouble(),
+                this.mob.restrictCenter.y.toDouble() + 1.0,
                 this.mob.restrictCenter.z.toDouble()
             )
         )
-
-        if (--this.timeToRecalcPath <= 0) {
-            this.timesRecalcluated += 1
-            if (this.timesRecalcluated > this.permittedTimesRecalculated) {
-                if (allowTeleport) {
-                    this.tryToTeleportToPosition()
-                }
-            } else {
-                this.timeToRecalcPath = this.adjustedTickDelay(10)
-                this.mob.getMoveControl().setWantedPosition(this.mob.restrictCenter.x.toDouble(),
-                    this.mob.restrictCenter.y.toDouble(),
-                    this.mob.restrictCenter.z.toDouble(),
-                    this.speedModifier)
+        if (--this.timeBeforeTeleport <= 0) {
+            if (allowTeleport) {
+                this.tryToTeleportToPosition()
             }
+            this.timeBeforeTeleport = 100
         }
     }
 

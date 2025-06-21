@@ -34,11 +34,12 @@ class SummonVexAction: Action() {
     val level = targetable.level as ServerLevel
     var strength = 0.0
     var duration = 10.0
-    val hasLimitedLife = descriptors.none {it is PermanentDurationDescriptor }
     for (d in descriptors) {
       if (d is StrengthDescriptor) strength += d.strengthModifier()
       if (d is DurationDescriptor) duration += d.durationModifier()
     }
+    val finalDuration = if (descriptors.none {it is PermanentDurationDescriptor }) duration.toInt() * 20 else null
+
     val behaviourDescriptors: List<SummonBehaviourDescriptor> = descriptors.filter{it is SummonBehaviourDescriptor}.map{it as SummonBehaviourDescriptor}
     val isSentry: Boolean = behaviourDescriptors.any{ it.behaviour == SUMMON_BEHAVIOURS.SENTRY  }
     val isFollower: Boolean = behaviourDescriptors.any{ it.behaviour == SUMMON_BEHAVIOURS.FOLLOWER }
@@ -62,7 +63,7 @@ class SummonVexAction: Action() {
         } else if (!isFollower) {
           summonedVex.boundOrigin = blockPos2
         }
-        summonedVex.setSummonParams(l,  duration.toInt() * 20, hasLimitedLife, strength.toInt(), getColor(descriptors), behaviourDescriptors, level)
+        summonedVex.setSummonParams(l,  finalDuration, strength.toInt(), getColor(descriptors), behaviourDescriptors, level)
 
         summonedVex.finalizeSpawn(level, level.getCurrentDifficultyAt(blockPos2), MobSpawnType.MOB_SUMMONED, null)
         summonedVex.setPos(vecPos)

@@ -5,7 +5,6 @@ import com.ssblur.scriptor.word.descriptor.summon.SummonBehaviourDescriptor
 import net.minecraft.Util
 import net.minecraft.core.BlockPos
 import net.minecraft.nbt.CompoundTag
-import net.minecraft.network.chat.Component
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.sounds.SoundEvents
 import net.minecraft.util.RandomSource
@@ -15,7 +14,6 @@ import net.minecraft.world.entity.ai.goal.FloatGoal
 import net.minecraft.world.entity.ai.goal.Goal
 import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal
-import net.minecraft.world.entity.ai.goal.target.TargetGoal
 import net.minecraft.world.entity.monster.Creeper
 import net.minecraft.world.entity.monster.Monster
 import net.minecraft.world.entity.monster.Vex
@@ -35,8 +33,7 @@ class SummonedVex(entityType: EntityType<SummonedVex?>?, level: Level): IMagicSu
 
     override var summonerUUID: UUID? = null
 
-    var limitedLifeTicks: Int = 0
-    var hasLimitedLife: Boolean = true
+    var limitedLifeTicks: Int? = null
     var power: Int = 0
     var color: Int = -6265536
     //    Don't want to have ranged Vexes
@@ -44,14 +41,22 @@ class SummonedVex(entityType: EntityType<SummonedVex?>?, level: Level): IMagicSu
 
     override var AI_ROUTINE_INDEX: Int? = null
 
-    fun setSummonParams(summoner: LivingEntity?, limitedLifeTicks: Int = 100, hasLimitedLife: Boolean = true, power: Int, color: Int = -6265536, behaviourDescriptors: List<SummonBehaviourDescriptor>? = null, level: Level?) {
+
+    fun initSummon() {
+        if (this.level() != null && !this.level().isClientSide) {
+            this.goalSelector.removeAllGoals { true }
+            this.targetSelector.removeAllGoals { true }
+            this.registerGoals()
+        }
+    }
+
+    fun setSummonParams(summoner: LivingEntity?, limitedLifeTicks: Int? = 100, power: Int, color: Int = -6265536, behaviourDescriptors: List<SummonBehaviourDescriptor>? = null, level: Level?) {
         if (level != null && !level.isClientSide) {
             setSummonerAlt(summoner)
 //            if (this.getSummonerAlt() == null) {
 //                this.level().players().first().sendSystemMessage(Component.literal("Summoner is null " + summoner!!.uuid.toString()))
 //            }
             this.limitedLifeTicks = limitedLifeTicks
-            this.hasLimitedLife = hasLimitedLife
             this.color = color
             this.power = power
             if (behaviourDescriptors == null) {
@@ -59,10 +64,7 @@ class SummonedVex(entityType: EntityType<SummonedVex?>?, level: Level): IMagicSu
             } else {
                 setAiRoutineIndex(calculateAiRoutineIndex(behaviourDescriptors.map{it.behaviour}))
             }
-            this.goalSelector.removeAllGoals { true }
-            this.targetSelector.removeAllGoals { true }
-
-            this.registerGoals()
+            initSummon()
 //            for (g in this.targetSelector.availableGoals) {
 //                this.level().players().first().sendSystemMessage(Component.literal("target " + g.goal::class.java.toString()))
 //            }
@@ -76,6 +78,9 @@ class SummonedVex(entityType: EntityType<SummonedVex?>?, level: Level): IMagicSu
 
     override fun readAdditionalSaveData(compoundTag: CompoundTag) {
         super.readAdditionalSaveData(compoundTag)
+        if (compoundTag.contains("lifetimeLimitedTicks")) {
+            this.limitedLifeTicks = (compoundTag.getInt("lifetimeLimitedTicks"))
+        }
         if (compoundTag.contains("AiRoutineIndex")) {
             this.AI_ROUTINE_INDEX = (compoundTag.getInt("AiRoutineIndex"))
         }
@@ -87,10 +92,16 @@ class SummonedVex(entityType: EntityType<SummonedVex?>?, level: Level): IMagicSu
         } else {
             null
         }
+        initSummon()
     }
 
     override fun addAdditionalSaveData(compound: CompoundTag) {
         super.addAdditionalSaveData(compound)
+
+        val limitedTicks = this.limitedLifeTicks
+        if (limitedTicks != null) {
+            compound.putInt("lifetimeLimitedTicks", limitedTicks)
+        }
 
         val aiRoutineIndex = this.AI_ROUTINE_INDEX
         if (aiRoutineIndex != null) {
@@ -123,10 +134,12 @@ class SummonedVex(entityType: EntityType<SummonedVex?>?, level: Level): IMagicSu
         this.noPhysics = false
         this.setNoGravity(true)
         if (!this.level().isClientSide) {
-            if (this.hasLimitedLife && --this.limitedLifeTicks <= 0) {
+            var limitedTicks = this.limitedLifeTicks
+            if (limitedTicks != null && --limitedTicks <= 0) {
                 spawnPoof(this.level() as ServerLevel, this.blockPosition())
                 this.remove(RemovalReason.DISCARDED)
             }
+            this.limitedLifeTicks = limitedTicks
         }
     }
 
@@ -168,11 +181,9 @@ class SummonedVex(entityType: EntityType<SummonedVex?>?, level: Level): IMagicSu
 //        TARGETS
 //        Priority 0
         if (routine_index in BERSERK_INDEXES) {
-            this.targetSelector.addGoal(0, NearestAttackableTargetGoal(this, LivingEntity::class.java, 10, true, false,
-                {
-                        entity: LivingEntity -> true
-                }
-            ))
+            this.targetSelector.addGoal(0, GenericHurtByTargetGoal(this, { entity: Entity? -> false }))
+            this.targetSelector.addGoal(1, NearestAttackableTargetGoal(this, Player::class.java, 5, false, false, null))
+            this.targetSelector.addGoal(2, NearestAttackableTargetGoal(this, LivingEntity::class.java, 5, false, false, null))
             return
         } else {
             this.targetSelector.addGoal(0, GenericOwnerHurtByTargetGoal(this, this::getSummonerAlt))
@@ -219,6 +230,10 @@ class SummonedVex(entityType: EntityType<SummonedVex?>?, level: Level): IMagicSu
 
     }
 
+    override fun isPreventingPlayerRest(pPlayer: Player): Boolean {
+        return !this.isAlliedTo(pPlayer)
+    }
+
     override fun populateDefaultEquipmentSlots(randomSource: RandomSource, difficultyInstance: DifficultyInstance) {
         val weapon = when (this.power) {
             in 0..1 -> Items.STICK
@@ -257,7 +272,7 @@ class SummonedVex(entityType: EntityType<SummonedVex?>?, level: Level): IMagicSu
             val livingentity = this@SummonedVex.getTarget()
             if (livingentity != null) {
                 val vec3 = livingentity.getEyePosition()
-                this@SummonedVex.moveControl.setWantedPosition(vec3.x, vec3.y, vec3.z, 1.0)
+                this@SummonedVex.moveControl.setWantedPosition(vec3.x, vec3.y, vec3.z, 1.5)
             }
 
             this@SummonedVex.setIsCharging(true)
@@ -288,7 +303,7 @@ class SummonedVex(entityType: EntityType<SummonedVex?>?, level: Level): IMagicSu
                     val d0 = this@SummonedVex.distanceToSqr(livingentity)
                     if (d0 < 9.0) {
                         val vec3 = livingentity.getEyePosition()
-                        this@SummonedVex.moveControl.setWantedPosition(vec3.x, vec3.y, vec3.z, 1.0)
+                        this@SummonedVex.moveControl.setWantedPosition(vec3.x, vec3.y, vec3.z, 1.5)
                     }
                 }
             }
