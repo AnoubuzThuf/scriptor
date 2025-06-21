@@ -41,6 +41,12 @@ class PlayerSpellsSavedData: SavedData {
     return spells[tier]!!
   }
 
+  fun resetTier(tier: Int) {
+    if (!spells.containsKey(tier) && spells[tier] != null) {
+      spells[tier]!!.clear()
+    }
+  }
+
   fun getScrapTier(tier: Int): HashMap<String, Boolean> {
     if (!scraps.containsKey(tier)) scraps[tier] = HashMap()
     return scraps[tier]!!
