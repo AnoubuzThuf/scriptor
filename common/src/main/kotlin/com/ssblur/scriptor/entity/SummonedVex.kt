@@ -60,8 +60,9 @@ class SummonedVex(entityType: EntityType<SummonedVex?>?, level: Level): IMagicSu
             this.limitedLifeTicks = limitedLifeTicks
             this.color = color
             this.power = power
-            if (summoner != null) {
-                this.setCustomName(Component.literal(summoner.getCustomName()!!.getString() + "'s Summoned Vex"))
+
+            if (summoner != null && summoner is Player) {
+                this.setCustomName(Component.literal(summoner.getName()!!.getString() + "'s Summoned Vex"))
             }
             if (behaviourDescriptors == null) {
                 setAiRoutineIndex(calculateAiRoutineIndex(null))
@@ -348,11 +349,20 @@ class SummonedVex(entityType: EntityType<SummonedVex?>?, level: Level): IMagicSu
             }
 
             for (i in 0..2) {
-                val blockpos1 = blockpos!!.offset(
-                    this@SummonedVex.random.nextInt(15) - 7,
-                    this@SummonedVex.random.nextInt(11) - 5,
-                    this@SummonedVex.random.nextInt(15) - 7
-                )
+                val blockpos1 = if (this@SummonedVex.level().isEmptyBlock(blockpos.below())) {
+                    blockpos!!.offset(
+                        this@SummonedVex.random.nextInt(15) - 7,
+                        this@SummonedVex.random.nextInt(11) - 5,
+                        this@SummonedVex.random.nextInt(15) - 7
+                    )
+                } else {
+                    blockpos!!.offset(
+                        this@SummonedVex.random.nextInt(15) - 7,
+                        this@SummonedVex.random.nextInt(5) + 1,
+                        this@SummonedVex.random.nextInt(15) - 7
+                    )
+                }
+
                 if (this@SummonedVex.level().isEmptyBlock(blockpos1)) {
                     this@SummonedVex.moveControl.setWantedPosition(
                         blockpos1.getX().toDouble() + 0.5,

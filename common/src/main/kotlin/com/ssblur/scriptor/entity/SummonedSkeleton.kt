@@ -75,8 +75,8 @@ class SummonedSkeleton(entityType: EntityType<SummonedSkeleton?>?, level: Level)
             this.power = power
             this.color = color
 
-            if (summoner != null) {
-                this.setCustomName(Component.literal(summoner.getCustomName()!!.getString() + "'s Summoned Skeleton"))
+            if (summoner != null && summoner is Player) {
+                this.setCustomName(Component.literal(summoner.getName()!!.getString() + "'s Summoned Skeleton"))
             }
 
             this.isRanged = isRanged
