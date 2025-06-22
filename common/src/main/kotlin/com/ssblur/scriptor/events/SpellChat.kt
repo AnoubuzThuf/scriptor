@@ -7,6 +7,7 @@ import com.ssblur.scriptor.data.saved_data.LastCastSpellSavedData
 import com.ssblur.scriptor.effect.EmpoweredStatusEffect
 import com.ssblur.scriptor.effect.ScriptorEffects.HOARSE
 import com.ssblur.scriptor.effect.ScriptorEffects.MUTE
+import com.ssblur.scriptor.effect.VoodooStatusEffect
 import com.ssblur.scriptor.helpers.targetable.EntityTargetable
 import com.ssblur.unfocused.event.common.PlayerChatEvent
 import net.minecraft.ChatFormatting
@@ -27,10 +28,10 @@ object SpellChat {
       if (level is ServerLevel) {
         val spell = computeIfAbsent(level).parse(sentence)
         if (spell != null) {
-          if (player.hasEffect(HOARSE)) {
+          if (player.armorCoverPercentage <= 0.0 && player.activeEffects.any { it.effect.value() == HOARSE.value}) {
             player.sendSystemMessage(Component.translatable("extra.scriptor.hoarse"))
             return@register it.cancel()
-          } else if (player.hasEffect(MUTE)) {
+          } else if (player.activeEffects.any { it.effect.value() == MUTE.value}) {
             player.sendSystemMessage(Component.translatable("extra.scriptor.mute"))
             return@register it.cancel()
           }
@@ -48,7 +49,7 @@ object SpellChat {
 
           val adjustedCost = Math.round(cost * (ScriptorConfig.VOCAL_COOLDOWN_MULTIPLIER() / 100.0)).toInt()
           if (!player.isCreative) {
-            player.addEffect(MobEffectInstance(HOARSE.ref(), adjustedCost))
+            player.addEffect(MobEffectInstance(HOARSE.ref(), adjustedCost / 4))
             if (adjustedCost > ScriptorConfig.VOCAL_HUNGER_THRESHOLD())
               player.addEffect(
                 MobEffectInstance(

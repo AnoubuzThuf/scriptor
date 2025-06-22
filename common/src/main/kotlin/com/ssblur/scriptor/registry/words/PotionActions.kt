@@ -91,7 +91,7 @@ object PotionActions {
       1.0 / 3.0,
       Word.Cost(8.0, Word.COSTTYPE.ADDITIVE),
 //      Prevent invincibility
-      4.0,
+      3.0,
       registryKey="resistance",
     )
   )
