@@ -66,6 +66,7 @@ interface IMagicSummon {
     var AI_ROUTINE_INDEX: Int?
 
     var summonerUUID: UUID?
+    var color: Int
 
 
     var summoner: LivingEntity?
@@ -107,8 +108,10 @@ interface IMagicSummon {
     fun isAlliedHelper(entity: Entity): Boolean {
         val summoner = getSummonerAlt()
         if (summoner == null) {
-            return false
+            return (entity is IMagicSummon && entity.color == this.color)
         }
+        val hasCommonSummoner = (entity is IMagicSummon && entity.getSummonerAlt() == summoner)
+        if (hasCommonSummoner) return true
         val isFellowAlly = entity == summoner || entity.isAlliedTo(summoner as Entity)
         val hasCommonOwner = (entity is OwnableEntity && entity.getOwner() == summoner)
         return isFellowAlly || hasCommonOwner

@@ -27,6 +27,7 @@ import net.minecraft.world.entity.animal.Wolf
 import net.minecraft.world.entity.monster.AbstractSkeleton
 import net.minecraft.world.entity.monster.Creeper
 import net.minecraft.world.entity.monster.Monster
+import net.minecraft.world.entity.monster.Shulker
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
@@ -53,7 +54,7 @@ class SummonedSkeleton(entityType: EntityType<SummonedSkeleton?>?, level: Level)
 
     var limitedLifeTicks: Int? = 0
     var power: Int = 0
-    var color: Int = -6265536
+    override var color: Int = -6265536
     //    Don't want to have ranged Vexes
     var isRanged: Boolean = false
 
@@ -215,40 +216,43 @@ class SummonedSkeleton(entityType: EntityType<SummonedSkeleton?>?, level: Level)
             this.targetSelector.addGoal(2, NearestAttackableTargetGoal(this, LivingEntity::class.java, 5, false, false, null))
             return
         } else {
-            this.targetSelector.addGoal(0, GenericOwnerHurtByTargetGoal(this, this::getSummonerAlt))
-            this.targetSelector.addGoal(1, GenericOwnerHurtTargetGoal(this, this::getSummonerAlt))
-            this.targetSelector.addGoal(2, GenericCopyOwnerTargetGoal(this, this::getSummonerAlt))
+            if (this.getSummonerAlt() != null) {
+                this.targetSelector.addGoal(0, GenericOwnerHurtByTargetGoal(this, this::getSummonerAlt))
+                this.targetSelector.addGoal(1, GenericOwnerHurtTargetGoal(this, this::getSummonerAlt))
+                this.targetSelector.addGoal(2, GenericCopyOwnerTargetGoal(this, this::getSummonerAlt))
+            }
             this.targetSelector.addGoal(3, GenericHurtByTargetGoal(this, { entity: Entity? -> entity == getSummonerAlt() }).setAlertOthers())
+
 //            this.targetSelector.addGoal(10, GenericProtectOwnerTargetGoal(this, this::getSummoner))
         }
 
-
 //        Priority 5
         if (routine_index in MONSTER_HUNT_INDEXES) {
-            this.targetSelector.addGoal(5, NearestAttackableTargetGoal(this, Monster::class.java, 10, true, false,
+            this.targetSelector.addGoal(5, NearestAttackableTargetGoal(this, Monster::class.java, 8, true, false,
                 {
-                        entity: LivingEntity -> entity is Monster && entity !is IMagicSummon && entity !is Creeper
+                        entity: LivingEntity -> entity !is IMagicSummon && entity !is Creeper
+                }
+            ))
+//            Technically Shulkers aren't monsters, so add this in here
+            this.targetSelector.addGoal(5, NearestAttackableTargetGoal(this, Shulker::class.java, 8, true, false,
+                {
+                        entity: LivingEntity -> entity !is IMagicSummon && entity !is Creeper
                 }
             ))
         }
         if (routine_index in OTHER_PLAYER_HUNT_INDEXES) {
 //            Hunt non-allied summons before players
-            this.targetSelector.addGoal(5, NearestAttackableTargetGoal(this, Monster::class.java, 10, true, false,
+            this.targetSelector.addGoal(5, NearestAttackableTargetGoal(this, Monster::class.java, 8, true, false,
                 {
-                        entity: LivingEntity -> entity is IMagicSummon && !isAlliedHelper(entity) && entity !is Creeper
+                        entity: LivingEntity -> (entity is IMagicSummon) && !isAlliedHelper(entity) && entity !is Creeper
                 }
             ))
         }
 //        Priority 6
         if (routine_index in OTHER_PLAYER_HUNT_INDEXES) {
-            this.targetSelector.addGoal(6, NearestAttackableTargetGoal(this, Player::class.java, 10, true, false,
-                {
-                        entity: LivingEntity ->
-                    if (this.getSummonerAlt() == null) {
-                        entity is Player
-                    } else {
-                        entity is Player && entity != this.getSummonerAlt()
-                    }
+            this.targetSelector.addGoal(6, NearestAttackableTargetGoal(this, Player::class.java, 8, true, false,
+                { entity: LivingEntity -> if (entity is Player && this.getSummonerAlt() == null) true
+                    else ((entity is Player) && (entity != this.getSummonerAlt()))
                 }
             ))
         }
