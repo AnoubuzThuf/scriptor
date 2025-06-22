@@ -10,7 +10,7 @@ import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.Vec3
 
-class ChainDescriptor: Descriptor(), TargetDescriptor {
+class ChainDescriptor(registryKey: String): Descriptor(registryKey), TargetDescriptor {
   override fun modifyTargets(originalTargetables: List<Targetable>, owner: Targetable): List<Targetable> {
     val targetables = originalTargetables.toMutableList()
     if (targetables.isEmpty()) return targetables

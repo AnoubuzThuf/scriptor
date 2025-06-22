@@ -16,7 +16,7 @@ object Reagents {
       LOGGER.info("Loaded reagent {}: {} / {}", location, reagent.item, reagent.cost)
       register(
         "reagent." + location.toShortLanguageKey(),
-        ReagentDescriptor(BuiltInRegistries.ITEM[ResourceLocation.parse(reagent.item)], reagent.cost, reagent.power)
+        ReagentDescriptor(BuiltInRegistries.ITEM[ResourceLocation.parse(reagent.item)], reagent.cost, reagent.power, "reagent." + location.toShortLanguageKey())
       )
     }
   }

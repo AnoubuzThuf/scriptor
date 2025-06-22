@@ -18,7 +18,7 @@ object Colors {
       val index = registerWithEasing(location.toShortLanguageKey(), colors)
       val name = location.toShortLanguageKey()
       cache += Triplet(index, name, colors)
-      register("color.$name", CustomColorDescriptor(name))
+      register("color.$name", CustomColorDescriptor(name, "stacking_strong"))
       ScriptorMod.LOGGER.info("Registering custom color $name")
     }
   }

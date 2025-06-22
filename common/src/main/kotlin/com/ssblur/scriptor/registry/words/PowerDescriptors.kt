@@ -10,33 +10,41 @@ import com.ssblur.scriptor.word.descriptor.power.SolarPowerDescriptor
 object PowerDescriptors {
   val BLOOD_POWER = register(
     "blood_power",
-    BloodPowerDescriptor()
+    BloodPowerDescriptor(
+    "blood_power")
   )
   val STRONG = register(
     "strong",
-    SimpleStrengthDescriptor(2, 1.0)
+    SimpleStrengthDescriptor(2, 1.0,
+    "strong")
   )
   val POWERFUL = register(
     "powerful",
-    SimpleStrengthDescriptor(6, 4.0)
+    SimpleStrengthDescriptor(6, 4.0,
+    "powerful")
   )
   val STACKING_STRONG =
     register(
-      "stacking_strong", SimpleStrengthDescriptor(
-        4,
-        1.0
+      "stacking_strong",
+      SimpleStrengthDescriptor(
+          4,
+        1.0,
+        "stacking_strong"
       ).allowDuplication()
     )
   val MASSIVE_STRONG = register(
     "massive_strong",
-    SimpleStrengthDescriptor(120, 30.0)
+    SimpleStrengthDescriptor(120, 30.0,
+    "massive_strong")
   )
   val OVERWHELMING_STRENGTH = register(
     "overwhelming",
-    OverwhelmingStrengthDescriptor()
+    OverwhelmingStrengthDescriptor(
+    "overwhelming")
   )
   val SOLAR_POWER = register(
     "solar_power",
-    SolarPowerDescriptor()
+    SolarPowerDescriptor(
+    "solar_power")
   )
 }

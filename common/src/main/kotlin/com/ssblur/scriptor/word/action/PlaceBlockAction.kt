@@ -15,7 +15,7 @@ import net.minecraft.world.InteractionResult
 import net.minecraft.world.item.BlockItem
 import net.minecraft.world.phys.BlockHitResult
 
-class PlaceBlockAction: Action() {
+class PlaceBlockAction(registryKey: String): Action(registryKey) {
   override fun cost() = Cost(1.5, COSTTYPE.ADDITIVE)
 
   override fun apply(caster: Targetable, targetable: Targetable, descriptors: Array<Descriptor>, words: Array<Word?>) {

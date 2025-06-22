@@ -12,7 +12,7 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.Item
 import kotlin.math.min
 
-class ReagentDescriptor(var item: Item, var cost: Double, var strength: Double): Descriptor(), CastDescriptor, AfterCastDescriptor, StrengthDescriptor {
+class ReagentDescriptor(var item: Item, var cost: Double, var strength: Double, registryKey: String): Descriptor(registryKey), CastDescriptor, AfterCastDescriptor, StrengthDescriptor {
   override fun cost() = Cost.add(-cost)
 
   override fun cannotCast(caster: Targetable?): Boolean {

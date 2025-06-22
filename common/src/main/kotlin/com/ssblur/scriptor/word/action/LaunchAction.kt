@@ -14,7 +14,7 @@ import net.minecraft.world.entity.item.FallingBlockEntity
 import net.minecraft.world.level.block.FallingBlock
 import net.minecraft.world.phys.Vec3
 
-class LaunchAction: Action() {
+class LaunchAction(registryKey: String): Action(registryKey) {
   override fun apply(caster: Targetable, targetable: Targetable, descriptors: Array<Descriptor>, words: Array<Word?>) {
     var strength = 1.5
     for (d in descriptors) {

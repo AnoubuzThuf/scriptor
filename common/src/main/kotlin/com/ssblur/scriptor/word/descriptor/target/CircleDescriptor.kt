@@ -6,7 +6,7 @@ import com.ssblur.scriptor.helpers.targetable.Targetable
 import net.minecraft.core.Direction
 import net.minecraft.world.phys.Vec2
 
-class CircleDescriptor: Descriptor(), GeometricTargetDescriptor {
+class CircleDescriptor(registryKey: String): Descriptor(registryKey), GeometricTargetDescriptor {
   override fun modifyTargets(originalTargetables: List<Targetable>, owner: Targetable, index: Int, descriptors: Array<Descriptor>): List<Targetable> {
     val uses = getUses(index, descriptors)
     val radius = uses

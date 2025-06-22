@@ -7,7 +7,7 @@ import com.ssblur.scriptor.word.descriptor.focus.FocusDescriptor
 import net.minecraft.world.item.ItemStack
 import java.util.function.Predicate
 
-class CasterFirstEmptySlotDescriptor: Descriptor(), FocusDescriptor {
+class CasterFirstEmptySlotDescriptor(registryKey: String): Descriptor(registryKey), FocusDescriptor {
   override fun cost() = Cost(0.0, COSTTYPE.ADDITIVE)
 
   override fun modifyFocus(targetable: Targetable): Targetable {

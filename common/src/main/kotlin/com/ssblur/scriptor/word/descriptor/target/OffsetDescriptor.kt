@@ -9,7 +9,7 @@ import net.minecraft.world.phys.Vec2
 import net.minecraft.world.phys.Vec3
 import org.apache.commons.lang3.function.TriConsumer
 
-class OffsetDescriptor(val cost: Double): Descriptor(), TargetDescriptor {
+class OffsetDescriptor(val cost: Double, registryKey: String): Descriptor(registryKey), TargetDescriptor {
   var transforms: MutableList<TriConsumer<Targetable, Targetable, MutableList<Targetable>>> = ArrayList()
   override fun modifyTargets(originalTargetables: List<Targetable>, owner: Targetable): List<Targetable> {
     val output: MutableList<Targetable> = ArrayList()

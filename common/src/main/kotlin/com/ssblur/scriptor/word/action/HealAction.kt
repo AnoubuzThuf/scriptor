@@ -14,7 +14,7 @@ import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.item.ItemStack
 import kotlin.math.max
 
-class HealAction: Action() {
+class HealAction(registryKey: String): Action(registryKey) {
   override fun apply(caster: Targetable, targetable: Targetable, descriptors: Array<Descriptor>, words: Array<Word?>) {
     var strength = 2.0
     for (d in descriptors) {

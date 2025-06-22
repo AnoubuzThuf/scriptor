@@ -6,7 +6,7 @@ import com.ssblur.scriptor.helpers.targetable.Targetable
 import com.ssblur.scriptor.word.descriptor.CastDescriptor
 import net.minecraft.world.entity.LivingEntity
 
-class CriticalDescriptor: Descriptor(), CastDescriptor {
+class CriticalDescriptor(registryKey: String): Descriptor(registryKey), CastDescriptor {
   override fun cost() = Cost.multiply(0.3)
 
   override fun cannotCast(caster: Targetable?) =

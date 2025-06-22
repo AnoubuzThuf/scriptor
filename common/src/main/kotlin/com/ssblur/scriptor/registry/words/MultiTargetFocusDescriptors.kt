@@ -8,10 +8,10 @@ import com.ssblur.scriptor.word.descriptor.focus.entity.EntityOnlyDescriptor
 object MultiTargetFocusDescriptors {
   val ENTITY_ONLY = register(
     "entity_only",
-    EntityOnlyDescriptor()
+    EntityOnlyDescriptor("entity_only")
   )
   val BLOCK_ONLY = register(
     "block_only",
-    BlockOnlyDescriptor()
+    BlockOnlyDescriptor("block_only")
   )
 }

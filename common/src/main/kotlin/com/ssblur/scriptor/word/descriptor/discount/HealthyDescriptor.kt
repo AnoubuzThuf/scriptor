@@ -6,7 +6,7 @@ import com.ssblur.scriptor.helpers.targetable.Targetable
 import com.ssblur.scriptor.word.descriptor.CastDescriptor
 import net.minecraft.world.entity.LivingEntity
 
-class HealthyDescriptor: Descriptor(), CastDescriptor {
+class HealthyDescriptor(registryKey: String): Descriptor(registryKey), CastDescriptor {
   override fun cost() = Cost(0.8, COSTTYPE.MULTIPLICATIVE)
 
   override fun cannotCast(caster: Targetable?): Boolean {

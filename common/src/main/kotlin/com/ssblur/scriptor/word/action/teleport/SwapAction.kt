@@ -18,7 +18,7 @@ import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.ChunkPos
 import net.minecraft.world.level.Level
 
-open class SwapAction: Action() {
+open class SwapAction(registryKey: String): Action(registryKey) {
   override fun apply(caster: Targetable, targetable: Targetable, descriptors: Array<Descriptor>, words: Array<Word?>) {
     if (targetable.level.isClientSide) return
 

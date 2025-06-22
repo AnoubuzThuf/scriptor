@@ -14,7 +14,8 @@ object PotionActions {
       MobEffects.POISON,
       60.0,
       1.0 / 3.0,
-      Word.Cost(8.0, Word.COSTTYPE.ADDITIVE)
+      Word.Cost(8.0, Word.COSTTYPE.ADDITIVE),
+      registryKey="poison",
     )
   )
   val SLOW_POTION = register(
@@ -23,7 +24,8 @@ object PotionActions {
       MobEffects.MOVEMENT_SLOWDOWN,
       80.0,
       1.0 / 3.0,
-      Word.Cost(6.0, Word.COSTTYPE.ADDITIVE)
+      Word.Cost(6.0, Word.COSTTYPE.ADDITIVE),
+      registryKey="slow",
     )
   )
   val REGENERATION_POTION = register(
@@ -32,17 +34,19 @@ object PotionActions {
       MobEffects.REGENERATION,
       30.0,
       1.0 / 3.0,
-      Word.Cost(8.0, Word.COSTTYPE.ADDITIVE)
+      Word.Cost(8.0, Word.COSTTYPE.ADDITIVE),
+      registryKey="regeneration",
     )
   )
-  val WITHER_POTION = register("wither", WitherAction())
+  val WITHER_POTION = register("wither", WitherAction("wither"))
   val SATURATION_POTION = register(
     "saturation",
     PotionAction(
       MobEffects.SATURATION,
       4.0,
       1.0 / 3.0,
-      Word.Cost(10.0, Word.COSTTYPE.ADDITIVE)
+      Word.Cost(10.0, Word.COSTTYPE.ADDITIVE),
+      registryKey="saturation",
     )
   )
   val SPEED_POTION = register(
@@ -51,7 +55,8 @@ object PotionActions {
       MobEffects.MOVEMENT_SPEED,
       80.0,
       1.0 / 2.0,
-      Word.Cost(6.0, Word.COSTTYPE.ADDITIVE)
+      Word.Cost(6.0, Word.COSTTYPE.ADDITIVE),
+      registryKey="speed",
     )
   )
   val HASTE_POTION = register(
@@ -60,12 +65,13 @@ object PotionActions {
       MobEffects.DIG_SPEED,
       50.0,
       1.0 / 3.0,
-      Word.Cost(8.0, Word.COSTTYPE.ADDITIVE)
+      Word.Cost(8.0, Word.COSTTYPE.ADDITIVE),
+      registryKey="haste",
     )
   )
   val STRENGTH_POTION = register(
     "strength",
-    StrengthAction()
+    StrengthAction("strength")
   )
   val JUMP_BOOST_POTION = register(
     "jump_boost",
@@ -73,7 +79,8 @@ object PotionActions {
       MobEffects.JUMP,
       60.0,
       1.0 / 3.0,
-      Word.Cost(9.0, Word.COSTTYPE.ADDITIVE)
+      Word.Cost(9.0, Word.COSTTYPE.ADDITIVE),
+      registryKey="jump_boost",
     )
   )
   val RESISTANCE_POTION = register(
@@ -84,7 +91,8 @@ object PotionActions {
       1.0 / 3.0,
       Word.Cost(8.0, Word.COSTTYPE.ADDITIVE),
 //      Prevent invincibility
-      4.0
+      4.0,
+      registryKey="resistance",
     )
   )
   val FIRE_RESISTANCE_POTION = register(
@@ -93,7 +101,8 @@ object PotionActions {
       MobEffects.FIRE_RESISTANCE,
       30.0,
       1.0 / 3.0,
-      Word.Cost(10.0, Word.COSTTYPE.ADDITIVE)
+      Word.Cost(10.0, Word.COSTTYPE.ADDITIVE),
+      registryKey="fire_resistance",
     )
   )
   val WATER_BREATHING_POTION = register(
@@ -102,7 +111,8 @@ object PotionActions {
       MobEffects.WATER_BREATHING,
       80.0,
       1.0 / 3.0,
-      Word.Cost(6.0, Word.COSTTYPE.ADDITIVE)
+      Word.Cost(6.0, Word.COSTTYPE.ADDITIVE),
+      registryKey="water_breathing",
     )
   )
   val NIGHT_VISION_POTION = register(
@@ -111,7 +121,8 @@ object PotionActions {
       MobEffects.NIGHT_VISION,
       80.0,
       1.0 / 3.0,
-      Word.Cost(6.0, Word.COSTTYPE.ADDITIVE)
+      Word.Cost(6.0, Word.COSTTYPE.ADDITIVE),
+      registryKey="night_vision",
     )
   )
   val WEAKNESS_POTION = register(
@@ -120,7 +131,8 @@ object PotionActions {
       MobEffects.WEAKNESS,
       50.0,
       1.0 / 3.0,
-      Word.Cost(6.0, Word.COSTTYPE.ADDITIVE)
+      Word.Cost(6.0, Word.COSTTYPE.ADDITIVE),
+      registryKey="weakness",
     )
   )
   val HERO_POTION = register(
@@ -129,17 +141,18 @@ object PotionActions {
       MobEffects.HERO_OF_THE_VILLAGE,
       120.0,
       1.0 / 6.0,
-      Word.Cost(100.0, Word.COSTTYPE.ADDITIVE)
+      Word.Cost(100.0, Word.COSTTYPE.ADDITIVE),
+      registryKey="hero",
     )
   )
-  val PHASING_POTION = register("phasing", PhasingAction())
+  val PHASING_POTION = register("phasing", PhasingAction("phasing"))
   val WILD_PHASING_POTION = register(
     "wild_phasing",
-    WildPhasingAction()
+    WildPhasingAction("wild_phasing")
   )
   val FREEZING_POTION = register(
     "freeze",
-    FreezeAction()
+    FreezeAction("freeze")
   )
   val ARCANE_POISON_POTION = register(
     "arcane_poison",
@@ -147,7 +160,8 @@ object PotionActions {
       ScriptorEffects.ARCANE_POISON.ref(),
       30.0,
       1.0/3.0,
-      Word.Cost(15.0, Word.COSTTYPE.ADDITIVE)
+      Word.Cost(15.0, Word.COSTTYPE.ADDITIVE),
+      registryKey="arcane_poison",
     )
   )
   val LEVITATION_POTION = register(
@@ -156,7 +170,8 @@ object PotionActions {
       MobEffects.LEVITATION,
       15.0,
       1.0,
-      Word.Cost(15.0, Word.COSTTYPE.ADDITIVE)
+      Word.Cost(15.0, Word.COSTTYPE.ADDITIVE),
+      registryKey="levitate",
     )
   )
   val BLINDNESS_POTION = register(
@@ -165,7 +180,8 @@ object PotionActions {
       MobEffects.BLINDNESS,
       30.0,
       1.0 / 3.0,
-      Word.Cost(6.0, Word.COSTTYPE.ADDITIVE)
+      Word.Cost(6.0, Word.COSTTYPE.ADDITIVE),
+      registryKey="blind",
     )
   )
   val ABSORPTION_POTION = register(
@@ -174,7 +190,8 @@ object PotionActions {
       MobEffects.ABSORPTION,
       30.0,
       1.0 / 3.0,
-      Word.Cost(8.0, Word.COSTTYPE.ADDITIVE)
+      Word.Cost(8.0, Word.COSTTYPE.ADDITIVE),
+      registryKey="absorption",
     )
   )
   val DOLPHINS_GRACE_POTION = register(
@@ -183,7 +200,8 @@ object PotionActions {
       MobEffects.DOLPHINS_GRACE,
       80.0,
       1.0 / 2.0,
-      Word.Cost(6.0, Word.COSTTYPE.ADDITIVE)
+      Word.Cost(6.0, Word.COSTTYPE.ADDITIVE),
+      registryKey="dolphins_grace",
     )
   )
   val SLOW_FALLING_POTION = register(
@@ -192,7 +210,8 @@ object PotionActions {
       MobEffects.SLOW_FALLING,
       80.0,
       1.0 / 2.0,
-      Word.Cost(6.0, Word.COSTTYPE.ADDITIVE)
+      Word.Cost(6.0, Word.COSTTYPE.ADDITIVE),
+      registryKey="slow_falling",
     )
   )
   val INVISIBILITY_POTION = register(
@@ -201,7 +220,8 @@ object PotionActions {
       MobEffects.INVISIBILITY,
       15.0,
       1.0 / 3.0,
-      Word.Cost(8.0, Word.COSTTYPE.ADDITIVE)
+      Word.Cost(8.0, Word.COSTTYPE.ADDITIVE),
+      registryKey="invisible",
     )
   )
 }

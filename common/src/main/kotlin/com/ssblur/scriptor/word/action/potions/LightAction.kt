@@ -17,7 +17,7 @@ import net.minecraft.world.effect.MobEffects
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
 
-class LightAction: Action() {
+class LightAction(registryKey: String): Action(registryKey) {
   override fun apply(caster: Targetable, targetable: Targetable, descriptors: Array<Descriptor>, words: Array<Word?>) {
     var seconds = 6
     for (d in descriptors) {

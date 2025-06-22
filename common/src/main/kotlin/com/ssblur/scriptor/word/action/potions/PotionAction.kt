@@ -21,8 +21,8 @@ open class PotionAction(
   var durationScale: Double,
   var strengthScale: Double,
   var cost: Cost,
-  val strengthCap: Double? = null
-): Action() {
+  val strengthCap: Double? = null,
+  registryKey: String): Action(registryKey) {
   override fun apply(caster: Targetable, targetable: Targetable, descriptors: Array<Descriptor>, words: Array<Word?>) {
     var strength = 0.0
     var duration = 2.0

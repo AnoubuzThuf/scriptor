@@ -4,7 +4,7 @@ import com.ssblur.scriptor.api.word.Descriptor
 import com.ssblur.scriptor.api.word.Word
 import com.ssblur.scriptor.helpers.targetable.Targetable
 
-class GotoAction: SwapAction() {
+class GotoAction(registryKey: String): SwapAction(registryKey) {
   override fun apply(caster: Targetable, targetable: Targetable, descriptors: Array<Descriptor>, words: Array<Word?>) {
     if (targetable.level.isClientSide) return
 

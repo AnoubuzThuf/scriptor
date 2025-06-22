@@ -6,7 +6,7 @@ import com.ssblur.scriptor.helpers.targetable.Targetable
 import com.ssblur.scriptor.word.descriptor.CastDescriptor
 import net.minecraft.world.entity.LivingEntity
 
-class OnFireDescriptor: Descriptor(), CastDescriptor {
+class OnFireDescriptor(registryKey: String): Descriptor(registryKey), CastDescriptor {
   override fun cost() = Cost(0.7, COSTTYPE.MULTIPLICATIVE)
 
   override fun cannotCast(caster: Targetable?): Boolean {

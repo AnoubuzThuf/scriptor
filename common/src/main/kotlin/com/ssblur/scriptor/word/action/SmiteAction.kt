@@ -14,7 +14,7 @@ import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.LightningBolt
 import kotlin.math.floor
 
-class SmiteAction: Action() {
+class SmiteAction(registryKey: String): Action(registryKey) {
   override fun apply(caster: Targetable, targetable: Targetable, descriptors: Array<Descriptor>, words: Array<Word?>) {
     var strength = 1.0
     for (d in descriptors) {

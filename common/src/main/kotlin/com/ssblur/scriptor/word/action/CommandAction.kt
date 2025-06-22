@@ -26,8 +26,8 @@ class CommandAction @JvmOverloads constructor(
   var cost: Double,
   blockTargetCommand: Array<String?> = arrayOfNulls(0),
   entityTargetCommand: Array<String?> = arrayOfNulls(0),
-  itemTargetCommand: Array<String?> = arrayOfNulls(0)
-): Action() {
+  itemTargetCommand: Array<String?> = arrayOfNulls(0),
+  registryKey: String): Action(registryKey) {
   var entityTargetCommand: MutableList<String> = entityTargetCommand.filterNotNull().toMutableList()
   var blockTargetCommand: MutableList<String> = blockTargetCommand.filterNotNull().toMutableList()
   var itemTargetCommand: MutableList<String> = itemTargetCommand.filterNotNull().toMutableList()

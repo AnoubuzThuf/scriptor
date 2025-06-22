@@ -25,7 +25,7 @@ class ProjectileSubject: Subject() {
     for (d in spell.deduplicatedDescriptorsForSubjects()) {
       if (d is DurationDescriptor) duration += d.durationModifier()
 //      if (d is SpeedDescriptor) speed *= d.speedModifier()
-      if (d == CollideWithWaterDescriptor) collidesWithWater = true
+      if (d is CollideWithWaterDescriptor) collidesWithWater = true
     }
     for (d in spell.speedDescriptorsForSubjects()) {
       speed *= d.speedModifier()

@@ -14,7 +14,7 @@ import com.ssblur.scriptor.registry.colorable.ColorableBlockRegistry.get
 import com.ssblur.scriptor.registry.colorable.ColorableBlockRegistry.has
 import net.minecraft.world.item.ItemStack
 
-class ColorAction: Action() {
+class ColorAction(registryKey: String): Action(registryKey) {
   override fun apply(caster: Targetable, targetable: Targetable, descriptors: Array<Descriptor>, words: Array<Word?>) {
     val color = getColor(descriptors)
     if (targetable is EntityTargetable) {

@@ -14,36 +14,43 @@ import com.ssblur.scriptor.word.descriptor.target.inventory.InventoryDescriptor
 object InventoryDescriptors {
   val INVENTORY = register(
     "inventory",
-    InventoryDescriptor()
+    InventoryDescriptor(
+    "inventory")
   )
   val FIRST_EMPTY = register(
     "first_empty",
-    FirstEmptySlotDescriptor()
+    FirstEmptySlotDescriptor(
+    "first_empty")
   )
   val FIRST_FILLED = register(
     "first_filled",
-    FirstFilledSlotDescriptor()
+    FirstFilledSlotDescriptor(
+    "first_filled")
   )
   val FIRST_MATCHING = register(
     "first_matching",
-    IgnoreTargetedSlotDescriptor()
+    IgnoreTargetedSlotDescriptor(
+    "first_matching")
   )
 
   val CASTER_INVENTORY = register(
     "caster_inventory",
-    CasterInventoryDescriptor()
+    CasterInventoryDescriptor(
+    "caster_inventory")
   )
   val CASTER_FIRST_EMPTY = register(
     "caster_first_empty",
-    CasterFirstEmptySlotDescriptor()
+    CasterFirstEmptySlotDescriptor(
+    "caster_first_empty")
   )
   val CASTER_FIRST_FILLED = register(
     "caster_first_filled",
-    CasterFirstFilledSlotDescriptor()
+    CasterFirstFilledSlotDescriptor(
+    "caster_first_filled")
   )
   val CASTER_FIRST_MATCHING =
     register(
       "caster_first_matching",
-      CasterIgnoreTargetedSlotDescriptor()
+      CasterIgnoreTargetedSlotDescriptor("caster_first_matching")
     )
 }

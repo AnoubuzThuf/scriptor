@@ -24,7 +24,7 @@ import net.minecraft.world.level.gameevent.GameEvent
 import net.minecraft.world.phys.Vec3
 
 
-class SummonSkeletonAction: Action() {
+class SummonSkeletonAction(registryKey: String): Action(registryKey) {
   override fun apply(caster: Targetable, targetable: Targetable, descriptors: Array<Descriptor>, words: Array<Word?>) {
     val level = targetable.level as ServerLevel
     var strength = 0.0

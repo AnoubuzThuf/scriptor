@@ -29,7 +29,7 @@ import net.minecraft.world.phys.Vec3
 
 
 
-class SummonVexAction: Action() {
+class SummonVexAction(registryKey: String): Action(registryKey) {
   override fun apply(caster: Targetable, targetable: Targetable, descriptors: Array<Descriptor>, words: Array<Word?>) {
     val level = targetable.level as ServerLevel
     var strength = 0.0

@@ -19,7 +19,7 @@ class TouchSubject: Subject() {
     if (caster is EntityTargetable && caster.targetEntity is Player) {
       TraceNetwork.requestTraceData(
         caster.targetEntity as Player,
-        spell.deduplicatedDescriptorsForSubjects().contains(CollideWithWaterDescriptor)
+        spell.deduplicatedDescriptorsForSubjects().any{ it is CollideWithWaterDescriptor }
       ) { target: Targetable -> result.complete(listOf(target)) }
     } else if (caster is LecternTargetable) {
       val pos = caster.beforeBlockPos

@@ -6,7 +6,7 @@ import com.ssblur.scriptor.api.word.Descriptor
 import com.ssblur.scriptor.helpers.targetable.Targetable
 import net.minecraft.world.level.block.Blocks
 
-class PlaceWaterAction: Action() {
+class PlaceWaterAction(registryKey: String): Action(registryKey) {
   override fun cost() = Cost(1.5, COSTTYPE.ADDITIVE)
 
   override fun apply(caster: Targetable, targetable: Targetable, descriptors: Array<Descriptor>, words: Array<Word?>) {

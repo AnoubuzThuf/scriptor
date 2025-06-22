@@ -23,7 +23,8 @@ object Words {
           word.cost.toDouble(),
           word.castAtPosition.toTypedArray(),
           word.castOnEntity.toTypedArray(),
-          word.castOnItem.toTypedArray()
+          word.castOnItem.toTypedArray(),
+          "action." + location.toShortLanguageKey()
         )
       )
     }

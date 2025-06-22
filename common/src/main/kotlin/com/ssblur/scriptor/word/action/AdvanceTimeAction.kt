@@ -7,7 +7,7 @@ import com.ssblur.scriptor.helpers.targetable.Targetable
 import com.ssblur.scriptor.word.descriptor.power.StrengthDescriptor
 import net.minecraft.server.level.ServerLevel
 
-class AdvanceTimeAction: Action() {
+class AdvanceTimeAction(registryKey: String): Action(registryKey) {
   override fun apply(caster: Targetable, targetable: Targetable, descriptors: Array<Descriptor>, words: Array<Word?>) {
     if (targetable.level.isClientSide) return
     var strength = 2.0

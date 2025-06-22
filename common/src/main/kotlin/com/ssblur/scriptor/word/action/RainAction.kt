@@ -12,7 +12,7 @@ import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.LightningBolt
 import kotlin.math.sign
 
-class RainAction: Action() {
+class RainAction(registryKey: String): Action(registryKey) {
   override fun apply(caster: Targetable, targetable: Targetable, descriptors: Array<Descriptor>, words: Array<Word?>) {
     if (targetable.level.isClientSide) return
     var strength = 2.0

@@ -12,7 +12,7 @@ import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import java.util.stream.Collectors
 
-class BreakBlockAction: Action() {
+class BreakBlockAction(registryKey: String): Action(registryKey) {
   override fun apply(caster: Targetable, targetable: Targetable, descriptors: Array<Descriptor>, words: Array<Word?>) {
     if (targetable.level.isClientSide) return
     var strength = 1.0

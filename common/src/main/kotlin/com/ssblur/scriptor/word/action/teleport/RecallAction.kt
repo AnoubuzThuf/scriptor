@@ -36,7 +36,7 @@ fun vec3ToString(pos: Vec3): String {
     return pos.x.toString() + ',' + pos.y.toString() + ',' + pos.z.toString()
 }
 
-class RecallAction: SwapAction() {
+class RecallAction(registryKey: String): SwapAction(registryKey) {
     override fun apply(caster: Targetable, targetable: Targetable, descriptors: Array<Descriptor>, words: Array<Word?>) {
         if (targetable.level.isClientSide) return
         if (caster.level.isClientSide) return

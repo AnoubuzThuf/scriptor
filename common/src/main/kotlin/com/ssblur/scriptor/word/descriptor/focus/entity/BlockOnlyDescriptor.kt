@@ -12,7 +12,7 @@ import net.minecraft.world.phys.Vec3
 /**
  * Convert all currently targeted entities into block targets, using the entities positions
  */
-class BlockOnlyDescriptor: Descriptor(), MultiTargetFocusDescriptor {
+class BlockOnlyDescriptor(registryKey: String): Descriptor(registryKey), MultiTargetFocusDescriptor {
   override fun modifyTargetsFocus(originalTargetables: List<Targetable>, owner: Targetable): List<Targetable> {
     val targetables = mutableListOf<Targetable>()
     if (originalTargetables.isEmpty()) return targetables

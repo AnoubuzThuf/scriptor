@@ -9,7 +9,7 @@ import net.minecraft.world.effect.MobEffects
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
 
-class ExperienceCostDescriptor: Descriptor(), CastDescriptor {
+class ExperienceCostDescriptor(registryKey: String): Descriptor(registryKey), CastDescriptor {
 //  Each use costs 10 levels
   override fun cost() = Cost(-200.0, COSTTYPE.ADDITIVE_POST)
 

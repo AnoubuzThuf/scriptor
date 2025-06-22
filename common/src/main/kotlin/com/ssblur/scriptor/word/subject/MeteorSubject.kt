@@ -25,7 +25,7 @@ class MeteorSubject: Subject() {
       val player = caster.targetEntity as Player
       TraceNetwork.requestExtendedTraceData(
         player,
-        spell.deduplicatedDescriptorsForSubjects().contains(CollideWithWaterDescriptor)
+        spell.deduplicatedDescriptorsForSubjects().any{ it is CollideWithWaterDescriptor }
       ) { target: Targetable ->
         spawnMeteorOver(target.level, target.targetPos, spell, result)
       }

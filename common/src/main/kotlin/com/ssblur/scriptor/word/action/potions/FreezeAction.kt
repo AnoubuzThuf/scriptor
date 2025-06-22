@@ -9,7 +9,7 @@ import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.LiquidBlock
 import net.minecraft.world.level.material.Fluids
 
-class FreezeAction: PotionAction(FREEZE.ref(), 30.0, 1.0 / 3.0, Cost(4.0, COSTTYPE.ADDITIVE)) {
+class FreezeAction(registryKey: String): PotionAction(FREEZE.ref(), 30.0, 1.0 / 3.0, Cost(4.0, COSTTYPE.ADDITIVE), null, registryKey) {
   override fun applyToPosition(
     caster: Targetable?,
     targetable: Targetable?,

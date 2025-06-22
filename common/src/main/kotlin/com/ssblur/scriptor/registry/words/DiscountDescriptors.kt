@@ -7,43 +7,52 @@ import com.ssblur.scriptor.word.descriptor.discount.*
 object DiscountDescriptors {
   val BLOOD_COST = register(
     "blood_cost",
-    BloodCostDescriptor()
+    BloodCostDescriptor(
+    "blood_cost")
   )
   val EXPERIENCE_COST = register(
     "experience_cost",
-    ExperienceCostDescriptor()
+    ExperienceCostDescriptor(
+    "experience_cost")
   )
-  val CHEAP = register("cheap", CheapDescriptor())
+  val CHEAP = register("cheap", CheapDescriptor("cheap"))
   val HEALTHY = register(
     "healthy",
-    HealthyDescriptor()
+    HealthyDescriptor("healthy")
   )
   val POISONED = register(
     "poisoned",
-    PoisonDescriptor()
+    PoisonDescriptor(
+    "poisoned")
   )
   val WEAKENED = register(
     "weakened",
-    WeakDescriptor()
+    WeakDescriptor(
+    "weakened")
   )
   val ON_FIRE = register(
     "on_fire",
-    OnFireDescriptor()
+    OnFireDescriptor(
+    "on_fire")
   )
   val CRITICAL = register(
     "critical",
-    CriticalDescriptor()
+    CriticalDescriptor(
+    "critical")
   )
   val NIGHT = register(
     "night",
-    NightDiscountDescriptor()
+    NightDiscountDescriptor(
+    "night")
   )
   val RAIN = register(
     "rain",
-    RainDiscountDescriptor()
+    RainDiscountDescriptor(
+    "rain")
   )
   val CLEAR_SKIES = register(
     "clear_skies",
-    ClearDiscountDescriptor()
+    ClearDiscountDescriptor(
+    "clear_skies")
   )
 }

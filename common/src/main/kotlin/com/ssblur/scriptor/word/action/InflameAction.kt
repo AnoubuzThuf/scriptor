@@ -17,7 +17,7 @@ import net.minecraft.world.item.crafting.RecipeType
 import net.minecraft.world.item.crafting.SingleRecipeInput
 import net.minecraft.world.level.block.BaseFireBlock
 
-class InflameAction: Action() {
+class InflameAction(registryKey: String): Action(registryKey) {
   override fun apply(caster: Targetable, targetable: Targetable, descriptors: Array<Descriptor>, words: Array<Word?>) {
     var seconds = 2.0
     for (d in descriptors) {

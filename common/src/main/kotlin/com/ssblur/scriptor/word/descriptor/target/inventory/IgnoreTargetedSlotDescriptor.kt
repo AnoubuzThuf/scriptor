@@ -5,7 +5,7 @@ import com.ssblur.scriptor.helpers.targetable.InventoryTargetable
 import com.ssblur.scriptor.helpers.targetable.Targetable
 import com.ssblur.scriptor.word.descriptor.target.TargetDescriptor
 
-class IgnoreTargetedSlotDescriptor: Descriptor(), TargetDescriptor {
+class IgnoreTargetedSlotDescriptor(registryKey: String): Descriptor(registryKey), TargetDescriptor {
   override fun cost() = Cost(0.0, COSTTYPE.ADDITIVE)
 
   @Override

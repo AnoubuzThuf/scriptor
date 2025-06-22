@@ -21,7 +21,7 @@ import net.minecraft.world.level.block.Block
 import java.util.function.Supplier
 import kotlin.math.floor
 
-class BoundToolAction(var item: Supplier<Item>, var tags: List<TagKey<Block>>): Action() {
+class BoundToolAction(var item: Supplier<Item>, var tags: List<TagKey<Block>>, registryKey: String): Action(registryKey) {
   override fun apply(caster: Targetable, targetable: Targetable, descriptors: Array<Descriptor>, words: Array<Word?>) {
     var strength = 6f
     var duration = 4.0

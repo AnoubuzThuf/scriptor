@@ -14,7 +14,7 @@ import com.ssblur.scriptor.network.client.ParticleNetwork
  * area this deletes all targets - this is useful for making some spells 'safe', e.g. using ignite to ignite a mob
  * but missing and hitting your wooden house.
  */
-class EntityOnlyDescriptor: Descriptor(), MultiTargetFocusDescriptor {
+class EntityOnlyDescriptor(registryKey: String): Descriptor(registryKey), MultiTargetFocusDescriptor {
   override fun modifyTargetsFocus(originalTargetables: List<Targetable>, owner: Targetable): List<Targetable> {
     val targetables = mutableListOf<Targetable>()
     if (originalTargetables.isEmpty()) return targetables

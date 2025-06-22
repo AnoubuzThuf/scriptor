@@ -4,7 +4,7 @@ import com.ssblur.scriptor.api.word.Descriptor
 import com.ssblur.scriptor.helpers.MathHelper
 import com.ssblur.scriptor.helpers.targetable.Targetable
 
-class SquareDescriptor: Descriptor(), GeometricTargetDescriptor {
+class SquareDescriptor(registryKey: String): Descriptor(registryKey), GeometricTargetDescriptor {
   override fun modifyTargets(originalTargetables: List<Targetable>, owner: Targetable, index: Int, descriptors: Array<Descriptor>): List<Targetable> {
     val uses = getUses(index, descriptors)
     if (uses < 1) {

@@ -2,7 +2,7 @@ package com.ssblur.scriptor.api.word
 
 import com.ssblur.scriptor.helpers.targetable.Targetable
 
-abstract class Action: Word() {
+abstract class Action(val registryKey: String): Word() {
   /**
    * Applies the effects of this spell.
    * This step should factor in any Descriptors on this spell.

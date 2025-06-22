@@ -24,7 +24,7 @@ import net.minecraft.world.entity.player.Player
 import kotlin.math.min
 import kotlin.math.sqrt
 
-class VoodooHarmSelfAction: Action() {
+class VoodooHarmSelfAction(registryKey: String): Action(registryKey) {
     override fun apply(caster: Targetable, targetable: Targetable, descriptors: Array<Descriptor>, words: Array<Word?>) {
         if (caster is EntityTargetable && caster.targetEntity is LivingEntity) {
             val casterEntity = caster.targetEntity as LivingEntity
