@@ -1,8 +1,8 @@
 package com.ssblur.scriptor.registry.words
 
 import com.ssblur.scriptor.api.word.Word
+import com.ssblur.scriptor.effect.ScriptorEffects
 import com.ssblur.scriptor.registry.words.WordRegistry.register
-import com.ssblur.scriptor.word.action.ArcanePoisonAction
 import com.ssblur.scriptor.word.action.potions.*
 import net.minecraft.world.effect.MobEffects
 
@@ -143,7 +143,12 @@ object PotionActions {
   )
   val ARCANE_POISON_POTION = register(
     "arcane_poison",
-    ArcanePoisonAction()
+    PotionAction(
+      ScriptorEffects.ARCANE_POISON.ref(),
+      30.0,
+      1.0/3.0,
+      Word.Cost(15.0, Word.COSTTYPE.ADDITIVE)
+    )
   )
   val LEVITATION_POTION = register(
     "levitate",

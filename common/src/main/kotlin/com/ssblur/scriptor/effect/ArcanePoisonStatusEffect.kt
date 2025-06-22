@@ -1,5 +1,6 @@
 package com.ssblur.scriptor.effect
 
+import net.minecraft.network.chat.Component
 import net.minecraft.world.effect.MobEffect
 import net.minecraft.world.effect.MobEffectCategory
 import net.minecraft.world.entity.LivingEntity
@@ -10,7 +11,12 @@ open class ArcanePoisonStatusEffect: MobEffect {
     constructor(mobEffectCategory: MobEffectCategory, i: Int): super(mobEffectCategory, i)
 
     override fun applyEffectTick(entity: LivingEntity, amplifier: Int): Boolean {
-        entity.hurt(entity.damageSources().magic(), 0.5F * amplifier);
+        val activeEffects = entity.activeEffects
+        val burningEffect = if (entity.remainingFireTicks > 0) 1 else 0
+        val damage = (activeEffects.size + burningEffect) * (amplifier + 0.5)
+        entity.hurt(entity.damageSources().magic(), damage.toFloat());
+        entity.sendSystemMessage(Component.literal("Effects = " + (activeEffects.size + burningEffect).toString()))
+        entity.sendSystemMessage(Component.literal("Damage = " + (damage).toString()))
         return true
     }
 

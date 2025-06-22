@@ -21,7 +21,6 @@ object Actions {
   val INFLAME = register("inflame", InflameAction())
   val LIGHT = register("light", LightAction())
   val FREEZE = register("freeze", FreezeAction())
-  val ARCANE_POISON = register("arcane_poison", ArcanePoisonAction())
   val HEAL = register("heal", HealAction())
   val SMITE = register("smite", SmiteAction())
   val SUMMON_VEX = register("summon_vex", SummonVexAction())
