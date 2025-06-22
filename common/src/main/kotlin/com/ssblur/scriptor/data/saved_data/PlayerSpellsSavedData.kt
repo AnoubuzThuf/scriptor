@@ -42,7 +42,7 @@ class PlayerSpellsSavedData: SavedData {
   }
 
   fun resetTier(tier: Int) {
-    if (!spells.containsKey(tier) && spells[tier] != null) {
+    if (spells.containsKey(tier) && spells[tier] != null) {
       spells[tier]!!.clear()
     }
   }

@@ -41,6 +41,9 @@ class VoodooHarmOtherAction(registryKey: String): Action(registryKey) {
             if (targetable is EntityTargetable && targetable.targetEntity is LivingEntity) {
                 val benefitor = casterEntity
                 val victim = targetable.targetEntity as LivingEntity
+                if (benefitor.uuid == victim.uuid) {
+                    return
+                }
                 benefitor.addEffect(
                     MobEffectInstance(
                         VOODOO_EFFECT, Math.round(duration).toInt(), floor(strength).toInt()

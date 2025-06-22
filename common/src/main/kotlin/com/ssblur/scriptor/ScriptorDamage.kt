@@ -14,6 +14,8 @@ object ScriptorDamage {
     ResourceKey.create(Registries.DAMAGE_TYPE, ScriptorMod.location("sacrifice"))
   val OVERLOAD: ResourceKey<DamageType> = ResourceKey.create(Registries.DAMAGE_TYPE, ScriptorMod.location("overload"))
   val OVERLOAD_NO_FLINCH: ResourceKey<DamageType> = ResourceKey.create(Registries.DAMAGE_TYPE, ScriptorMod.location("overload_no_flinch"))
+  val VOODOO: ResourceKey<DamageType> =
+    ResourceKey.create(Registries.DAMAGE_TYPE, ScriptorMod.location("voodoo"))
 
   @JvmStatic
   fun sacrifice(entity: Entity): DamageSource {
@@ -51,6 +53,18 @@ object ScriptorDamage {
       )
     }
       .orElse(null)
+  }
+
+  @JvmStatic
+  fun voodoo(entity: Entity): DamageSource {
+    val level = entity.level()
+    return level.registryAccess().registry(Registries.DAMAGE_TYPE).map { damageTypes: Registry<DamageType> ->
+      DamageSource(
+        damageTypes.getHolderOrThrow(
+          VOODOO
+        ), entity
+      )
+    }.orElseThrow()
   }
 
   @JvmStatic

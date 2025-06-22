@@ -47,6 +47,9 @@ class VoodooHarmSelfAction(registryKey: String): Action(registryKey) {
             if (targetable is EntityTargetable && targetable.targetEntity is LivingEntity) {
                 val benefitor = targetable.targetEntity as LivingEntity
                 val victim = casterEntity
+                if (benefitor.uuid == victim.uuid) {
+                    return
+                }
                 benefitor.addEffect(
                     MobEffectInstance(
                         VOODOO_EFFECT, Math.round(duration).toInt(), floor(strength).toInt()
