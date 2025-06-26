@@ -24,27 +24,29 @@ enum class SUMMON_PROPERTIES {
     RANGED, INVISIBLE
 }
 
-val MONSTER_HUNT_INDEXES = listOf(1, 5, 9)
-val OTHER_PLAYER_HUNT_INDEXES = listOf(2, 6, 10)
-val BERSERK_INDEXES = listOf(3, 7, 11)
+val MONSTER_HUNT_INDEXES = listOf(1, 3, 6, 8, 11, 13)
+val OTHER_PLAYER_HUNT_INDEXES = listOf(2, 3, 7, 8, 12, 13)
+val BERSERK_INDEXES = listOf(4, 9, 14)
 
 fun calculateAiRoutineIndex(behaviours: List<SUMMON_BEHAVIOURS>?): Int {
     if (behaviours == null) {
         return 0
     }
-    val targetVal = if (SUMMON_BEHAVIOURS.HUNTER in behaviours) {
-        1
+    val targetVal = if (SUMMON_BEHAVIOURS.BERSERK in behaviours) {
+        4
+    } else if (SUMMON_BEHAVIOURS.PLAYER_HUNTER in behaviours && SUMMON_BEHAVIOURS.HUNTER in behaviours) {
+        3
     } else if (SUMMON_BEHAVIOURS.PLAYER_HUNTER in behaviours) {
         2
-    } else if (SUMMON_BEHAVIOURS.BERSERK in behaviours) {
-        3
+    } else if (SUMMON_BEHAVIOURS.HUNTER in behaviours) {
+        1
     } else {
         0
     }
     val movementVal = if (SUMMON_BEHAVIOURS.SENTRY in behaviours) {
-        8
+        10
     } else if (SUMMON_BEHAVIOURS.FOLLOWER in behaviours) {
-        4
+        5
     } else {
         0
     }
@@ -55,16 +57,19 @@ interface IMagicSummon {
 
 //    0 - Roaming Mob, defends itself and the player
 //    1 - Roaming Mob, hunts monsters
-//    2 - Roaming Mob, hunts monsters and other players
-//    3 - Roaming Mob, attacks everything
-//    4 - Follower Mob, defends itself and the player
-//    5 - Follower Mob, hunts monsters
-//    6 - Follower Mob, hunts monsters and other players
-//    7 - Follower Mob, attacks everything
-//    8 - Sentry Mob, defends itself and the player
-//    9 - Sentry Mob, hunts monsters
-//    10 - Sentry Mob, hunts monsters and other players
-//    11 - Sentry Mob, attacks everything
+//    2 - Roaming Mob, hunts other players
+//    3 - Roaming Mob, hunts monsters and other players
+//    4 - Roaming Mob, attacks everything
+//    5 - Follower Mob, defends itself and the player
+//    6 - Follower Mob, hunts monsters
+//    7 - Follower Mob, hunts other players
+//    8 - Follower Mob, hunts monsters and other players
+//    9 - Follower Mob, attacks everything
+//    10 - Sentry Mob, defends itself and the player
+//    11 - Sentry Mob, hunts monsters
+//    12 - Sentry Mob, hunts other players
+//    13 - Sentry Mob, hunts monsters and other players
+//    14 - Sentry Mob, attacks everything
     var AI_ROUTINE_INDEX: Int?
 
     var summonerUUID: UUID?

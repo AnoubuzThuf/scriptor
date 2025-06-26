@@ -215,7 +215,7 @@ class SummonedSkeleton(entityType: EntityType<SummonedSkeleton?>?, level: Level)
                 }
             ))
         }
-        if (routine_index in OTHER_PLAYER_HUNT_INDEXES) {
+        if (routine_index in OTHER_PLAYER_HUNT_INDEXES && routine_index in MONSTER_HUNT_INDEXES) {
 //            Hunt non-allied summons before players
             this.targetSelector.addGoal(5, NearestAttackableTargetGoal(this, Monster::class.java, 8, true, false,
                 {
