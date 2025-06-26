@@ -55,6 +55,7 @@ object WordRegistry {
     Actions
     PotionActions
     OathActions
+    MetaDescriptors
     ColorDescriptors
     Descriptors
     OffsetDescriptors

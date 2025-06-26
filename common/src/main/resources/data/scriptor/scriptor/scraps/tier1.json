@@ -18,6 +18,10 @@
     "descriptor:brown",
     "descriptor:dark_gray",
     "descriptor:block_only",
+    "descriptor:descriptor_multiplier__two",
+    "descriptor:descriptor_multiplier__three",
+    "descriptor:descriptor_multiplier__five",
+    "descriptor:descriptor_multiplier__seven",
     "action:mark",
     "action:recall"
   ]

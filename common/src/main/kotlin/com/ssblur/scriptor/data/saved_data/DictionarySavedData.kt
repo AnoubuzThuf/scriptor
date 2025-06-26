@@ -18,6 +18,7 @@ import com.ssblur.scriptor.registry.words.WordRegistry.descriptorRegistry
 import com.ssblur.scriptor.registry.words.WordRegistry.subjectRegistry
 import com.ssblur.scriptor.word.PartialSpell
 import com.ssblur.scriptor.word.Spell
+import com.ssblur.scriptor.word.descriptor.meta.DescriptorMultiplier
 import net.minecraft.core.HolderLookup
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.NbtOps
@@ -26,6 +27,7 @@ import net.minecraft.util.datafix.DataFixTypes
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.saveddata.SavedData
 import java.util.*
+import kotlin.math.PI
 
 class DictionarySavedData: SavedData {
   var spellStructure: MutableList<WORD?>
@@ -189,6 +191,7 @@ class DictionarySavedData: SavedData {
 
     var position = 0
     var tokenPosition = 0
+    var descriptorMultiplier: Int? = null
     try {
       val tokens = text.split("[\\n\\r\\s]+".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
 
@@ -246,7 +249,16 @@ class DictionarySavedData: SavedData {
               expectingAnd = (position % spellStructure.size == 0)
               continue
             }
-            descriptors.add(descriptor)
+            if (descriptor is DescriptorMultiplier) {
+              val i = descriptor.multiplier
+              descriptorMultiplier = if (descriptorMultiplier == null) i else descriptorMultiplier * i
+            } else {
+              descriptorMultiplier = if (descriptorMultiplier != null) descriptorMultiplier else 1
+              for (i in 1..descriptorMultiplier) {
+                descriptors.add(descriptor)
+              }
+              descriptorMultiplier = null
+            }
             tokenPosition++
             continue
           }
