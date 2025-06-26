@@ -187,10 +187,11 @@ object PotionActions {
   val ABSORPTION_POTION = register(
     "absorption",
     PotionAction(
-      MobEffects.ABSORPTION,
-      30.0,
-      1.0 / 3.0,
-      Word.Cost(8.0, Word.COSTTYPE.ADDITIVE),
+      MobEffects.HEALTH_BOOST,
+      60.0,
+      1.0 / 2.0,
+      Word.Cost(6.0, Word.COSTTYPE.ADDITIVE),
+      9.0,
       registryKey="absorption",
     )
   )
