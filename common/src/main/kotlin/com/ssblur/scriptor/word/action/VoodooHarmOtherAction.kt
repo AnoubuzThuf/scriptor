@@ -20,14 +20,14 @@ class VoodooHarmOtherAction(registryKey: String): Action(registryKey) {
     override fun apply(caster: Targetable, targetable: Targetable, descriptors: Array<Descriptor>, words: Array<Word?>) {
         if (caster is EntityTargetable && caster.targetEntity is LivingEntity) {
             val casterEntity = caster.targetEntity as LivingEntity
-            var strength: Double = 1.0
+            var strength: Double = 0.0
             var duration: Double = 5.0
             for (d in descriptors) {
                 if (d is StrengthDescriptor) strength += d.strengthModifier()
                 if (d is DurationDescriptor) duration += d.durationModifier()
             }
 
-            strength = sqrt(strength) * 10
+            strength = (strength / 4).coerceIn(0.0, 4.0)
             duration = duration * 20
 
             duration = duration.coerceAtLeast(1.0)
@@ -46,7 +46,7 @@ class VoodooHarmOtherAction(registryKey: String): Action(registryKey) {
                 }
                 benefitor.addEffect(
                     MobEffectInstance(
-                        VOODOO_EFFECT, Math.round(duration).toInt(), floor(strength).toInt()
+                        VOODOO_EFFECT.ref(), Math.round(duration).toInt(), floor(strength).toInt()
                     ))
                 val voodooVictimIdHolder = VoodooSpellSavedData.computeIfAbsent(benefitor)
                 if (voodooVictimIdHolder != null) {

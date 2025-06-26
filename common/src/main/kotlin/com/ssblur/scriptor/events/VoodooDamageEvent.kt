@@ -19,7 +19,7 @@ object VoodooDamageEvent {
                     val voodooEffects = entity.activeEffects.filter { it.effect.value() is VoodooStatusEffect && (it.duration > 0 || it.isInfiniteDuration) }
                     if (voodooEffects.size > 0) {
                         val voodooEffect = voodooEffects.first()
-                        val redirectDamageMultiplier = ((voodooEffect.amplifier * 5).toFloat() / 100f).coerceIn(0.1f, 0.9f)
+                        val redirectDamageMultiplier = (((voodooEffect.amplifier + 1) * 20).toFloat() / 100f).coerceIn(0.1f, 0.9f)
                         val voodooVictimIdHolder = VoodooSpellSavedData.computeIfAbsent(entity)
                         if (voodooVictimIdHolder != null && voodooVictimIdHolder.getSubjectId() != null) {
                             val victimEntity = level.getEntity(voodooVictimIdHolder.getSubjectId()!!)

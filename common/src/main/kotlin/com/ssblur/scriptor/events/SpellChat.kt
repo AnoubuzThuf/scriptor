@@ -28,7 +28,7 @@ object SpellChat {
       if (level is ServerLevel) {
         val spell = computeIfAbsent(level).parse(sentence)
         if (spell != null) {
-          if (player.armorCoverPercentage <= 0.0 && player.activeEffects.any { it.effect.value() == HOARSE.value}) {
+          if (player.activeEffects.any { it.effect.value() == HOARSE.value}) {
             player.sendSystemMessage(Component.translatable("extra.scriptor.hoarse"))
             return@register it.cancel()
           } else if (player.activeEffects.any { it.effect.value() == MUTE.value}) {
@@ -49,7 +49,9 @@ object SpellChat {
 
           val adjustedCost = Math.round(cost * (ScriptorConfig.VOCAL_COOLDOWN_MULTIPLIER() / 100.0)).toInt()
           if (!player.isCreative) {
-            player.addEffect(MobEffectInstance(HOARSE.ref(), adjustedCost / 4))
+            if (player.armorCoverPercentage > 0.1) {
+              player.addEffect(MobEffectInstance(HOARSE.ref(), adjustedCost / 4))
+            }
             if (adjustedCost > ScriptorConfig.VOCAL_HUNGER_THRESHOLD())
               player.addEffect(
                 MobEffectInstance(
