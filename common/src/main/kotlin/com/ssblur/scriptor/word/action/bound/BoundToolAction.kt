@@ -34,7 +34,7 @@ class BoundToolAction(var item: Supplier<Item>, var tags: List<TagKey<Block>>, r
 
     itemStack.set(DataComponents.DYED_COLOR, DyedItemColor(getColor(descriptors), false))
     itemStack.set(
-      ScriptorDataComponents.EXPIRES, caster.level.gameTime + floor(duration * 80)
+      ScriptorDataComponents.EXPIRES, caster.level.gameTime + floor(duration * 80 * getMetaDurationMultiplier(caster, targetable))
         .toLong()
     )
     val finalStrength = (strength * 0.666f).toInt()

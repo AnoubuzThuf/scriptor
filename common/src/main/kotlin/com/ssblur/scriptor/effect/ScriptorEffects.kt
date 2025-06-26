@@ -17,5 +17,6 @@ object ScriptorEffects {
   val FREEZE: RegistrySupplier<MobEffect> = registerEffect("freeze") { FreezingStatusEffect() }
   val ARCANE_POISON: RegistrySupplier<MobEffect> = registerEffect("arcane_poison") { ArcanePoisonStatusEffect() }
   val VOODOO_EFFECT: RegistrySupplier<MobEffect> = registerEffect("voodoo") { VoodooStatusEffect() }
+  val UNARMOURED_OATH_EFFECT: RegistrySupplier<MobEffect> = registerEffect("unarmoured_oath") { UnarmouredOathStatusEffect() }
   fun register() {}
 }

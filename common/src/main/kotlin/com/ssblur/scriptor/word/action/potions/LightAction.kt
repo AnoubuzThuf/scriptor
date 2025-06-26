@@ -23,7 +23,7 @@ class LightAction(registryKey: String): Action(registryKey) {
     for (d in descriptors) {
       if (d is DurationDescriptor) seconds = (seconds + 3 * d.durationModifier()).toInt()
     }
-    seconds = seconds * 20
+    seconds = seconds * 20 * getMetaDurationMultiplier(caster, targetable).toInt()
 
     seconds = seconds.coerceAtLeast(1)
 

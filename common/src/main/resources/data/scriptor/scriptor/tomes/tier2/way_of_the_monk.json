@@ -1,0 +1,16 @@
+{
+  "name": "tome.scriptor.way_of_the_monk",
+  "author": "AnoubuzThuf",
+  "item": "scriptor:spellbook_brown",
+  "tier": 2,
+  "spell": {
+    "subject": "self",
+    "spells": [
+      {
+        "action": "unarmoured_oath_action",
+        "descriptors": [
+        ]
+      }
+    ]
+  }
+}

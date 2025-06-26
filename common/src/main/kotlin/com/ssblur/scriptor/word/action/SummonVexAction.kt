@@ -38,7 +38,7 @@ class SummonVexAction(registryKey: String): Action(registryKey) {
       if (d is StrengthDescriptor) strength += d.strengthModifier()
       if (d is DurationDescriptor) duration += d.durationModifier()
     }
-    val finalDuration = if (descriptors.none {it is PermanentDurationDescriptor }) duration.toInt() * 20 else null
+    val finalDuration = if (descriptors.none {it is PermanentDurationDescriptor }) (duration * getMetaDurationMultiplier(caster, targetable)).toInt() * 20 else null
 
     val behaviourDescriptors: List<SummonBehaviourDescriptor> = descriptors.filter{it is SummonBehaviourDescriptor}.map{it as SummonBehaviourDescriptor}
     val isSentry: Boolean = behaviourDescriptors.any{ it.behaviour == SUMMON_BEHAVIOURS.SENTRY  }

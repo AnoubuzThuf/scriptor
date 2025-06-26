@@ -33,7 +33,7 @@ class SummonSkeletonAction(registryKey: String): Action(registryKey) {
       if (d is StrengthDescriptor) strength += d.strengthModifier()
       if (d is DurationDescriptor) duration += d.durationModifier()
     }
-    val finalDuration = if (descriptors.none {it is PermanentDurationDescriptor }) duration.toInt() * 20 else null
+    val finalDuration = if (descriptors.none {it is PermanentDurationDescriptor }) (duration * getMetaDurationMultiplier(caster, targetable)).toInt() * 20 else null
 
     val behaviourDescriptors: List<SummonBehaviourDescriptor> = descriptors.filter{it is SummonBehaviourDescriptor}.map{it as SummonBehaviourDescriptor}
     val summonProperties: List<SUMMON_PROPERTIES> = descriptors.filter{it is SummonPropertyDescriptor}.map{it as SummonPropertyDescriptor}.map{it.summonProperty}

@@ -33,7 +33,7 @@ class BoundSwordAction(registryKey: String): Action(registryKey) {
 
     itemStack.set(DataComponents.DYED_COLOR, DyedItemColor(getColor(descriptors), false))
     itemStack.set(
-      ScriptorDataComponents.EXPIRES, caster.level.gameTime + floor(duration * 80)
+      ScriptorDataComponents.EXPIRES, caster.level.gameTime + floor(duration * 80 * getMetaDurationMultiplier(caster, targetable))
         .toLong()
     )
 
