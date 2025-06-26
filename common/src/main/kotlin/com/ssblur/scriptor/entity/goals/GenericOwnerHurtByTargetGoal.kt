@@ -49,9 +49,9 @@ class GenericOwnerHurtByTargetGoal(private val entity: Mob, private val owner: S
     override fun start() {
 
         this.mob.setTarget(this.ownerLastHurtBy)
-        if (this.owner.get()!!.uuid == this.ownerLastHurtBy!!.uuid) {
-            this.owner.get()!!.sendSystemMessage(Component.literal(this::class.java.toString()))
-        }
+//        if (this.owner.get()!!.uuid == this.ownerLastHurtBy!!.uuid) {
+//            this.owner.get()!!.sendSystemMessage(Component.literal(this::class.java.toString()))
+//        }
         this.mob.getBrain()
             .setMemoryWithExpiry<LivingEntity?>(MemoryModuleType.ATTACK_TARGET, this.ownerLastHurtBy, 200L)
         val owner = this.owner.get()

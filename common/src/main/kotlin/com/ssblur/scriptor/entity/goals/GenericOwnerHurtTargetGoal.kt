@@ -47,9 +47,9 @@ class GenericOwnerHurtTargetGoal(private val entity: Mob, private val owner: Sup
      */
     override fun start() {
         this.mob.setTarget(this.ownerLastHurt)
-        if (this.owner.get()!!.uuid == this.ownerLastHurt!!.uuid) {
-            this.owner.get()!!.sendSystemMessage(Component.literal(this::class.java.toString()))
-        }
+//        if (this.owner.get()!!.uuid == this.ownerLastHurt!!.uuid) {
+//            this.owner.get()!!.sendSystemMessage(Component.literal(this::class.java.toString()))
+//        }
         val owner = this.owner.get()
         if (owner != null) {
             this.timestamp = owner.getLastHurtMobTimestamp()

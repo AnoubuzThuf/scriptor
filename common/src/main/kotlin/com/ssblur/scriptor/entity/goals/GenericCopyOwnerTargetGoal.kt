@@ -32,9 +32,9 @@ class GenericCopyOwnerTargetGoal(pMob: PathfinderMob?, private val ownerGetter: 
         val target = (ownerGetter.get() as Mob).getTarget()
         mob.setTarget(target)
 
-        if (this.ownerGetter.get()!!.uuid == target!!.uuid) {
-            this.ownerGetter.get()!!.sendSystemMessage(Component.literal(this::class.java.toString()))
-        }
+//        if (this.ownerGetter.get()!!.uuid == target!!.uuid) {
+//            this.ownerGetter.get()!!.sendSystemMessage(Component.literal(this::class.java.toString()))
+//        }
         this.mob.getBrain().setMemoryWithExpiry<LivingEntity?>(MemoryModuleType.ATTACK_TARGET, target, 200L)
 
         super.start()
