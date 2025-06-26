@@ -83,6 +83,8 @@ object AddLootEvent {
       LootItemRecord(ResourceLocation.tryBuild("minecraft", "chests/trial_chambers/reward_unique"), 0.2f),
       LootItemRecord(ResourceLocation.tryBuild("minecraft", "chests/trial_chambers/reward_ominous_rare"), 0.4f),
       LootItemRecord(ResourceLocation.tryBuild("minecraft", "chests/trial_chambers/reward_ominous_unique"), 0.8f),
+      LootItemRecord(ResourceLocation.tryBuild("minecraft", "entities/ender_dragon"), 1f),
+      LootItemRecord(ResourceLocation.tryBuild("minecraft", "chests/end_city_treasure"), 0.9f),
     )
     pools[TOME_TIER3] = tier3
     pools[SCRAP_TIER3] = tier3

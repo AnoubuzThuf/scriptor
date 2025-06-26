@@ -2,7 +2,7 @@ package com.ssblur.scriptor.entity
 
 import com.ssblur.scriptor.entity.goals.*
 import com.ssblur.scriptor.word.descriptor.summon.SummonBehaviourDescriptor
-import net.minecraft.Util
+import net.minecraft.core.BlockPos
 import net.minecraft.core.Holder
 import net.minecraft.core.component.DataComponents
 import net.minecraft.nbt.CompoundTag
@@ -12,6 +12,8 @@ import net.minecraft.sounds.SoundEvent
 import net.minecraft.sounds.SoundEvents
 import net.minecraft.util.RandomSource
 import net.minecraft.world.DifficultyInstance
+import net.minecraft.world.InteractionHand
+import net.minecraft.world.InteractionResult
 import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.effect.MobEffect
 import net.minecraft.world.effect.MobEffectInstance
@@ -19,7 +21,6 @@ import net.minecraft.world.effect.MobEffects
 import net.minecraft.world.entity.*
 import net.minecraft.world.entity.ai.attributes.AttributeInstance
 import net.minecraft.world.entity.ai.attributes.AttributeModifier
-import net.minecraft.world.entity.ai.attributes.AttributeSupplier
 import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.entity.ai.goal.*
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal
@@ -52,11 +53,12 @@ class SummonedSkeleton(entityType: EntityType<SummonedSkeleton?>?, level: Level)
 
     override var summonerUUID: UUID? = null
 
-    var limitedLifeTicks: Int? = 0
+    override var limitedLifeTicks: Int? = 0
     var power: Int = 0
     override var color: Int = -6265536
     //    Don't want to have ranged Vexes
     var isRanged: Boolean = false
+    override var summonBoundOrigin: BlockPos? = null
 
     override var AI_ROUTINE_INDEX: Int? = null
 
@@ -110,44 +112,14 @@ class SummonedSkeleton(entityType: EntityType<SummonedSkeleton?>?, level: Level)
 
     override fun readAdditionalSaveData(compoundTag: CompoundTag) {
         super.readAdditionalSaveData(compoundTag)
-        if (compoundTag.contains("AiRoutineIndex")) {
-            this.AI_ROUTINE_INDEX = (compoundTag.getInt("AiRoutineIndex"))
-        }
-        if (compoundTag.contains("lifetimeLimitedTicks")) {
-            this.limitedLifeTicks = (compoundTag.getInt("lifetimeLimitedTicks"))
-        }
-        if (compoundTag.contains("SummonerUUID")) {
-            val uuid = compoundTag.getUUID("SummonerUUID")
-            if (uuid != null) {
-                this.summonerUUID = compoundTag.getUUID("SummonerUUID")
-            }
-        } else {
-            null
-        }
-        this.initSummon()
+        this.getSummonData(compoundTag)
+        initSummon()
         this.reassessWeaponGoal()
     }
 
-    override fun addAdditionalSaveData(compound: CompoundTag) {
-        super.addAdditionalSaveData(compound)
-        val limitedTicks = this.limitedLifeTicks
-        if (limitedTicks != null) {
-            compound.putInt("lifetimeLimitedTicks", limitedTicks)
-        }
-
-        val aiRoutineIndex = this.AI_ROUTINE_INDEX
-        if (aiRoutineIndex != null) {
-            compound.putInt("AiRoutineIndex", aiRoutineIndex)
-        }
-        if (this.summoner != null) {
-            compound.putUUID("SummonerUUID", this.summoner!!.uuid)
-        } else {
-            if (this.summonerUUID == null || this.summonerUUID == Util.NIL_UUID) {
-                compound.putUUID("SummonerUUID", Util.NIL_UUID)
-            } else {
-                compound.putUUID("SummonerUUID", this.summonerUUID!!)
-            }
-        }
+    override fun addAdditionalSaveData(compoundTag: CompoundTag) {
+        super.addAdditionalSaveData(compoundTag)
+        this.setSummonData(compoundTag)
     }
 
     override fun tick() {
@@ -189,7 +161,7 @@ class SummonedSkeleton(entityType: EntityType<SummonedSkeleton?>?, level: Level)
 //        PRIORITY 2
         this.goalSelector.addGoal(2, AvoidEntityGoal(this, Wolf::class.java, 6.0F, 1.0, 1.2))
         if (routine_index in 4..7) {
-            this.goalSelector.addGoal(2, GenericFollowOwnerGoal(this, this::getSummonerAlt, 1.0, 10f, 2f, false, 50f))
+            this.goalSelector.addGoal(2, GenericFollowOwnerGoal(this, this::getSummonerAlt, 1.2, 5f, 2f, false, 25f))
         }
 //        PRIORITY 3
         this.goalSelector.addGoal(3, FleeSunGoal(this, 1.0))
@@ -197,15 +169,18 @@ class SummonedSkeleton(entityType: EntityType<SummonedSkeleton?>?, level: Level)
 //        Skeleton Ranged Attack Goal
 //        PRIORITY 5
         if (routine_index in 8..11) {
-            val moveTowardsRestrictionGoal = GenericSentryGoal(this, 1.0, true)
+            val moveTowardsRestrictionGoal = GenericSentryGoal(this, 1.2, true)
             this.goalSelector.addGoal(5, moveTowardsRestrictionGoal)
             moveTowardsRestrictionGoal.setFlags(EnumSet.of<Goal.Flag?>(Goal.Flag.MOVE, Goal.Flag.LOOK))
         }
+//        PRIORITY 6
+        this.goalSelector.addGoal(6, GenericBoundedWanderGoal(this, 7.0))
+//        PRIORITY 8
         this.goalSelector.addGoal(8, LookAtPlayerGoal(this, Player::class.java, 3.0f, 1.0f))
         this.goalSelector.addGoal(8, RandomLookAroundGoal(this))
-//        PRIORITY 6
+//        PRIORITY 10
         if (routine_index in 0 .. 7) {
-            this.goalSelector.addGoal(9,WaterAvoidingRandomStrollGoal(this, 1.0))
+            this.goalSelector.addGoal(10,WaterAvoidingRandomStrollGoal(this, 1.0))
         }
 
 //        TARGETS
@@ -398,6 +373,37 @@ class SummonedSkeleton(entityType: EntityType<SummonedSkeleton?>?, level: Level)
             )
             this.setItemSlot(equipmentSlot, itemStack)
         }
+    }
+
+//    public InteractionResult mobInteract(Player arg, InteractionHand arg2) {
+    override fun mobInteract(player: Player, interactionHand: InteractionHand): InteractionResult {
+        val itemStack = player.getItemInHand(interactionHand)
+        val item = itemStack.getItem()
+        if (!this.level().isClientSide) {
+            if (item == Items.BONE_MEAL && this.health < this.maxHealth) {
+                itemStack.consume(1, player)
+                this.heal(4.0f)
+                return InteractionResult.SUCCESS
+            } else {
+                val interactionResult = super.mobInteract(player, interactionHand)
+                if (interactionHand == InteractionHand.MAIN_HAND) {
+                    if (!interactionResult.consumesAction() && this.getSummonerAlt() == player) {
+                        if (this.summonBoundOrigin == null) {
+                            player.sendSystemMessage(Component.literal("Staying here."))
+                            this.summonBoundOrigin = this.blockPosition()
+                        } else {
+                            player.sendSystemMessage(Component.literal("Following."))
+                            resetSummonBoundOrigin()
+                        }
+                        this.navigation.stop()
+                        return InteractionResult.SUCCESS_NO_ITEM_USED
+                    }
+                }
+            }
+        } else {
+            if (this.getSummonerAlt() == player) return InteractionResult.SUCCESS_NO_ITEM_USED else InteractionResult.PASS
+        }
+        return InteractionResult.PASS
     }
 }
 

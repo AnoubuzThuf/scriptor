@@ -10,6 +10,8 @@ import net.minecraft.server.level.ServerLevel
 import net.minecraft.sounds.SoundEvents
 import net.minecraft.util.RandomSource
 import net.minecraft.world.DifficultyInstance
+import net.minecraft.world.InteractionHand
+import net.minecraft.world.InteractionResult
 import net.minecraft.world.entity.*
 import net.minecraft.world.entity.ai.goal.FloatGoal
 import net.minecraft.world.entity.ai.goal.Goal
@@ -23,6 +25,7 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import net.minecraft.world.level.Level
+import net.minecraft.world.phys.Vec3
 import java.util.*
 
 
@@ -35,14 +38,14 @@ class SummonedVex(entityType: EntityType<SummonedVex?>?, level: Level): IMagicSu
 
     override var summonerUUID: UUID? = null
 
-    var limitedLifeTicks: Int? = null
+    override var limitedLifeTicks: Int? = null
     var power: Int = 0
     override var color: Int = -6265536
     //    Don't want to have ranged Vexes
     var isRanged: Boolean = false
+    override var summonBoundOrigin: BlockPos? = null
 
     override var AI_ROUTINE_INDEX: Int? = null
-
 
     fun initSummon() {
         if (this.level() != null && !this.level().isClientSide) {
@@ -84,44 +87,13 @@ class SummonedVex(entityType: EntityType<SummonedVex?>?, level: Level): IMagicSu
 
     override fun readAdditionalSaveData(compoundTag: CompoundTag) {
         super.readAdditionalSaveData(compoundTag)
-        if (compoundTag.contains("lifetimeLimitedTicks")) {
-            this.limitedLifeTicks = (compoundTag.getInt("lifetimeLimitedTicks"))
-        }
-        if (compoundTag.contains("AiRoutineIndex")) {
-            this.AI_ROUTINE_INDEX = (compoundTag.getInt("AiRoutineIndex"))
-        }
-        if (compoundTag.contains("SummonerUUID")) {
-            val uuid = compoundTag.getUUID("SummonerUUID")
-            if (uuid != null) {
-                this.summonerUUID = compoundTag.getUUID("SummonerUUID")
-            }
-        } else {
-            null
-        }
+        this.getSummonData(compoundTag)
         initSummon()
     }
 
-    override fun addAdditionalSaveData(compound: CompoundTag) {
-        super.addAdditionalSaveData(compound)
-
-        val limitedTicks = this.limitedLifeTicks
-        if (limitedTicks != null) {
-            compound.putInt("lifetimeLimitedTicks", limitedTicks)
-        }
-
-        val aiRoutineIndex = this.AI_ROUTINE_INDEX
-        if (aiRoutineIndex != null) {
-            compound.putInt("AiRoutineIndex", aiRoutineIndex)
-        }
-        if (this.summoner != null) {
-            compound.putUUID("SummonerUUID", this.summoner!!.uuid)
-        } else {
-            if (this.summonerUUID == null || this.summonerUUID == Util.NIL_UUID) {
-                compound.putUUID("SummonerUUID", Util.NIL_UUID)
-            } else {
-                compound.putUUID("SummonerUUID", this.summonerUUID!!)
-            }
-        }
+    override fun addAdditionalSaveData(compoundTag: CompoundTag) {
+        super.addAdditionalSaveData(compoundTag)
+        this.setSummonData(compoundTag)
     }
 
     override fun tick() {this.noPhysics = true
@@ -168,13 +140,15 @@ class SummonedVex(entityType: EntityType<SummonedVex?>?, level: Level): IMagicSu
         this.goalSelector.addGoal(4, SummonedVexChargeAttackGoal())
 //        PRIORITY 5
         if (routine_index in 8..11) {
-            val moveTowardsRestrictionGoal = GenericSentryGoal(this, 0.6, true)
+            val moveTowardsRestrictionGoal = GenericSentryGoal(this, 1.0, true)
             this.goalSelector.addGoal(5, moveTowardsRestrictionGoal)
             moveTowardsRestrictionGoal.setFlags(EnumSet.of<Goal.Flag?>(Goal.Flag.MOVE, Goal.Flag.LOOK))
         }
         if (routine_index in 4..7) {
-            this.goalSelector.addGoal(5, GenericFollowOwnerGoal(this, this::getSummonerAlt, 1.5, 5f, 2f, true, 50f))
+            this.goalSelector.addGoal(5, GenericFollowOwnerGoal(this, this::getSummonerAlt, 1.5, 5f, 2f, true, 10f))
         }
+//        PRIORITY 6
+        this.goalSelector.addGoal(6, GenericBoundedWanderGoal(this, 7.0))
 //        PRIORITY 8
         this.goalSelector.addGoal(8, LookAtPlayerGoal(this, Player::class.java, 3.0f, 1.0f))
         this.goalSelector.addGoal(8, LookAtPlayerGoal(this, Mob::class.java, 8.0f))
@@ -242,6 +216,38 @@ class SummonedVex(entityType: EntityType<SummonedVex?>?, level: Level): IMagicSu
         return !this.isAlliedTo(pPlayer)
     }
 
+
+    //    public InteractionResult mobInteract(Player arg, InteractionHand arg2) {
+    override fun mobInteract(player: Player, interactionHand: InteractionHand): InteractionResult {
+        val itemStack = player.getItemInHand(interactionHand)
+        val item = itemStack.getItem()
+        if (!this.level().isClientSide) {
+            if (item == Items.BONE_MEAL && this.health < this.maxHealth) {
+                itemStack.consume(1, player)
+                this.heal(4.0f)
+                return InteractionResult.SUCCESS
+            } else {
+                val interactionResult = super.mobInteract(player, interactionHand)
+                if (interactionHand == InteractionHand.MAIN_HAND) {
+                    if (!interactionResult.consumesAction() && this.getSummonerAlt() == player) {
+                        if (this.summonBoundOrigin == null) {
+                            player.sendSystemMessage(Component.literal("Staying here."))
+                            this.summonBoundOrigin = this.blockPosition()
+                        } else {
+                            player.sendSystemMessage(Component.literal("Following."))
+                            resetSummonBoundOrigin()
+                        }
+                        this.navigation.stop()
+                        return InteractionResult.SUCCESS_NO_ITEM_USED
+                    }
+                }
+            }
+        } else {
+            if (this.getSummonerAlt() == player) return InteractionResult.SUCCESS_NO_ITEM_USED else InteractionResult.PASS
+        }
+        return InteractionResult.PASS
+    }
+
     override fun populateDefaultEquipmentSlots(randomSource: RandomSource, difficultyInstance: DifficultyInstance) {
         val weapon = when (this.power) {
             in 0..1 -> Items.STICK
@@ -264,7 +270,7 @@ class SummonedVex(entityType: EntityType<SummonedVex?>?, level: Level): IMagicSu
             val target: LivingEntity? = this@SummonedVex.getTarget()
             if (target != null && target.isAlive() && !this@SummonedVex.getMoveControl().hasWanted()
                 && this@SummonedVex.random.nextInt(reducedTickDelay(7)) == 0) {
-                return this@SummonedVex.distanceToSqr(target) > 4.0
+                return this@SummonedVex.distanceToSqr(target) > 8.0
             } else {
                 return false
             }

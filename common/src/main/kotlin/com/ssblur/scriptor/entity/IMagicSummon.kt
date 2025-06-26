@@ -4,6 +4,7 @@ import net.minecraft.Util
 import net.minecraft.core.BlockPos
 import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.core.particles.SimpleParticleType
+import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.chat.Component
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.Entity
@@ -11,6 +12,7 @@ import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.OwnableEntity
 import net.minecraft.world.level.EntityGetter
 import net.minecraft.world.level.Level
+import net.minecraft.world.phys.Vec3
 import java.util.UUID
 
 
@@ -67,7 +69,13 @@ interface IMagicSummon {
 
     var summonerUUID: UUID?
     var color: Int
+    var limitedLifeTicks: Int?
 
+    var summonBoundOrigin: BlockPos?
+
+    fun resetSummonBoundOrigin() {
+        this.summonBoundOrigin = null
+    }
 
     var summoner: LivingEntity?
 
@@ -115,6 +123,52 @@ interface IMagicSummon {
         val isFellowAlly = entity == summoner || entity.isAlliedTo(summoner as Entity)
         val hasCommonOwner = (entity is OwnableEntity && entity.getOwner() == summoner)
         return isFellowAlly || hasCommonOwner
+    }
+
+    fun getSummonData(compoundTag: CompoundTag) {
+        if (compoundTag.contains("lifetimeLimitedTicks")) {
+            this.limitedLifeTicks = (compoundTag.getInt("lifetimeLimitedTicks"))
+        }
+        if (compoundTag.contains("AiRoutineIndex")) {
+            this.AI_ROUTINE_INDEX = (compoundTag.getInt("AiRoutineIndex"))
+        }
+        if (compoundTag.contains("SummonerUUID")) {
+            val uuid = compoundTag.getUUID("SummonerUUID")
+            if (uuid != null) {
+                this.summonerUUID = compoundTag.getUUID("SummonerUUID")
+            }
+        }
+        if (compoundTag.contains("SummonBoundX")) {
+            this.summonBoundOrigin =
+                BlockPos(compoundTag.getInt("SummonBoundX"), compoundTag.getInt("SummonBoundY"), compoundTag.getInt("SummonBoundZ"))
+        }
+    }
+
+    fun setSummonData(compoundTag: CompoundTag) {
+
+        val limitedTicks = this.limitedLifeTicks
+        if (limitedTicks != null) {
+            compoundTag.putInt("lifetimeLimitedTicks", limitedTicks)
+        }
+
+        val aiRoutineIndex = this.AI_ROUTINE_INDEX
+        if (aiRoutineIndex != null) {
+            compoundTag.putInt("AiRoutineIndex", aiRoutineIndex)
+        }
+        if (this.summoner != null) {
+            compoundTag.putUUID("SummonerUUID", this.summoner!!.uuid)
+        } else {
+            if (this.summonerUUID == null || this.summonerUUID == Util.NIL_UUID) {
+                compoundTag.putUUID("SummonerUUID", Util.NIL_UUID)
+            } else {
+                compoundTag.putUUID("SummonerUUID", this.summonerUUID!!)
+            }
+        }
+        if (this.summonBoundOrigin != null) {
+            compoundTag.putInt("SummonBoundX", this.summonBoundOrigin!!.x)
+            compoundTag.putInt("SummonBoundY", this.summonBoundOrigin!!.y)
+            compoundTag.putInt("SummonBoundZ", this.summonBoundOrigin!!.z)
+        }
     }
 
     fun spawnPoof(world: ServerLevel, pos: BlockPos) {

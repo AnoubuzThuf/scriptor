@@ -1,5 +1,6 @@
 package com.ssblur.scriptor.entity.goals
 
+import com.ssblur.scriptor.entity.IMagicSummon
 import net.minecraft.core.BlockPos
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.PathfinderMob
@@ -38,6 +39,8 @@ class GenericFollowOwnerGoal(
         val livingentity = this.ownerGetter.get()
         if (livingentity == null) {
             return false
+        } else if (mob is IMagicSummon && mob.summonBoundOrigin != null) {
+            return false
         } else if (this.mob.distanceToSqr(livingentity) < (this.startDistance * this.startDistance).toDouble()) {
             return false
         } else {
@@ -48,6 +51,8 @@ class GenericFollowOwnerGoal(
 
     override fun canContinueToUse(): Boolean {
         if (this.navigation.isDone()) {
+            return false
+        } else if (mob is IMagicSummon && mob.summonBoundOrigin != null) {
             return false
         } else {
             return !(this.mob.distanceToSqr(this.owner) <= (this.stopDistance * this.stopDistance).toDouble())
