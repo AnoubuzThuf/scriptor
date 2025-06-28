@@ -136,6 +136,9 @@ class SummonedVex(entityType: EntityType<SummonedVex?>?, level: Level): IMagicSu
 //        GOALS
 //        PRIORITY 0
         this.goalSelector.addGoal(0, FloatGoal(this))
+        if (routine_index in 4..7) {
+            this.goalSelector.addGoal(0, GenericFollowOwnerGoal(this, this::getSummonerAlt, 1.5, 10f, 2f, true, 25f))
+        }
 //        PRIORITY 4
         this.goalSelector.addGoal(4, SummonedVexChargeAttackGoal())
 //        PRIORITY 5

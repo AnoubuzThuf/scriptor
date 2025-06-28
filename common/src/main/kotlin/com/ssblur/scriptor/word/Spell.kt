@@ -128,21 +128,27 @@ class Spell(val subject: Subject, vararg val spells: PartialSpell) {
     }
 
     assert(spells.isNotEmpty())
-    for (descriptor in spells[0].deduplicatedDescriptors()) {
-      if (descriptor is CastDescriptor)
-        if (descriptor.cannotCast(caster)) {
-          if (entity is Player) {
-            entity.sendSystemMessage(Component.translatable("extra.scriptor.condition_not_met"))
-            ScriptorAdvancements.FIZZLE.get().trigger(entity as ServerPlayer)
+    for (spell in spells) {
+      for (descriptor in spell.deduplicatedDescriptors()) {
+        if (descriptor is CastDescriptor)
+          if (descriptor.cannotCast(caster)) {
+            if (entity is Player) {
+              entity.sendSystemMessage(Component.translatable("extra.scriptor.condition_not_met"))
+              ScriptorAdvancements.FIZZLE.get().trigger(entity as ServerPlayer)
+            }
+            if (!caster.level.isClientSide) ParticleNetwork.fizzle(caster.level, caster.targetBlockPos)
+            return
           }
-          if (!caster.level.isClientSide) ParticleNetwork.fizzle(caster.level, caster.targetBlockPos)
-          return
-        }
-      if (descriptor is FocusDescriptor) caster = descriptor.modifyFocus(caster)
+        if (descriptor is FocusDescriptor) caster = descriptor.modifyFocus(caster)
+      }
     }
+
     val targetFuture = subject.getTargets(caster, this)
-    for (descriptor in spells[0].deduplicatedDescriptors())
-      if (descriptor is AfterCastDescriptor) descriptor.afterCast(caster)
+
+    for (spell in spells) {
+      for (descriptor in spell.deduplicatedDescriptors())
+        if (descriptor is AfterCastDescriptor) descriptor.afterCast(caster)
+    }
 
     if (targetFuture.isDone) {
       try {
