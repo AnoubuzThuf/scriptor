@@ -42,23 +42,29 @@ object Scraps {
     val data = computeIfAbsent(player)
     if (data != null) {
       val known = data.getScrapTier(t)
-      TOME.get().trigger(player as ServerPlayer)
-      if (options.size <= known.size) return options[random.nextInt(options.size)].value.keys.random()
+      val totalOptions: ArrayList<Pair<ResourceLocation, String>> = arrayListOf()
+      var filtered: ArrayList<Pair<ResourceLocation, String>> = arrayListOf()
+      for (resource in options) {
+//        player.sendSystemMessage(Component.literal(resource.toString()))
+        for (index in resource.value.keys.indices) {
+          val key = resource.key.withSuffix("." + resource.value.keys[index].replace(":", "."))
+          totalOptions.add(Pair(key, resource.value.keys[index]))
+          if (!known.containsKey(key.toShortLanguageKey())) {
+//            player.sendSystemMessage(Component.literal(key.toShortLanguageKey()))
+            filtered.add(Pair(key, resource.value.keys[index]))
+          }
+        }
+      }
+//      player.sendSystemMessage(Component.literal(filtered.size.toString()))
+      if (filtered.size <= 0) {
+        data.resetScrapTier(t)
+        filtered = totalOptions
+      }
 
-      var maxAttempts = 40
-      var resource: MutableMap.MutableEntry<ResourceLocation, ScrapResource>
-      var index: Int
-      var key: ResourceLocation
-      do {
-        resource = options.random()
-        index = resource.value.keys.indices.random()
-        key = resource.key.withSuffix("." + resource.value.keys[index].replace(":", "."))
-
-        maxAttempts--
-      } while (maxAttempts > 0 && known.containsKey(key.toShortLanguageKey()))
-      known[key.toShortLanguageKey()] = true
+      val randomKeyPair = filtered.random()
+      known[randomKeyPair.first.toShortLanguageKey()] = true
       data.setDirty()
-      return resource.value.keys[index]
+      return randomKeyPair.second
     }
     return options[Tomes.random.nextInt(options.size)].value.keys.random()
   }

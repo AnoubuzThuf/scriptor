@@ -52,6 +52,10 @@ class PlayerSpellsSavedData: SavedData {
     return scraps[tier]!!
   }
 
+  fun resetScrapTier(tier: Int) {
+    scraps[tier] = HashMap()
+  }
+
   override fun save(tag: CompoundTag, provider: HolderLookup.Provider): CompoundTag {
     CODEC.encodeStart(NbtOps.INSTANCE, this).ifSuccess { tag.put("scriptor:obtained_spells", it) }
     return tag
